@@ -5,6 +5,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 /* ROUTE IMPORTS */
+import routes from "./routes";
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -25,6 +26,8 @@ app.get("/", (req, res) => {
 app.get("/health", (req, res) => {
   res.send("Server is up and running");
 });
+
+app.use("/api", routes);
 
 /* SERVER */
 const port = Number(process.env.PORT) || 3000;
