@@ -1,0 +1,43 @@
+{
+  "name": "pianifica-client",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.13.5",
+    "@emotion/styled": "^11.13.5",
+    "@mui/material": "^6.1.9",
+    "@mui/x-data-grid": "^7.23.0",
+    "axios": "^1.7.8",
+    "date-fns": "^4.1.0",
+    "gantt-task-react": "^0.3.9",
+    "lucide-react": "^0.462.0",
+    "next": "15.0.3",
+    "numeral": "^2.0.6",
+    "react": "19.0.0-rc-66855b96-20241106",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "react-dom": "19.0.0-rc-66855b96-20241106",
+    "recharts": "^2.13.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/numeral": "^2.0.5",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/uuid": "^10.0.0",
+    "eslint": "^8",
+    "eslint-config-next": "15.0.3",
+    "postcss": "^8",
+    "prettier": "^3.4.1",
+    "prettier-plugin-tailwindcss": "^0.6.9",
+    "tailwind-merge": "^2.5.5",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
