@@ -5,5 +5,6 @@ import taskRoutes from "./routes/task-routes";
 const router = Router();
 
 router.use("/project", projectRoutes);
+router.use("/task", taskRoutes);
 
 export default router;
