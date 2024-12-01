@@ -53,6 +53,7 @@ export const updateProject = async (
         description,
         startDate,
         endDate,
+        updatedAt: new Date(),
       },
     });
     res.json(updatedProject);

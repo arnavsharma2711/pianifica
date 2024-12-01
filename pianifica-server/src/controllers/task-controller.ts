@@ -98,6 +98,7 @@ export const updateTask = async (
         projectId,
         authorUserId,
         assignedUserId,
+        updatedAt: new Date(),
       },
     });
     res.json(updatedTask);
@@ -135,6 +136,7 @@ export const updateTaskStatus = async (
       },
       data: {
         status: status,
+        updatedAt: new Date(),
       },
     });
     res.json(updatedTask);
