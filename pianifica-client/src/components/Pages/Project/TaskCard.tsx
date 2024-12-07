@@ -32,7 +32,7 @@ const TaskCard = ({ task }: Props) => {
 
 	return (
 		<div className="mb-3 rounded-lg bg-white p-4 shadow-md dark:bg-dark-secondary dark:text-white">
-			<p
+			<div
 				className={`mb-2 flex flex-row items-center justify-between ${isCollapsed ? "" : "pb-4 border-b-2"} text-xl cursor-pointer`}
 				onClick={() => setIsCollapsed(!isCollapsed)}
 				onKeyUp={(e) => {
@@ -53,7 +53,7 @@ const TaskCard = ({ task }: Props) => {
 				) : (
 					<ChevronUp className="w-5 h-5" />
 				)}
-			</p>
+			</div>
 
 			{!isCollapsed && (
 				<div className="pl-[1px]">
