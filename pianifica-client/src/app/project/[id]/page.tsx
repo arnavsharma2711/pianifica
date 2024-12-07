@@ -3,6 +3,7 @@
 import Board from "@/components/Pages/Project/BoardView";
 import List from "@/components/Pages/Project/ListView";
 import ProjectHeader from "@/components/Pages/Project/ProjectHeader";
+import Timeline from "@/components/Pages/Project/TimelineView";
 import React, { useState, useEffect } from "react";
 
 type Props = {
@@ -32,6 +33,9 @@ const Project = ({ params }: Props) => {
 			)}
 			{activeTab === "List" && (
 				<List id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+			)}
+			{activeTab === "Timeline" && (
+				<Timeline id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
 			)}
 		</div>
 	);
