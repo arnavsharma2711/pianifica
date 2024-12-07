@@ -15,9 +15,10 @@ const Navbar = () => {
 				{isSidebarCollapsed && (
 					<button
 						type="button"
+						className="rounded p-2 dark:hover:bg-gray-700 hover:bg-gray-200"
 						onClick={() => dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))}
 					>
-						<Menu className="h-8 w-8 cursor-pointer dark:text-white" />
+						<Menu className="text-gray-800 dark:text-white" />
 					</button>
 				)}
 				<div className="relative flex h-min w-[200px]">
@@ -43,7 +44,7 @@ const Navbar = () => {
 					)}
 				</button>
 				<Link
-					href="settings"
+					href="/settings"
 					className={`h-min w-min rounded p-2 ${isDarkMode ? "dark:hover:bg-gray-700" : "hover:bg-gray-200"}`}
 				>
 					<Settings className="h-6 w-6 cursor-pointer dark:text-white" />

@@ -14,12 +14,12 @@ import {
 	Layers3,
 	LockIcon,
 	type LucideIcon,
+	Menu,
 	Search,
 	Settings,
 	ShieldAlert,
 	User,
 	Users,
-	X,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -73,20 +73,20 @@ const Sidebar = () => {
 			<div className="flex h-full w-full flex-col justify-start">
 				{/* Pianifica Logo */}
 				<div className="z-50 flex min-h-[56px] w-64 items-center justify-between bg-white px-6 dark:bg-black">
-					<div className="text-xl font-bold text-gray-800 dark:text-white">
-						JOHN DOE
-					</div>
 					{!isSidebarCollapsed && (
 						<button
 							type="button"
-							className="py-3"
+							className="rounded p-3 dark:hover:bg-gray-700 hover:bg-gray-200"
 							onClick={() =>
 								dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))
 							}
 						>
-							<X className="h-6 w-6 text-gray-800 hover:text-gray-500 dark:text-white" />
+							<Menu className="text-gray-800 dark:text-white" />
 						</button>
 					)}
+					<div className="text-xl font-bold text-gray-800 dark:text-white">
+						JOHN DOE
+					</div>
 				</div>
 
 				{/* Teams */}
