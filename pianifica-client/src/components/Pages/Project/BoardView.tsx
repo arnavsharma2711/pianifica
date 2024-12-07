@@ -1,3 +1,4 @@
+import Header from "@/components/Header";
 import type { Task as TaskType } from "@/interface";
 import { useGetTasksQuery, useUpdateTaskStatusMutation } from "@/state/api";
 import { EllipsisVertical, MessageSquareMore, Plus } from "lucide-react";
@@ -256,19 +257,36 @@ const BoardView = ({ id, setIsModalNewTaskOpen }: BoardViewProps) => {
 	if (error) return <div>An error occurred while fetching tasks</div>;
 
 	return (
-		<DndProvider backend={HTML5Backend}>
-			<div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 xl:grid-cols-4">
-				{TASK_STATUS.map((status) => (
-					<TaskColumn
-						key={status}
-						status={status}
-						tasks={tasks || []}
-						moveTask={moveTask}
-						setIsModalNewTaskOpen={setIsModalNewTaskOpen}
-					/>
-				))}
+		<div className="px-4 pb-8 xl:px-6">
+			<div className="pt-5">
+				<Header
+					name="Board"
+					buttonComponent={
+						<button
+							type="button"
+							className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+							onClick={() => setIsModalNewTaskOpen(true)}
+						>
+							Add Task
+						</button>
+					}
+					isSmallText
+				/>
 			</div>
-		</DndProvider>
+			<DndProvider backend={HTML5Backend}>
+				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+					{TASK_STATUS.map((status) => (
+						<TaskColumn
+							key={status}
+							status={status}
+							tasks={tasks || []}
+							moveTask={moveTask}
+							setIsModalNewTaskOpen={setIsModalNewTaskOpen}
+						/>
+					))}
+				</div>
+			</DndProvider>
+		</div>
 	);
 };
 
