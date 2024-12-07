@@ -5,6 +5,7 @@ import List from "@/components/Pages/Project/ListView";
 import ProjectHeader from "@/components/Pages/Project/ProjectHeader";
 import Timeline from "@/components/Pages/Project/TimelineView";
 import React, { useState, useEffect } from "react";
+import TableView from "@/components/Pages/Project/TableView";
 
 type Props = {
 	params: Promise<{ id: string }>;
@@ -36,6 +37,9 @@ const Project = ({ params }: Props) => {
 			)}
 			{activeTab === "Timeline" && (
 				<Timeline id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+			)}
+			{activeTab === "Table" && (
+				<TableView id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
 			)}
 		</div>
 	);
