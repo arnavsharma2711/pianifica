@@ -36,11 +36,17 @@ const ListView = ({ id, setIsModalNewTaskOpen }: ListViewProps) => {
 					isSmallText
 				/>
 			</div>
-			<div className="flex flex-col">
-				{tasks?.map((task: Task) => (
-					<TaskCard key={task.id} task={task} />
-				))}
-			</div>
+			{tasks?.length === 0 ? (
+				<div className="text-center mt-5 dark:text-white">
+					No Task Assigned to the project
+				</div>
+			) : (
+				<div className="flex flex-col">
+					{tasks?.map((task: Task) => (
+						<TaskCard key={task.id} task={task} />
+					))}
+				</div>
+			)}
 		</div>
 	);
 };

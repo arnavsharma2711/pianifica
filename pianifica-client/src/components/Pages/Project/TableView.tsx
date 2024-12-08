@@ -96,7 +96,11 @@ const TableView = ({ id, setIsModalNewTaskOpen }: TableViewProps) => {
 					}
 					isSmallText
 				/>
-				<Table tasks={tasks} onEdit={() => {}} />
+				{tasks?.length === 0 ? (
+				<div className="text-center mt-5 dark:text-white">No Task Assigned to the project</div>
+				) : (
+					<Table tasks={tasks} onEdit={() => {}} />
+				)}
 			</div>
 		</div>
 	);
