@@ -31,7 +31,7 @@ const TaskCard = ({ task }: Props) => {
 	const [isCollapsed, setIsCollapsed] = useState(true);
 
 	return (
-		<div className="mb-3 rounded-lg bg-white p-4 shadow-md dark:bg-dark-secondary dark:text-white">
+		<div className="mb-3 rounded-lg bg-white p-4 shadow-md dark:bg-dark-secondary">
 			<div
 				className={`mb-2 flex flex-row items-center justify-between ${isCollapsed ? "" : "pb-4 border-b-2"} text-xl cursor-pointer`}
 				onClick={() => setIsCollapsed(!isCollapsed)}
@@ -43,7 +43,7 @@ const TaskCard = ({ task }: Props) => {
 			>
 				<div className="flex flex-row items-center justify-center gap-2">
 					<p>
-						<strong>Title:</strong> {task.title}
+						<strong>{task.title}</strong>
 					</p>
 					<StatusTag status={task.status || ""} />
 				</div>

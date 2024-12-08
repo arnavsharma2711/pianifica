@@ -16,7 +16,7 @@ const InputField = ({
 	placeholder,
 }: InputFieldProps) => (
 	<div className="w-full">
-		<label htmlFor={label} className="w-full block font-medium dark:text-white">
+		<label htmlFor={label} className="w-full block font-medium">
 			{label}
 		</label>
 
@@ -24,7 +24,7 @@ const InputField = ({
 			<input
 				type="text"
 				className={
-					"w-full rounded border border-gray-300 p-2 mt-1 shadow-sm dark:border-dark-tertiary dark:bg-dark-tertiary dark:text-white dark:focus:outline-none"
+					"w-full rounded border border-gray-300 p-2 mt-1 shadow-sm dark:border-dark-tertiary dark:bg-dark-tertiary dark:focus:outline-none"
 				}
 				placeholder={placeholder || label}
 				value={value}
@@ -35,7 +35,7 @@ const InputField = ({
 			<input
 				type="date"
 				className={
-					"w-full rounded border border-gray-300 p-2 mt-1 shadow-sm dark:border-dark-tertiary dark:bg-dark-tertiary dark:text-white dark:focus:outline-none"
+					"w-full rounded border border-gray-300 p-2 mt-1 shadow-sm dark:border-dark-tertiary dark:bg-dark-tertiary dark:focus:outline-none"
 				}
 				value={value}
 				onChange={onChange}
@@ -44,7 +44,7 @@ const InputField = ({
 		{type === "textarea" && (
 			<textarea
 				className={
-					"w-full rounded border border-gray-300 p-2 mt-1 shadow-sm dark:border-dark-tertiary dark:bg-dark-tertiary dark:text-white dark:focus:outline-none"
+					"w-full rounded border border-gray-300 p-2 mt-1 shadow-sm dark:border-dark-tertiary dark:bg-dark-tertiary dark:focus:outline-none"
 				}
 				placeholder={placeholder || label}
 				value={value}

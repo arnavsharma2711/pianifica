@@ -1,4 +1,5 @@
 import { useAppSelector } from "@/app/redux";
+import Header from "@/components/Header";
 import { useGetTasksQuery } from "@/state/api";
 import { type DisplayOption, Gantt, ViewMode } from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
@@ -54,40 +55,39 @@ const Timeline = ({ id, setIsModalNewTaskOpen }: Props) => {
 	return (
 		<div className="px-4 xl:px-6">
 			<div className="flex flex-wrap items-center justify-between gap-2 py-5">
-				<h1 className="me-2 text-lg font-bold dark:text-white">
-					Project Tasks Timeline
-				</h1>
-				{ganttTasks.length !== 0 ? (
-					<div className="relative inline-block w-64">
-						<select
-							className="focus:shadow-outline block w-full appearance-none rounded border border-gray-400 bg-white px-4 py-2 pr-8 leading-tight shadow hover:border-gray-500 focus:outline-none dark:border-dark-secondary dark:bg-dark-secondary dark:text-white"
-							value={displayOptions.viewMode}
-							onChange={handleViewModeChange}
-						>
-							<option value={ViewMode.Day}>Day</option>
-							<option value={ViewMode.Week}>Week</option>
-							<option value={ViewMode.Month}>Month</option>
-						</select>
-					</div>
-				) : (
-					<div className="px-4 pb-5 pt-1">
-						<button
-							type="button"
-							className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
-							onClick={() => setIsModalNewTaskOpen(true)}
-						>
-							Add New Task
-						</button>
-					</div>
-				)}
+				<Header
+					name="Project Tasks Timeline"
+					buttonComponent={
+						ganttTasks.length === 0 ? (
+							<button
+								type="button"
+								className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+								onClick={() => setIsModalNewTaskOpen(true)}
+							>
+								Add Task
+							</button>
+						) : (
+							<div className="relative inline-block w-64">
+								<select
+									className="focus:shadow-outline block w-full appearance-none rounded border border-gray-400 bg-white px-4 py-2 pr-8 leading-tight shadow hover:border-gray-500 focus:outline-none dark:border-dark-secondary dark:bg-dark-secondary"
+									value={displayOptions.viewMode}
+									onChange={handleViewModeChange}
+								>
+									<option value={ViewMode.Day}>Day</option>
+									<option value={ViewMode.Week}>Week</option>
+									<option value={ViewMode.Month}>Month</option>
+								</select>
+							</div>
+						)
+					}
+					isSmallText
+				/>
 			</div>
 			{ganttTasks.length === 0 ? (
-				<div className="text-center mt-5 dark:text-white">
-					No Task Assigned to the project
-				</div>
+				<div className="text-center mt-5">No Task Assigned to the project</div>
 			) : (
 				<>
-					<div className="overflow-hidden rounded-md bg-white shadow dark:bg-dark-secondary dark:text-white">
+					<div className="overflow-hidden rounded-md bg-white shadow dark:bg-dark-secondary">
 						<div className="timeline">
 							<Gantt
 								tasks={ganttTasks}

@@ -31,7 +31,9 @@ const TabButton = ({
 		<button
 			type="button"
 			className={`${
-				isActive ? "text-blue-600 after:bg-blue-600 dark:text-white" : ""
+				isActive
+					? "text-blue-600 after:bg-blue-600 dark:text-white font-bold"
+					: ""
 			} relative flex items-center gap-2 px-1 py-2 text-gray-500 after:absolute after:-bottom-[9px] after:left-0 after:h-[1px] after:w-full hover:text-blue-600 dark:text-neutral-500 dark:hover:text-white sm:px-2 lg:px-4`}
 			onClick={() => setActiveTab(tabName)}
 		>
@@ -112,7 +114,7 @@ const ProjectHeader = ({ activeTab, setActiveTab }: Props) => {
 					<div className="relative">
 						<input
 							type="text"
-							className="rounded-md border py-1 pl-8 pr-4 focus:outline-none dark:outline-none dark:border-dark-secondary dark:bg-dark-secondary dark:text-white"
+							className="rounded-md border py-1 pl-8 pr-4 focus:outline-none dark:outline-none dark:border-dark-secondary dark:bg-dark-secondary"
 							placeholder="Search Task"
 						/>
 						<Grid3X3 className="h-4 w-4 absolute left-3 top-2 text-gray-400 dark:text-neutral-500" />

@@ -51,13 +51,11 @@ const Timeline = () => {
 			<header className="mb-4 flex items-center justify-between">
 				<Header name="Projects Timeline" />
 				{ganttTasks.length === 0 ? (
-					<div className="text-center mt-5 dark:text-white">
-						No Projects to display
-					</div>
+					<div className="text-center mt-5">No Projects to display</div>
 				) : (
 					<div className="relative inline-block w-64">
 						<select
-							className="focus:shadow-outline block w-full appearance-none rounded border border-gray-400 bg-white px-4 py-2 pr-8 leading-tight shadow hover:border-gray-500 focus:outline-none dark:border-dark-secondary dark:bg-dark-secondary dark:text-white"
+							className="focus:shadow-outline block w-full appearance-none rounded border border-gray-400 bg-white px-4 py-2 pr-8 leading-tight shadow hover:border-gray-500 focus:outline-none dark:border-dark-secondary dark:bg-dark-secondary"
 							value={displayOptions.viewMode}
 							onChange={handleViewModeChange}
 						>
@@ -69,7 +67,7 @@ const Timeline = () => {
 				)}
 			</header>
 			{ganttTasks.length !== 0 && (
-				<div className="overflow-hidden rounded-md bg-white shadow dark:bg-dark-secondary dark:text-white">
+				<div className="overflow-hidden rounded-md bg-white shadow dark:bg-dark-secondary">
 					<div className="timeline">
 						<Gantt
 							tasks={ganttTasks}

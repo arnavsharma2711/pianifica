@@ -10,8 +10,8 @@ interface TaskTableProps {
 const Table = ({ tasks, onEdit }: TaskTableProps) => {
 	return (
 		<div className="relative border-2 overflow-x-auto shadow-md sm:rounded-lg">
-			<table className="w-full text-sm text-left  rtl:text-right dark:text-white">
-				<thead className="text-xs uppercase border-b bg-gray-100 dark:bg-dark-secondary dark:text-white">
+			<table className="w-full text-sm text-left rtl:text-right">
+				<thead className="text-xs uppercase border-b bg-gray-100 dark:bg-dark-secondary">
 					<tr>
 						<th className="px-6 py-3 border-r">ID</th>
 						<th className="px-6 py-3 border-r">Title</th>
@@ -97,7 +97,9 @@ const TableView = ({ id, setIsModalNewTaskOpen }: TableViewProps) => {
 					isSmallText
 				/>
 				{tasks?.length === 0 ? (
-				<div className="text-center mt-5 dark:text-white">No Task Assigned to the project</div>
+					<div className="text-center mt-5">
+						No Task Assigned to the project
+					</div>
 				) : (
 					<Table tasks={tasks} onEdit={() => {}} />
 				)}

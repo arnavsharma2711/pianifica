@@ -53,7 +53,7 @@ const TaskColumn = ({
 			<div className="mb-3 flex w-full">
 				<div className={`w-2 ${TASK_STATUS_COLOR[status]} rounded-s-lg`} />
 				<div className="flex w-full items-center justify-between rounded-e-lg bg-white px-5 py-4 dark:bg-dark-secondary">
-					<h3 className="flex items-center text-lg font-semibold dark:text-white">
+					<h3 className="flex items-center text-lg font-semibold">
 						{status}{" "}
 						<span
 							className="ml-2 inline-block rounded-full bg-gray-200 p-1 text-center text-sm leading-none dark:bg-dark-tertiary"
@@ -71,7 +71,7 @@ const TaskColumn = ({
 						</button>
 						<button
 							type="button"
-							className="flex h-6 w-6 items-center justify-center rounded bg-gray-200 dark:bg-dark-tertiary dark:text-white"
+							className="flex h-6 w-6 items-center justify-center rounded bg-gray-200 dark:bg-dark-tertiary"
 							onClick={() => setIsModalNewTaskOpen(true)}
 						>
 							<Plus size={16} />
@@ -175,11 +175,9 @@ const Task = ({ task }: TaskProps) => {
 				</div>
 
 				<div className="my-3 flex justify-between">
-					<h4 className="text-md font-bold dark:text-white">{task.title}</h4>
+					<h4 className="text-md font-bold">{task.title}</h4>
 					{typeof task.points === "number" && (
-						<div className="text-xs font-semibold dark:text-white">
-							{task.points} pts
-						</div>
+						<div className="text-xs font-semibold">{task.points} pts</div>
 					)}
 				</div>
 
