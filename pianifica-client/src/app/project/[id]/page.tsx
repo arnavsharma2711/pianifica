@@ -6,6 +6,7 @@ import ProjectHeader from "@/components/Pages/Project/ProjectHeader";
 import Timeline from "@/components/Pages/Project/TimelineView";
 import React, { useState, useEffect } from "react";
 import TableView from "@/components/Pages/Project/TableView";
+import NewTaskModal from "@/components/Modal/NewTaskModal";
 
 type Props = {
 	params: Promise<{ id: string }>;
@@ -28,6 +29,11 @@ const Project = ({ params }: Props) => {
 
 	return (
 		<div>
+			<NewTaskModal
+				isOpen={isModalNewTaskOpen}
+				onClose={() => setIsModalNewTaskOpen(false)}
+				id={id}
+			/>
 			<ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} />
 			{activeTab === "Board" && (
 				<Board id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
