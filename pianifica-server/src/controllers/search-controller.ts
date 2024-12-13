@@ -36,9 +36,12 @@ export const search = async (req: Request, res: Response): Promise<void> => {
     });
 
     res.json({ task, projects, users });
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: `Error retrieving projects: ${error.message}` });
+  } catch (error) {
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: `Error retrieving projects: ${error.message}` });
+    }
+    res.status(500).json({ message: "An unknown error occurred" });
   }
 };

@@ -17,10 +17,13 @@ export const getTasks = async (req: Request, res: Response): Promise<void> => {
       },
     });
     res.json(tasks);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: `Error retrieving tasks: ${error.message}` });
+  } catch (error) {
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: `Error retrieving tasks: ${error.message}` });
+    }
+    res.status(500).json({ message: "An unknown error occurred" });
   }
 };
 
@@ -58,10 +61,13 @@ export const createTask = async (
       },
     });
     res.status(201).json(newTask);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: `Error creating a task: ${error.message}` });
+  } catch (error) {
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: `Error creating a task: ${error.message}` });
+    }
+    res.status(500).json({ message: "An unknown error occurred" });
   }
 };
 
@@ -102,8 +108,13 @@ export const updateTask = async (
       },
     });
     res.json(updatedTask);
-  } catch (error: any) {
-    res.status(500).json({ message: `Error updating task: ${error.message}` });
+  } catch (error) {
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: `Error updating task: ${error.message}` });
+    }
+    res.status(500).json({ message: "An unknown error occurred" });
   }
 };
 
@@ -118,8 +129,13 @@ export const deleteTask = async (
       data: { deletedAt: new Date() },
     });
     res.json(deletedTask);
-  } catch (error: any) {
-    res.status(500).json({ message: `Error deleting task: ${error.message}` });
+  } catch (error) {
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: `Error deleting task: ${error.message}` });
+    }
+    res.status(500).json({ message: "An unknown error occurred" });
   }
 };
 
@@ -140,7 +156,12 @@ export const updateTaskStatus = async (
       },
     });
     res.json(updatedTask);
-  } catch (error: any) {
-    res.status(500).json({ message: `Error updating task: ${error.message}` });
+  } catch (error) {
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: `Error updating task: ${error.message}` });
+    }
+    res.status(500).json({ message: "An unknown error occurred" });
   }
 };

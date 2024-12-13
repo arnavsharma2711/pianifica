@@ -10,10 +10,13 @@ export const getProjects = async (
       where: { deletedAt: null },
     });
     res.json(projects);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: `Error retrieving projects: ${error.message}` });
+  } catch (error) {
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: `Error retrieving projects: ${error.message}` });
+    }
+    res.status(500).json({ message: "An unknown error occurred" });
   }
 };
 
@@ -32,10 +35,13 @@ export const createProject = async (
       },
     });
     res.status(201).json(newProject);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: `Error creating a project: ${error.message}` });
+  } catch (error) {
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: `Error creating a project: ${error.message}` });
+    }
+    res.status(500).json({ message: "An unknown error occurred" });
   }
 };
 
@@ -57,10 +63,13 @@ export const updateProject = async (
       },
     });
     res.json(updatedProject);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: `Error updating project: ${error.message}` });
+  } catch (error) {
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: `Error updating project: ${error.message}` });
+    }
+    res.status(500).json({ message: "An unknown error occurred" });
   }
 };
 
@@ -75,9 +84,12 @@ export const deleteProject = async (
       data: { deletedAt: new Date() },
     });
     res.json(deletedProject);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: `Error deleting project: ${error.message}` });
+  } catch (error) {
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: `Error deleting project: ${error.message}` });
+    }
+    res.status(500).json({ message: "An unknown error occurred" });
   }
 };
