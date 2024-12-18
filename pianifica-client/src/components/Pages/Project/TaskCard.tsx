@@ -1,5 +1,6 @@
 "use client";
 
+import { Status } from "@/enum";
 import type { Task } from "@/interface";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
@@ -9,18 +10,22 @@ type Props = {
 	task: Task;
 };
 
-const StatusTag = ({ status }: { status: string }) => (
+const StatusTag = ({ status }: { status: Status }) => (
 	<div
 		className={`rounded-full px-2 py-1 text-xs font-semibold ${
-			status === "To Do"
+			status === Status.TODO
 				? "bg-red-200 text-red-700"
-				: status === "Work In Progress"
+				: status === Status.IN_PROGRESS
 					? "bg-yellow-200 text-yellow-700"
-					: status === "Under Review"
+					: status === Status.UNDER_REVIEW
 						? "bg-blue-200 text-blue-700"
-						: status === "Completed"
-							? "bg-green-200 text-green-700"
-							: "bg-gray-200 text-gray-700"
+						: status === Status.RELEASE_READY
+							? "bg-purple-200 text-purple-700"
+							: status === Status.COMPLETED
+								? "bg-green-200 text-green-700"
+								: status === Status.BLOCKED
+									? "bg-gray-200 text-gray-700"
+									: "bg-gray-200 text-gray-700"
 		}`}
 	>
 		{status}
@@ -45,7 +50,7 @@ const TaskCard = ({ task }: Props) => {
 					<p>
 						<strong>{task.title}</strong>
 					</p>
-					<StatusTag status={task.status || ""} />
+					{task.status && <StatusTag status={task.status} />}
 				</div>
 
 				{isCollapsed ? (
@@ -82,11 +87,15 @@ const TaskCard = ({ task }: Props) => {
 					</p>
 					<p className="mb-2">
 						<strong>Author:</strong>{" "}
-						{task.author ? task.author.username : "Unknown"}
+						{task.author
+							? `${task.author.firstName} ${task.author.lastName}`
+							: "System Added"}
 					</p>
 					<p className="mb-2">
 						<strong>Assignee:</strong>{" "}
-						{task.assignee ? task.assignee.username : "Unassigned"}
+						{task.assignee
+							? `${task.assignee.firstName} ${task.assignee.lastName}`
+							: "Unassigned"}
 					</p>
 					{task.attachments && task.attachments.length > 0 && (
 						<div className="mb-4">
@@ -95,7 +104,7 @@ const TaskCard = ({ task }: Props) => {
 								{task.attachments.map((attachment) => (
 									<Image
 										key={attachment.fileURL}
-										src={`/${attachment.fileURL}`}
+										src={attachment.fileURL || ""}
 										alt={attachment.fileName}
 										width={400}
 										height={200}

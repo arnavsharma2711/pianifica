@@ -1,12 +1,12 @@
 import type { Priority, Status } from "@/enum";
 
 export interface User {
-  userId?: number;
+  id?: number;
   username: string;
+  firstName: string;
+  lastName: string;
   email: string;
   profilePictureUrl?: string;
-  cognitoId?: string;
-  teamId?: number;
 }
 
 export interface Attachment {
@@ -42,4 +42,10 @@ export interface Task {
   assignee?: User;
   comments?: Comment[];
   attachments?: Attachment[];
+}
+
+export interface Search {
+  tasks?: Task[];
+  projects?: Project[];
+  users?: User[];
 }

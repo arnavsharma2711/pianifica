@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import { Priority, Status } from "@/enum";
 import type { Task as TaskType } from "@/interface";
 import { useGetTasksQuery, useUpdateTaskStatusMutation } from "@/state/api";
 import { EllipsisVertical, MessageSquareMore, Plus } from "lucide-react";
@@ -14,7 +15,7 @@ import {
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 type TaskColumnProps = {
-	status: string;
+	status: Status;
 	tasks: TaskType[];
 	moveTask: (taskId: number, status: string) => void;
 	setIsModalNewTaskOpen: (isOpen: boolean) => void;
@@ -36,11 +37,13 @@ const TaskColumn = ({
 
 	const taskCount = tasks.filter((task) => task.status === status).length;
 
-	const TASK_STATUS_COLOR: { [key in (typeof TASK_STATUS)[number]]: string } = {
-		"To Do": "bg-red-500",
-		"Work In Progress": "bg-yellow-500",
-		"Under Review": "bg-blue-500",
-		Completed: "bg-green-500",
+	const TASK_STATUS_COLOR: { [key in Status]: string } = {
+		[Status.BLOCKED]: "bg-gray-500",
+		[Status.TODO]: "bg-red-500",
+		[Status.IN_PROGRESS]: "bg-yellow-500",
+		[Status.UNDER_REVIEW]: "bg-blue-500",
+		[Status.RELEASE_READY]: "bg-purple-500",
+		[Status.COMPLETED]: "bg-green-500",
 	};
 
 	return (
@@ -48,7 +51,7 @@ const TaskColumn = ({
 			ref={(instance) => {
 				dropRef(instance);
 			}}
-			className={`sl:py-4 rounded-lg py-2 xl:px-2 ${isOver ? "bg-blue-100 dark:bg-neutral-950" : ""}`}
+			className={`sl:py-4 rounded-lg py-2 xl:px-2 bg-blue-100 dark:bg-neutral-900 ${isOver ? "bg-blue-200 dark:bg-neutral-950" : ""}`}
 		>
 			<div className="mb-3 flex w-full">
 				<div className={`w-2 ${TASK_STATUS_COLOR[status]} rounded-s-lg`} />
@@ -114,18 +117,20 @@ const Task = ({ task }: TaskProps) => {
 
 	const commentCount = task.comments ? task.comments.length : 0;
 
-	const PriorityTag = ({ priority }: { priority: TaskType["priority"] }) => (
+	const PriorityTag = ({ priority }: { priority: Priority }) => (
 		<div
 			className={`rounded-full px-2 py-1 text-xs font-semibold ${
-				priority === "Urgent"
+				priority === Priority.URGENT
 					? "bg-red-200 text-red-700"
-					: priority === "High"
+					: priority === Priority.HIGH
 						? "bg-yellow-200 text-yellow-700"
-						: priority === "Medium"
+						: priority === Priority.MEDIUM
 							? "bg-green-200 text-green-700"
-							: priority === "Low"
+							: priority === Priority.LOW
 								? "bg-blue-200 text-blue-700"
-								: "bg-gray-200 text-gray-700"
+								: priority === Priority.BACKLOG
+									? "bg-gray-200 text-gray-700"
+									: "bg-gray-200 text-gray-700"
 			}`}
 		>
 			{priority}
@@ -143,7 +148,7 @@ const Task = ({ task }: TaskProps) => {
 		>
 			{task.attachments && task.attachments.length > 0 && (
 				<Image
-					src={`/${task.attachments[0].fileURL}`}
+					src={task.attachments[0].fileURL}
 					alt={task.attachments[0].fileName}
 					width={400}
 					height={200}
@@ -195,18 +200,18 @@ const Task = ({ task }: TaskProps) => {
 					<div className="flex -space-x-[6px] overflow-hidden">
 						{task.assignee && (
 							<Image
-								key={task.assignee.userId}
-								src={`/${task.assignee?.profilePictureUrl}`}
+								key={task.assignee.id}
+								src={task.assignee?.profilePictureUrl || ""}
 								alt={task.assignee.username}
 								width={30}
 								height={30}
 								className="h-8 w-8 rounded-full border-2 border-white object-cover dark:border-dark-secondary"
 							/>
 						)}
-						{task.author && (
+						{task.author && task.assignee?.id !== task.author?.id && (
 							<Image
-								key={task.author.userId}
-								src={`/${task.author.profilePictureUrl ?? ""}`}
+								key={task.author.id}
+								src={task.author.profilePictureUrl || ""}
 								alt={task.author.username}
 								width={30}
 								height={30}
@@ -231,11 +236,13 @@ type BoardViewProps = {
 	setIsModalNewTaskOpen: (isOpen: boolean) => void;
 };
 
-const TASK_STATUS: string[] = [
-	"To Do",
-	"Work In Progress",
-	"Under Review",
-	"Completed",
+const TASK_STATUS: Status[] = [
+	Status.BLOCKED,
+	Status.TODO,
+	Status.IN_PROGRESS,
+	Status.UNDER_REVIEW,
+	Status.RELEASE_READY,
+	Status.COMPLETED,
 ];
 
 const BoardView = ({ id, setIsModalNewTaskOpen }: BoardViewProps) => {
@@ -272,16 +279,18 @@ const BoardView = ({ id, setIsModalNewTaskOpen }: BoardViewProps) => {
 				/>
 			</div>
 			<DndProvider backend={HTML5Backend}>
-				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-					{TASK_STATUS.map((status) => (
-						<TaskColumn
-							key={status}
-							status={status}
-							tasks={tasks || []}
-							moveTask={moveTask}
-							setIsModalNewTaskOpen={setIsModalNewTaskOpen}
-						/>
-					))}
+				<div className="overflow-x-auto">
+					<div className="grid grid-cols-6 gap-4 min-w-max">
+						{TASK_STATUS.map((status) => (
+							<TaskColumn
+								key={status}
+								status={status}
+								tasks={tasks || []}
+								moveTask={moveTask}
+								setIsModalNewTaskOpen={setIsModalNewTaskOpen}
+							/>
+						))}
+					</div>
 				</div>
 			</DndProvider>
 		</div>

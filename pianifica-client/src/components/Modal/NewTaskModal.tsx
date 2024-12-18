@@ -15,8 +15,8 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
 	const [createTask, { isLoading }] = useCreateTaskMutation();
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
-	const [status, setStatus] = useState<Status>(Status.ToDo);
-	const [priority, setPriority] = useState<Priority>(Priority.Backlog);
+	const [status, setStatus] = useState<Status>(Status.TODO);
+	const [priority, setPriority] = useState<Priority>(Priority.BACKLOG);
 	const [tags, setTags] = useState("");
 	const [startDate, setStartDate] = useState("");
 	const [dueDate, setDueDate] = useState("");
@@ -46,7 +46,7 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
 			assignedUserId: Number.parseInt(assignedUserId),
 			projectId: Number(projectId),
 		});
-		
+
 		onClose();
 	};
 
@@ -93,10 +93,12 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
 							setStatus(Status[e.target.value as keyof typeof Status])
 						}
 					>
-						<option value={Status.ToDo}>To Do</option>
-						<option value={Status.WorkInProgress}>Work In Progress</option>
-						<option value={Status.UnderReview}>Under Review</option>
-						<option value={Status.Completed}>Completed</option>
+						<option value={Status.BLOCKED}>Blocked</option>
+						<option value={Status.TODO}>To Do</option>
+						<option value={Status.IN_PROGRESS}>In Progress</option>
+						<option value={Status.UNDER_REVIEW}>Under Review</option>
+						<option value={Status.RELEASE_READY}>Release Ready</option>
+						<option value={Status.COMPLETED}>Completed</option>
 					</select>
 					<select
 						className={selectStyles}
@@ -105,11 +107,11 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
 							setPriority(Priority[e.target.value as keyof typeof Priority])
 						}
 					>
-						<option value={Priority.Urgent}>Urgent</option>
-						<option value={Priority.High}>High</option>
-						<option value={Priority.Medium}>Medium</option>
-						<option value={Priority.Low}>Low</option>
-						<option value={Priority.Backlog}>Backlog</option>
+						<option value={Priority.BACKLOG}>Backlog</option>
+						<option value={Priority.LOW}>Low</option>
+						<option value={Priority.MEDIUM}>Medium</option>
+						<option value={Priority.HIGH}>High</option>
+						<option value={Priority.URGENT}>Urgent</option>
 					</select>
 				</div>
 				<InputField

@@ -1,14 +1,16 @@
 export enum Priority {
-  Urgent = "Urgent",
-  High = "High",
-  Medium = "Medium",
-  Low = "Low",
-  Backlog = "Backlog",
+  BACKLOG = "BACKLOG",
+  LOW = "LOW",
+  MEDIUM = "MEDIUM",
+  HIGH = "HIGH",
+  URGENT = "URGENT",
 }
 
 export enum Status {
-  ToDo = "To Do",
-  WorkInProgress = "Work In Progress",
-  UnderReview = "Under Review",
-  Completed = "Completed",
+  BLOCKED = "BLOCKED",
+  TODO = "TODO",
+  IN_PROGRESS = "IN_PROGRESS",
+  UNDER_REVIEW = "UNDER_REVIEW",
+  RELEASE_READY = "RELEASE_READY",
+  COMPLETED = "COMPLETED",
 }
