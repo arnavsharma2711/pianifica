@@ -41,8 +41,8 @@ export const createTask = async (
     dueDate,
     points,
     projectId,
-    authorUserId,
-    assignedUserId,
+    authorId,
+    assigneeId,
   } = req.body;
   try {
     const newTask = await prisma.task.create({
@@ -56,8 +56,8 @@ export const createTask = async (
         dueDate,
         points,
         projectId,
-        authorUserId,
-        assignedUserId,
+        authorId,
+        assigneeId,
       },
     });
     res.status(201).json(newTask);
@@ -86,8 +86,8 @@ export const updateTask = async (
     dueDate,
     points,
     projectId,
-    authorUserId,
-    assignedUserId,
+    authorId,
+    assigneeId,
   } = req.body;
   try {
     const updatedTask = await prisma.task.update({
@@ -102,8 +102,8 @@ export const updateTask = async (
         dueDate,
         points,
         projectId,
-        authorUserId,
-        assignedUserId,
+        authorId,
+        assigneeId,
         updatedAt: new Date(),
       },
     });
