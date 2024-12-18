@@ -103,8 +103,8 @@ const TaskCard = ({ task }: Props) => {
 							<div className="flex flex-wrap gap-2">
 								{task.attachments.map((attachment) => (
 									<Image
-										key={attachment.fileURL}
-										src={attachment.fileURL || ""}
+										key={attachment.fileName}
+										src={attachment.fileUrl || "/default-attachment.webp"}
 										alt={attachment.fileName}
 										width={400}
 										height={200}

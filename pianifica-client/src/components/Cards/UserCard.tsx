@@ -10,7 +10,7 @@ const UserCard = ({ user }: Props) => {
 		<div className="flex items-center rounded border p-4 shadow">
 			{user.profilePictureUrl && (
 				<Image
-					src={user.profilePictureUrl}
+					src={user.profilePictureUrl || "/default-profile-picture.webp"}
 					alt="profile picture"
 					width={32}
 					height={32}

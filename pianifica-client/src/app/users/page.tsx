@@ -1,7 +1,6 @@
 "use client";
 import { useGetUsersQuery } from "@/state/api";
 import React from "react";
-import { useAppSelector } from "../redux";
 import Header from "@/components/Header";
 import Image from "next/image";
 import { EllipsisVertical } from "lucide-react";
@@ -43,7 +42,10 @@ const Users = () => {
 								<td className="px-6 py-4 whitespace-nowrap flex flex-row items-center gap-2">
 									<div className="h-9 w-9">
 										<Image
-											src={user.profilePictureUrl || ""}
+											src={
+												user.profilePictureUrl ||
+												"/default-profile-picture.webp"
+											}
 											alt={user.username}
 											width={100}
 											height={50}

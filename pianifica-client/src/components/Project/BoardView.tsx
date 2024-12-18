@@ -148,7 +148,7 @@ const Task = ({ task }: TaskProps) => {
 		>
 			{task.attachments && task.attachments.length > 0 && (
 				<Image
-					src={task.attachments[0].fileURL}
+					src={task.attachments[0].fileUrl || "/default-attachment.webp"}
 					alt={task.attachments[0].fileName}
 					width={400}
 					height={200}
@@ -201,7 +201,10 @@ const Task = ({ task }: TaskProps) => {
 						{task.assignee && (
 							<Image
 								key={task.assignee.id}
-								src={task.assignee?.profilePictureUrl || ""}
+								src={
+									task.assignee.profilePictureUrl ||
+									"/default-profile-picture.webp"
+								}
 								alt={task.assignee.username}
 								width={30}
 								height={30}
@@ -211,7 +214,10 @@ const Task = ({ task }: TaskProps) => {
 						{task.author && task.assignee?.id !== task.author?.id && (
 							<Image
 								key={task.author.id}
-								src={task.author.profilePictureUrl || ""}
+								src={
+									task.author.profilePictureUrl ||
+									"/default-profile-picture.webp"
+								}
 								alt={task.author.username}
 								width={30}
 								height={30}
