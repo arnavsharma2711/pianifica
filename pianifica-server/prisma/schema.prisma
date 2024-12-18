@@ -15,102 +15,139 @@ datasource db {
 }
 
 model User {
-  userId            Int       @id @default(autoincrement())
-  cognitoId         String    @unique
+  id                Int       @id @default(autoincrement())
+  organizationId    Int
+  firstName         String
+  lastName          String
   username          String    @unique
+  email             String    @unique
+  password          String
   profilePictureUrl String?
-  teamId            Int?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @default(now())
   deletedAt         DateTime?
 
-  authoredTasks   Task[]           @relation("TaskAuthor")
-  assignedTasks   Task[]           @relation("TaskAssignee")
-  taskAssignments TaskAssignment[]
-  attachments     Attachment[]
-  comments        Comment[]
-  team            Team?            @relation(fields: [teamId], references: [id])
+  authoredTasks Task[]       @relation("TaskAuthor")
+  assignedTasks Task[]       @relation("TaskAssignee")
+  attachments   Attachment[]
+  comments      Comment[]
+  userRoles     UserRole[]
+  organization  Organization @relation(fields: [organizationId], references: [id])
+}
+
+model UserRole {
+  userId    Int
+  roleId    Int
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
+
+  @@id([userId, roleId])
+}
+
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+
+  userRoles UserRole[]
 }
 
 model Team {
-  id                   Int       @id @default(autoincrement())
-  teamName             String
-  productOwnerUserId   Int?
-  projectManagerUserId Int?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @default(now())
-  deletedAt            DateTime?
-
-  projectTeams ProjectTeam[]
-  user         User[]
-}
-
-model Project {
-  id          Int       @id @default(autoincrement())
-  name        String
-  description String?
-  startDate   DateTime?
-  endDate     DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now())
-  deletedAt   DateTime?
-
-  tasks        Task[]
-  projectTeams ProjectTeam[]
-}
-
-model ProjectTeam {
   id        Int       @id @default(autoincrement())
-  teamId    Int
-  projectId Int
+  name      String
+  leadId    Int?
+  managerId Int?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now())
   deletedAt DateTime?
+
+  projectTeams ProjectTeam[]
+}
+
+model Organization {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  users    User[]
+  projects Project[]
+}
+
+model Project {
+  id             Int       @id @default(autoincrement())
+  organizationId Int
+  name           String
+  description    String?
+  startDate      DateTime?
+  endDate        DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now())
+  deletedAt      DateTime?
+
+  tasks        Task[]
+  projectTeams ProjectTeam[]
+  organization Organization  @relation(fields: [organizationId], references: [id])
+}
+
+model ProjectTeam {
+  id        Int      @id @default(autoincrement())
+  teamId    Int
+  projectId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 
   team    Team    @relation(fields: [teamId], references: [id])
   project Project @relation(fields: [projectId], references: [id])
 }
 
-model Task {
-  id             Int       @id @default(autoincrement())
-  title          String
-  description    String?
-  status         String?
-  priority       String?
-  tags           String?
-  startDate      DateTime?
-  dueDate        DateTime?
-  points         Int?
-  projectId      Int
-  authorUserId   Int
-  assignedUserId Int?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @default(now())
-  deletedAt      DateTime?
-
-  project         Project          @relation(fields: [projectId], references: [id])
-  author          User             @relation("TaskAuthor", fields: [authorUserId], references: [userId])
-  assignee        User?            @relation("TaskAssignee", fields: [assignedUserId], references: [userId])
-  taskAssignments TaskAssignment[]
-  attachments     Attachment[]
-  comments        Comment[]
+enum Status {
+  BLOCKED
+  TODO
+  IN_PROGRESS
+  UNDER_REVIEW
+  RELEASE_READY
+  COMPLETED
 }
 
-model TaskAssignment {
-  id        Int       @id @default(autoincrement())
-  userId    Int
-  taskId    Int
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
-  deletedAt DateTime?
+enum Priority {
+  BACKLOG
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
 
-  user User @relation(fields: [userId], references: [userId])
-  task Task @relation(fields: [taskId], references: [id])
+model Task {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  status      Status?
+  priority    Priority?
+  tags        String?
+  startDate   DateTime?
+  dueDate     DateTime?
+  points      Int?
+  projectId   Int
+  authorId    Int
+  assigneeId  Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  deletedAt   DateTime?
+
+  project     Project      @relation(fields: [projectId], references: [id])
+  author      User         @relation("TaskAuthor", fields: [authorId], references: [id])
+  assignee    User?        @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  attachments Attachment[]
+  comments    Comment[]
 }
 
 model Attachment {
   id           Int       @id @default(autoincrement())
-  fileURL      String
+  fileUrl      String
   fileName     String?
   taskId       Int
   uploadedById Int
@@ -119,7 +156,7 @@ model Attachment {
   deletedAt    DateTime?
 
   task       Task @relation(fields: [taskId], references: [id])
-  uploadedBy User @relation(fields: [uploadedById], references: [userId])
+  uploadedBy User @relation(fields: [uploadedById], references: [id])
 }
 
 model Comment {
@@ -132,5 +169,5 @@ model Comment {
   deletedAt DateTime?
 
   task Task @relation(fields: [taskId], references: [id])
-  user User @relation(fields: [userId], references: [userId])
+  user User @relation(fields: [userId], references: [id])
 }
