@@ -9,6 +9,13 @@ export interface User {
   profilePictureUrl?: string;
 }
 
+export interface Team {
+  id?: number;
+  name: string;
+  teamManager?: User;
+  teamLead?: User;
+}
+
 export interface Attachment {
   id: number;
   fileUrl: string;
