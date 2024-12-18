@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { Project, Search, Task } from "@/interface";
+import type { Project, Search, Task, User } from "@/interface";
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL }),
   reducerPath: "api",
-  tagTypes: ["Projects", "Tasks"],
+  tagTypes: ["Projects", "Tasks", "Users"],
   endpoints: (build) => ({
     getProjects: build.query<Project[], void>({
       query: () => "project",
@@ -43,6 +43,10 @@ export const api = createApi({
         { type: "Tasks", id: taskId },
       ],
     }),
+    getUsers: build.query<User[], void>({
+      query: () => "users",
+      providesTags: ["Users"],
+    }),
     searchTaskProjectUser: build.query<Search, string>({
       query: (query) => `search?q=${query}`,
     }),
@@ -55,5 +59,6 @@ export const {
   useGetTasksQuery,
   useCreateTaskMutation,
   useUpdateTaskStatusMutation,
-  useSearchTaskProjectUserQuery
+  useGetUsersQuery,
+  useSearchTaskProjectUserQuery,
 } = api;

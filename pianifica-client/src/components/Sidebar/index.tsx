@@ -107,7 +107,7 @@ const Sidebar = () => {
 					<SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
 					<SidebarLink icon={Search} label="Search" href="/search" />
 					<SidebarLink icon={Settings} label="Settings" href="/settings" />
-					<SidebarLink icon={User} label="User" href="/user" />
+					<SidebarLink icon={User} label="Users" href="/users" />
 					<SidebarLink icon={Users} label="Teams" href="/teams" />
 				</nav>
 
