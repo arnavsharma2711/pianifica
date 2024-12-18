@@ -1,11 +1,11 @@
 "use client";
 
-import Board from "@/components/Pages/Project/BoardView";
-import List from "@/components/Pages/Project/ListView";
-import ProjectHeader from "@/components/Pages/Project/ProjectHeader";
-import Timeline from "@/components/Pages/Project/TimelineView";
+import Board from "@/components/Project/BoardView";
+import List from "@/components/Project/ListView";
+import ProjectHeader from "@/components/Project/ProjectHeader";
+import Timeline from "@/components/Project/TimelineView";
 import React, { useState, useEffect } from "react";
-import TableView from "@/components/Pages/Project/TableView";
+import TableView from "@/components/Project/TableView";
 import NewTaskModal from "@/components/Modal/NewTaskModal";
 
 type Props = {
