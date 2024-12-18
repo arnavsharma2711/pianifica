@@ -266,6 +266,19 @@ async function createTask(
     return enumValues[randomIndex];
   }
 
+  const attachment_urls = [
+    "https://utfs.io/f/DTNeoJKzjEnawijxNM8j5DGBeKt9lYSrJIpksugaTAo0LqdE",
+    "https://utfs.io/f/DTNeoJKzjEnaIe2puIGLQ4C5F7TaNXiWh0ovRnG9Y12UmlDA",
+    "https://utfs.io/f/DTNeoJKzjEnaDWXWw1KzjEna2SxlquGrbfI7O4PhkNtBCwsU",
+    "https://utfs.io/f/DTNeoJKzjEnaejeoqRtgNqYiHlV4n17kbRIhLEjTZAQXMJm6",
+    "https://utfs.io/f/DTNeoJKzjEna1dtjORVDJ3zw0rmSpLOntsMKycBGeq7gxj4C",
+    "https://utfs.io/f/DTNeoJKzjEnaiDnDvuLNEnUhA9J861dKXyM3jlVzDowvRb7S",
+    "https://utfs.io/f/DTNeoJKzjEnaXkfNDgOwk9MNs38V0oP1iBTLrcG4JOmzFAqY",
+    "https://utfs.io/f/DTNeoJKzjEnal5LxcYSnJ0SLwdF96srQoPKI7WZbVU2ytB43",
+    "https://utfs.io/f/DTNeoJKzjEnamjRcrf41nb8lA75dgNOXqyVer4mtSoP3926a",
+    "https://utfs.io/f/DTNeoJKzjEnag8cDkXazZFS7PKJ1xtG9n5iLY6H4cfdyEAX3",
+  ];
+
   console.log("Creating tasks, comments and attachments...");
 
   const projects = await ProjectModel.findMany();
@@ -312,8 +325,11 @@ async function createTask(
           await createData(AttachmentModel, {
             taskId: createdTask.id,
             uploadedById: createdTask.authorId,
-            fileUrl: faker.image.url(),
-            fileName: faker.system.commonFileName("jpg"),
+            fileUrl:
+              attachment_urls[
+                Math.floor(Math.random() * attachment_urls.length)
+              ],
+            fileName: faker.system.commonFileName("webp"),
           });
         }
       }
