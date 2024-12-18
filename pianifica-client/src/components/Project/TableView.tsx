@@ -2,6 +2,8 @@ import { useGetTasksQuery } from "@/state/api";
 import type React from "react";
 import Header from "@/components/Header";
 import type { Task } from "@/interface";
+import { Status } from "@/enum";
+import StatusTag from "../StatusTag";
 
 interface TaskTableProps {
 	tasks: Task[];
@@ -13,7 +15,7 @@ const Table = ({ tasks, onEdit }: TaskTableProps) => {
 			<table className="w-full text-sm text-left rtl:text-right">
 				<thead className="text-xs uppercase border-b bg-gray-100 dark:bg-dark-secondary">
 					<tr>
-						<th className="px-6 py-3 border-r">ID</th>
+						<th className="px-6 py-3 border-r">S. No</th>
 						<th className="px-6 py-3 border-r">Title</th>
 						<th className="px-6 py-3 border-r">Status</th>
 						<th className="px-6 py-3 border-r">Priority</th>
@@ -30,10 +32,10 @@ const Table = ({ tasks, onEdit }: TaskTableProps) => {
 							key={task.id}
 							className={`${index % 2 === 0 ? "bg-gray-200 dark:bg-zinc-800" : "bg-gray-100 dark:bg-zinc-900"} hover:bg-gray-300 dark:hover:bg-zinc-700`}
 						>
-							<td className="px-6 py-4">{task.id}</td>
+							<td className="px-6 py-4">{index + 1}</td>
 							<td className="px-6 py-4 whitespace-nowrap">{task.title}</td>
 							<td className="px-6 py-4 whitespace-nowrap">
-								{task.status || "N/A"}
+								<StatusTag status={task.status || Status.TODO} />
 							</td>
 							<td className="px-6 py-4">{task.priority || "N/A"}</td>
 							<td className="px-6 py-4">{task.tags || "No tags"}</td>
