@@ -42,8 +42,8 @@ export interface Task {
   dueDate?: string;
   points?: number;
   projectId: number;
-  authorUserId?: number;
-  assignedUserId?: number;
+  authorId?: number;
+  assignedId?: number;
 
   author?: User;
   assignee?: User;
