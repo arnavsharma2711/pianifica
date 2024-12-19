@@ -4,7 +4,7 @@ type InputFieldProps = {
 	onChange: (
 		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
 	) => void;
-	type?: "text" | "textarea" | "date";
+	type?: "text" | "textarea" | "date" | "number";
 	placeholder?: string;
 };
 
@@ -43,6 +43,17 @@ const InputField = ({
 		)}
 		{type === "textarea" && (
 			<textarea
+				className={
+					"w-full rounded border border-gray-300 p-2 mt-1 shadow-sm dark:border-dark-tertiary dark:bg-dark-tertiary dark:focus:outline-none"
+				}
+				placeholder={placeholder || label}
+				value={value}
+				onChange={onChange}
+			/>
+		)}
+		{type === "number" && (
+			<input
+				type="number"
 				className={
 					"w-full rounded border border-gray-300 p-2 mt-1 shadow-sm dark:border-dark-tertiary dark:bg-dark-tertiary dark:focus:outline-none"
 				}
