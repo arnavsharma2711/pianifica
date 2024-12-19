@@ -7,6 +7,7 @@ import Timeline from "@/components/Project/TimelineView";
 import React, { useState, useEffect } from "react";
 import TableView from "@/components/Project/TableView";
 import NewTaskModal from "@/components/Modal/NewTaskModal";
+import type { Task } from "@/interface";
 
 type Props = {
 	params: Promise<{ id: string }>;
@@ -15,7 +16,15 @@ type Props = {
 const Project = ({ params }: Props) => {
 	const [id, setId] = useState<string | null>(null);
 	const [activeTab, setActiveTab] = useState("Board");
+	const [task, setTask] = useState<Task>();
 	const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
+
+	const handleTaskModel = (action: string, task?: Task) => {
+		if (action === "edit") {
+			setTask(task);
+		}
+		setIsModalNewTaskOpen(true);
+	};
 
 	useEffect(() => {
 		params.then((resolvedParams) => {
@@ -32,20 +41,21 @@ const Project = ({ params }: Props) => {
 			<NewTaskModal
 				isOpen={isModalNewTaskOpen}
 				onClose={() => setIsModalNewTaskOpen(false)}
-				id={id}
+				project={Number(id)}
+				task={task}
 			/>
 			<ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} />
 			{activeTab === "Board" && (
-				<Board id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+				<Board id={id} handleTaskModel={handleTaskModel} />
 			)}
 			{activeTab === "List" && (
-				<List id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+				<List id={id} handleTaskModel={handleTaskModel} />
 			)}
 			{activeTab === "Timeline" && (
-				<Timeline id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+				<Timeline id={id} handleTaskModel={handleTaskModel} />
 			)}
 			{activeTab === "Table" && (
-				<TableView id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+				<TableView id={id} handleTaskModel={handleTaskModel} />
 			)}
 		</div>
 	);

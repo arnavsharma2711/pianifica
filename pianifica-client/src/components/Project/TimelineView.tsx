@@ -1,5 +1,6 @@
 import { useAppSelector } from "@/app/redux";
 import Header from "@/components/Header";
+import type { Task } from "@/interface";
 import { useGetTasksQuery } from "@/state/api";
 import { type DisplayOption, Gantt, ViewMode } from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
@@ -8,12 +9,12 @@ import { useMemo, useState } from "react";
 
 type Props = {
 	id: string;
-	setIsModalNewTaskOpen: (isOpen: boolean) => void;
+	handleTaskModel: (action: string, task?: Task) => void;
 };
 
 type TaskTypeItems = "task" | "milestone" | "project";
 
-const Timeline = ({ id, setIsModalNewTaskOpen }: Props) => {
+const Timeline = ({ id, handleTaskModel }: Props) => {
 	const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 	const {
 		data: tasks,
@@ -62,7 +63,7 @@ const Timeline = ({ id, setIsModalNewTaskOpen }: Props) => {
 							<button
 								type="button"
 								className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
-								onClick={() => setIsModalNewTaskOpen(true)}
+								onClick={() => handleTaskModel("create")}
 							>
 								Add Task
 							</button>
@@ -104,7 +105,7 @@ const Timeline = ({ id, setIsModalNewTaskOpen }: Props) => {
 							<button
 								type="button"
 								className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
-								onClick={() => setIsModalNewTaskOpen(true)}
+								onClick={() => handleTaskModel("create")}
 							>
 								Add New Task
 							</button>

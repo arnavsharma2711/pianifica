@@ -18,14 +18,14 @@ type TaskColumnProps = {
 	status: Status;
 	tasks: TaskType[];
 	moveTask: (taskId: number, status: string) => void;
-	setIsModalNewTaskOpen: (isOpen: boolean) => void;
+	handleTaskModel: (action: string, task?: TaskType) => void;
 };
 
 const TaskColumn = ({
 	status,
 	tasks,
 	moveTask,
-	setIsModalNewTaskOpen,
+	handleTaskModel,
 }: TaskColumnProps) => {
 	const [{ isOver }, dropRef] = useDrop(() => ({
 		accept: "task",
@@ -75,7 +75,7 @@ const TaskColumn = ({
 						<button
 							type="button"
 							className="flex h-6 w-6 items-center justify-center rounded bg-gray-200 dark:bg-dark-tertiary"
-							onClick={() => setIsModalNewTaskOpen(true)}
+							onClick={() => handleTaskModel("create")}
 						>
 							<Plus size={16} />
 						</button>
@@ -86,7 +86,7 @@ const TaskColumn = ({
 			{tasks
 				.filter((task) => task.status === status)
 				.map((task) => (
-					<Task key={task.id} task={task} />
+					<Task key={task.id} task={task} handleTaskModel={handleTaskModel} />
 				))}
 		</div>
 	);
@@ -94,9 +94,10 @@ const TaskColumn = ({
 
 type TaskProps = {
 	task: TaskType;
+	handleTaskModel: (action: string, task?: TaskType) => void;
 };
 
-const Task = ({ task }: TaskProps) => {
+const Task = ({ task, handleTaskModel }: TaskProps) => {
 	const [{ isDragging }, dragRef] = useDrag(() => ({
 		type: "task",
 		item: { id: task.id },
@@ -173,6 +174,7 @@ const Task = ({ task }: TaskProps) => {
 					</div>
 					<button
 						type="button"
+						onClick={() => handleTaskModel("edit", task)}
 						className="flex h-6 w-4 flex-shrink-0 items-center justify-center dark:text-neutral-500"
 					>
 						<EllipsisVertical size={26} />
@@ -239,7 +241,7 @@ const Task = ({ task }: TaskProps) => {
 
 type BoardViewProps = {
 	id: string;
-	setIsModalNewTaskOpen: (isOpen: boolean) => void;
+	handleTaskModel: (action: string, task?: TaskType) => void;
 };
 
 const TASK_STATUS: Status[] = [
@@ -251,7 +253,7 @@ const TASK_STATUS: Status[] = [
 	Status.COMPLETED,
 ];
 
-const BoardView = ({ id, setIsModalNewTaskOpen }: BoardViewProps) => {
+const BoardView = ({ id, handleTaskModel }: BoardViewProps) => {
 	const {
 		data: tasks,
 		isLoading,
@@ -276,7 +278,7 @@ const BoardView = ({ id, setIsModalNewTaskOpen }: BoardViewProps) => {
 						<button
 							type="button"
 							className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
-							onClick={() => setIsModalNewTaskOpen(true)}
+							onClick={() => handleTaskModel("create")}
 						>
 							Add Task
 						</button>
@@ -293,7 +295,7 @@ const BoardView = ({ id, setIsModalNewTaskOpen }: BoardViewProps) => {
 								status={status}
 								tasks={tasks || []}
 								moveTask={moveTask}
-								setIsModalNewTaskOpen={setIsModalNewTaskOpen}
+								handleTaskModel={handleTaskModel}
 							/>
 						))}
 					</div>

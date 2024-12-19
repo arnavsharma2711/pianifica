@@ -9,10 +9,10 @@ import { DataTable } from "../DataTable";
 
 type TableViewProps = {
 	id: string;
-	setIsModalNewTaskOpen: (isOpen: boolean) => void;
+	handleTaskModel: (action: string, task?: Task) => void;
 };
 
-const TableView = ({ id, setIsModalNewTaskOpen }: TableViewProps) => {
+const TableView = ({ id, handleTaskModel }: TableViewProps) => {
 	const {
 		data: tasks,
 		error,
@@ -69,7 +69,7 @@ const TableView = ({ id, setIsModalNewTaskOpen }: TableViewProps) => {
 						<button
 							type="button"
 							className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
-							onClick={() => setIsModalNewTaskOpen(true)}
+							onClick={() => handleTaskModel("create")}
 						>
 							Add Task
 						</button>

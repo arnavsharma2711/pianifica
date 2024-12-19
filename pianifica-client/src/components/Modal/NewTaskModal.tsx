@@ -1,17 +1,19 @@
 import Modal from "@/components/Modal";
 import { useCreateTaskMutation } from "@/state/api";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { formatISO } from "date-fns";
 import { Priority, Status } from "@/enum";
 import InputField from "../FormFields";
+import type { Task } from "@/interface";
 
 type Props = {
 	isOpen: boolean;
 	onClose: () => void;
-	id?: string | null;
+	project?: number | null;
+	task?: Task;
 };
 
-const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
+const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 	const [createTask, { isLoading }] = useCreateTaskMutation();
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
@@ -20,12 +22,27 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
 	const [tags, setTags] = useState("");
 	const [startDate, setStartDate] = useState("");
 	const [dueDate, setDueDate] = useState("");
-	const [authorUserId, setAuthorUserId] = useState("");
-	const [assignedUserId, setAssignedUserId] = useState("");
-	const [projectId, setProjectId] = useState(id || "");
+	const [authorId, setAuthorId] = useState(1);
+	const [assignedId, setAssignedId] = useState(1);
+	const [projectId, setProjectId] = useState(project || 1);
+
+	useEffect(() => {
+		if (task) {
+			setTitle(task.title);
+			setDescription(task.description || "");
+			setStatus(task.status || Status.TODO);
+			setPriority(task.priority || Priority.BACKLOG);
+			setTags(task.tags || "");
+			setStartDate(task.startDate || "");
+			setDueDate(task.dueDate || "");
+			setAuthorId(task.authorId || 1);
+			setAssignedId(task.assignedId || 1);
+			setProjectId(task.projectId || 1);
+		}
+	}, [task]);
 
 	const handleSubmit = async () => {
-		if (!title || !authorUserId || !projectId) return;
+		if (!title || !authorId || !projectId) return;
 
 		const formattedStartDate = formatISO(new Date(startDate), {
 			representation: "complete",
@@ -42,16 +59,16 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
 			tags,
 			startDate: formattedStartDate,
 			dueDate: formattedDueDate,
-			authorId: Number.parseInt(authorUserId),
-			assignedId: Number.parseInt(assignedUserId),
-			projectId: Number(projectId),
+			authorId: authorId,
+			assignedId: assignedId,
+			projectId,
 		});
 
 		onClose();
 	};
 
 	const isFormValid = () => {
-		return title && authorUserId && projectId;
+		return title && authorId && projectId;
 	};
 
 	const selectStyles =
@@ -66,12 +83,12 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
 					handleSubmit();
 				}}
 			>
-				{id !== null && (
+				{project !== null && (
 					<InputField
 						label="Project"
-						value={projectId}
-						onChange={(e) => setProjectId(e.target.value)}
-						type="text"
+						value={projectId.toString()}
+						onChange={(e) => setProjectId(Number(e.target.value))}
+						type="number"
 					/>
 				)}
 				<InputField
@@ -140,16 +157,16 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
 				<InputField
 					label="Assigned Author"
 					placeholder="Author User ID"
-					value={authorUserId}
-					onChange={(e) => setAuthorUserId(e.target.value)}
-					type="text"
+					value={authorId.toString()}
+					onChange={(e) => setAuthorId(Number(e.target.value))}
+					type="number"
 				/>
 				<InputField
 					label="Assigned User"
 					placeholder="Assigned User ID"
-					value={assignedUserId}
-					onChange={(e) => setAssignedUserId(e.target.value)}
-					type="text"
+					value={assignedId.toString()}
+					onChange={(e) => setAssignedId(Number(e.target.value))}
+					type="number"
 				/>
 
 				<button
