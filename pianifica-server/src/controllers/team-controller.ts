@@ -12,6 +12,9 @@ export const getTeams = async (req: Request, res: Response): Promise<void> => {
           select: { username: true },
         },
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
 
     res.json(teamsWithMangerAndLead);

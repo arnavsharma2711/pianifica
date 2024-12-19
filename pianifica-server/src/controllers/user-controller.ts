@@ -5,6 +5,9 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     const users = await prisma.user.findMany({
       where: { deletedAt: null },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
     res.json(users);
   } catch (error) {

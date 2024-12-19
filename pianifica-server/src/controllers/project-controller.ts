@@ -8,6 +8,9 @@ export const getProjects = async (
   try {
     const projects = await prisma.project.findMany({
       where: { deletedAt: null },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
     res.json(projects);
   } catch (error) {
@@ -32,6 +35,7 @@ export const createProject = async (
         description,
         startDate,
         endDate,
+        organizationId: 1,
       },
     });
     res.status(201).json(newProject);

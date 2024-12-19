@@ -15,6 +15,9 @@ export const getTasks = async (req: Request, res: Response): Promise<void> => {
         comments: true,
         attachments: true,
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
     res.json(tasks);
   } catch (error) {
