@@ -1,9 +1,11 @@
 "use client";
 import { useGetUsersQuery } from "@/state/api";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "@/components/Header";
 import Image from "next/image";
-import { EllipsisVertical } from "lucide-react";
+import { EllipsisVertical, Pencil, Trash } from "lucide-react";
+import { DataTable } from "@/components/DataTable";
+import type { User } from "@/interface";
 
 const Users = () => {
 	const { data: users, isLoading, isError } = useGetUsersQuery();
@@ -11,69 +13,95 @@ const Users = () => {
 	if (isLoading) return <div>Loading...</div>;
 	if (isError || !users) return <div>Error fetching users</div>;
 
+	const userColumns = [
+		{
+			header: "Username",
+			accessorKey: "username" as keyof User,
+			cell: (user: User) => (
+				<div className="flex flex-row items-center gap-2">
+					<div className="h-9 w-9">
+						<Image
+							src={user.profilePictureUrl || "/default-profile-picture.webp"}
+							alt={user.username}
+							width={100}
+							height={50}
+							className="h-full rounded-full object-cover"
+						/>
+					</div>
+					{user.username}
+				</div>
+			),
+		},
+		{
+			header: "First Name",
+			accessorKey: "firstName" as keyof User,
+		},
+		{
+			header: "Last Name",
+			accessorKey: "lastName" as keyof User,
+		},
+		{
+			header: "Email",
+			accessorKey: "email" as keyof User,
+		},
+	];
+
+	const UserAction = ({ user }: { user: User }) => {
+		const [isOpen, setIsOpen] = useState(false);
+		const ref = useRef<HTMLDivElement>(null);
+
+		const handleButtonClick = () => {
+			setIsOpen(!isOpen);
+		};
+
+		const handleClickOutside = (event: MouseEvent) => {
+			if (ref.current && !ref.current.contains(event.target as Node)) {
+				setIsOpen(false);
+			}
+		};
+
+		useEffect(() => {
+			document.addEventListener("mousedown", handleClickOutside);
+			return () => {
+				document.removeEventListener("mousedown", handleClickOutside);
+			};
+		}, []);
+
+		return (
+			<div className="relative" ref={ref}>
+				<button
+					onClick={handleButtonClick}
+					type="button"
+					className="flex h-6 w-5 items-center justify-center dark:text-neutral-500"
+				>
+					<EllipsisVertical size={26} />
+				</button>
+				{isOpen && (
+					<ul className="absolute z-30 left-0 -ml-20 mt-2 w-max bg-gray-200 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-md shadow-lg">
+						<li className="flex flex-row gap-2 justify-end items-center font-bold text-blue-600 px-4 py-2 hover:bg-blue-100">
+							Edit
+							<Pencil size={20} color="#2096F3" />
+						</li>
+						<li className="flex flex-row gap-2 justify-end items-center font-bold text-red-600 px-4 py-2 hover:bg-red-100">
+							Delete
+							<Trash size={20} color="#F34234" />
+						</li>
+					</ul>
+				)}
+			</div>
+		);
+	};
+
 	return (
 		<div className="flex w-full flex-col p-8">
 			<Header name="Users" />
-			<div className="overflow-x-auto relative border-2 shadow-md sm:rounded-lg">
-				<table className="min-w-full text-sm text-left rtl:text-right">
-					<thead className="text-xs uppercase border-b bg-gray-100 dark:bg-dark-secondary">
-						<tr>
-							<th className="px-6 py-3 whitespace-nowrap border-r">Username</th>
-							<th className="px-6 py-3 whitespace-nowrap border-r">
-								First Name
-							</th>
-							<th className="px-6 py-3 whitespace-nowrap border-r">
-								Last Name
-							</th>
-							<th className="px-6 py-3 whitespace-nowrap border-r">Email</th>
-							<th className="px-6 py-3 whitespace-nowrap border-r">Action</th>
-						</tr>
-					</thead>
-					<tbody>
-						{users.map((user, index) => (
-							<tr
-								key={user.id}
-								className={`${
-									index % 2 === 0
-										? "bg-gray-200 dark:bg-zinc-800"
-										: "bg-gray-100 dark:bg-zinc-900"
-								} hover:bg-gray-300 dark:hover:bg-zinc-700`}
-							>
-								<td className="px-6 py-4 whitespace-nowrap flex flex-row items-center gap-2">
-									<div className="h-9 w-9">
-										<Image
-											src={
-												user.profilePictureUrl ||
-												"/default-profile-picture.webp"
-											}
-											alt={user.username}
-											width={100}
-											height={50}
-											className="h-full rounded-full object-cover"
-										/>
-									</div>
-									{user.username}
-								</td>
-								<td className="px-6 py-4 whitespace-nowrap">
-									{user.firstName}
-								</td>
-								<td className="px-6 py-4 whitespace-nowrap">{user.lastName}</td>
-								<td className="px-6 py-4 whitespace-nowrap">{user.email}</td>
-								<td className="px-6 py-4 whitespace-nowrap">
-									<button
-										type="button"
-										className={
-											"h-min w-min rounded p-2 hover:bg-gray-400 dark:hover:bg-zinc-400"
-										}
-									>
-										<EllipsisVertical className="h-6 w-6 cursor-pointer" />
-									</button>
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-			</div>
+			<DataTable
+				data={users}
+				columns={userColumns}
+				withIndex={true}
+				actionHeader="Actions"
+				action={(user: User) => <UserAction user={user} />}
+			/>
 		</div>
 	);
 };

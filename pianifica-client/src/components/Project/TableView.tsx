@@ -5,67 +5,7 @@ import type { Task } from "@/interface";
 import { Status } from "@/enum";
 import StatusTag from "../StatusTag";
 
-interface TaskTableProps {
-	tasks: Task[];
-	onEdit: (id: number) => void;
-}
-const Table = ({ tasks, onEdit }: TaskTableProps) => {
-	return (
-		<div className="relative border-2 overflow-x-auto shadow-md sm:rounded-lg">
-			<table className="w-full text-sm text-left rtl:text-right">
-				<thead className="text-xs uppercase border-b bg-gray-100 dark:bg-dark-secondary">
-					<tr>
-						<th className="px-6 py-3 border-r">S. No</th>
-						<th className="px-6 py-3 border-r">Title</th>
-						<th className="px-6 py-3 border-r">Status</th>
-						<th className="px-6 py-3 border-r">Priority</th>
-						<th className="px-6 py-3 border-r">Tags</th>
-						<th className="px-6 py-3 border-r">Start Date</th>
-						<th className="px-6 py-3 border-r">Due Date</th>
-						<th className="px-6 py-3 border-r">Points</th>
-						<th className="px-6 py-3 border-r">Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					{tasks.map((task: Task, index) => (
-						<tr
-							key={task.id}
-							className={`${index % 2 === 0 ? "bg-gray-200 dark:bg-zinc-800" : "bg-gray-100 dark:bg-zinc-900"} hover:bg-gray-300 dark:hover:bg-zinc-700`}
-						>
-							<td className="px-6 py-4">{index + 1}</td>
-							<td className="px-6 py-4 whitespace-nowrap">{task.title}</td>
-							<td className="px-6 py-4 whitespace-nowrap">
-								<StatusTag status={task.status || Status.TODO} />
-							</td>
-							<td className="px-6 py-4">{task.priority || "N/A"}</td>
-							<td className="px-6 py-4">{task.tags || "No tags"}</td>
-							<td className="px-6 py-4">
-								{task.startDate
-									? new Date(task.startDate).toLocaleDateString()
-									: "N/A"}
-							</td>
-							<td className="px-6 py-4">
-								{task.dueDate
-									? new Date(task.dueDate).toLocaleDateString()
-									: "N/A"}
-							</td>
-							<td className="px-6 py-4">{task.points || "N/A"}</td>
-							<td className="px-6 py-4">
-								<button
-									type="button"
-									onClick={() => onEdit(task.id)}
-									className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-								>
-									Edit
-								</button>
-							</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
-		</div>
-	);
-};
+import { DataTable } from "../DataTable";
 
 type TableViewProps = {
 	id: string;
@@ -82,6 +22,44 @@ const TableView = ({ id, setIsModalNewTaskOpen }: TableViewProps) => {
 	if (isLoading) return <div>Loading...</div>;
 	if (error || !tasks) return <div>An error occurred while fetching tasks</div>;
 
+	const taskColumns = [
+		{
+			header: "Title",
+			accessorKey: "title" as keyof Task,
+		},
+		{
+			header: "Status",
+			accessorKey: "status" as keyof Task,
+			cell: (task: Task) => <StatusTag status={task.status || Status.TODO} />,
+		},
+		{
+			header: "Priority",
+			accessorKey: "priority" as keyof Task,
+			cell: (task: Task) => task.priority || "N/A",
+		},
+		{
+			header: "Start Date",
+			accessorKey: "startDate" as keyof Task,
+			cell: (task: Task) =>
+				task.startDate ? new Date(task.startDate).toLocaleDateString() : "N/A",
+		},
+		{
+			header: "Due Date",
+			accessorKey: "dueDate" as keyof Task,
+			cell: (task: Task) =>
+				task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "N/A",
+		},
+		{
+			header: "Points",
+			accessorKey: "points" as keyof Task,
+			cell: (task: Task) => task.points?.toString() || "0",
+		},
+		{
+			header: "Tags",
+			accessorKey: "tags" as keyof Task,
+			cell: (task: Task) => task.tags || "None",
+		},
+	];
 	return (
 		<div className="px-4 pb-8 xl:px-6">
 			<div className="pt-5">
@@ -103,7 +81,7 @@ const TableView = ({ id, setIsModalNewTaskOpen }: TableViewProps) => {
 						No Task Assigned to the project
 					</div>
 				) : (
-					<Table tasks={tasks} onEdit={() => {}} />
+					<DataTable data={tasks} columns={taskColumns} />
 				)}
 			</div>
 		</div>

@@ -17,8 +17,10 @@ import {
 	YAxis,
 } from "recharts";
 import { useAppSelector } from "./redux";
-import type { Priority } from "@/enum";
+import { Status, type Priority } from "@/enum";
 import type { Project, Task } from "@/interface";
+import { DataTable } from "@/components/DataTable";
+import StatusTag from "@/components/StatusTag";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
@@ -80,7 +82,28 @@ const Dashboard = () => {
 				pieFill: "#82ca9d",
 				text: "#000000",
 			};
-
+	const taskColumns = [
+		{
+			header: "Title",
+			accessorKey: "title" as keyof Task,
+		},
+		{
+			header: "Status",
+			accessorKey: "status" as keyof Task,
+			cell: (task: Task) => <StatusTag status={task.status || Status.TODO} />,
+		},
+		{
+			header: "Priority",
+			accessorKey: "priority" as keyof Task,
+			cell: (task: Task) => task.priority || "N/A",
+		},
+		{
+			header: "Due Date",
+			accessorKey: "dueDate" as keyof Task,
+			cell: (task: Task) =>
+				task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "N/A",
+		},
+	];
 	return (
 		<div className="container h-full w-[100%] bg-gray-100 bg-transparent p-8">
 			<Header name="Project Management Dashboard" />
@@ -131,35 +154,7 @@ const Dashboard = () => {
 					<h3 className="mb-4 text-lg font-semibold dark:text-white">
 						Your Tasks
 					</h3>
-					<div className="overflow-x-auto relative border-2 shadow-md sm:rounded-lg">
-						<table className="w-full text-sm text-left rtl:text-right">
-							<thead className="text-xs uppercase border-b bg-gray-100 dark:bg-dark-secondary">
-								<tr>
-									<th className="px-6 py-3 border-r">Title</th>
-									<th className="px-6 py-3 border-r">Status</th>
-									<th className="px-6 py-3 border-r">Priority</th>
-									<th className="px-6 py-3 border-r">Due Date</th>
-								</tr>
-							</thead>
-							<tbody>
-								{tasks.map((task, index) => (
-									<tr
-										key={task.id}
-										className={`${index % 2 === 0 ? "bg-gray-200 dark:bg-zinc-800" : "bg-gray-100 dark:bg-zinc-900"} hover:bg-gray-300 dark:hover:bg-zinc-700`}
-									>
-										<td className="px-6 py-4">{task.title}</td>
-										<td className="px-6 py-4">{task.status}</td>
-										<td className="px-6 py-4">{task.priority}</td>
-										<td className="px-6 py-4">
-											{task.dueDate
-												? new Date(task.dueDate).toLocaleDateString()
-												: "N/A"}
-										</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-					</div>
+					<DataTable data={tasks} columns={taskColumns} />
 				</div>
 			</div>
 		</div>
