@@ -26,12 +26,9 @@ const controllerWrapper = (fn: ControllerFunction): ControllerFunction => {
         });
       } else if (error instanceof ZodError) {
         const zodError = error as ZodError;
-        const errorMessages = JSON.stringify(
-          zodError.errors.map((err: ZodIssue) => ({
-            path: err.path.join("."),
-            message: err.message,
-          }))
-        );
+        const errorMessages = zodError.errors
+          .map((err: ZodIssue) => err.message)
+          .join(", ");
         res.invalid({
           message: "Invalid Payload",
           error: errorMessages,

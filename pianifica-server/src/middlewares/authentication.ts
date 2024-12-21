@@ -1,8 +1,8 @@
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { ACCESS_TOKEN_SECRET } from "../constants";
-import { controllerWrapper } from "../lib/controllerWrapper";
-import { findUserById } from "../model/user-model";
 import { CustomError } from "../lib/error/custom.error";
+import controllerWrapper from "../lib/controllerWrapper";
+import { getExistingUser } from "../service/user-service";
 
 export const authenticationMiddleware = controllerWrapper(
   async (req, res, next) => {
@@ -18,7 +18,7 @@ export const authenticationMiddleware = controllerWrapper(
       access_token,
       ACCESS_TOKEN_SECRET
     ) as JwtPayload;
-    const userDetails = await findUserById(decodedToken?.id);
+    const userDetails = await getExistingUser({ id: decodedToken?.id });
 
     if (!userDetails) {
       res.sendStatus(401);
@@ -29,7 +29,7 @@ export const authenticationMiddleware = controllerWrapper(
       id: userDetails.id,
       email: userDetails.email,
       username: userDetails.username,
-      organization_id: userDetails.organizationId,
+      organizationId: userDetails.organizationId,
     };
     next();
   }

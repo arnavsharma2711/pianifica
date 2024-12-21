@@ -1,34 +1,73 @@
-import { ACCESS_TOKEN_SECRET } from "../constants";
-import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 import Prisma from "../utils/prisma";
 
-export const findUserById = async (id: number) => {
-  const user = await Prisma.user.findUnique({
-    where: {
-      id: id,
-    },
-  });
-
-  if (!user) {
-    throw new Error("User not found");
-  }
-  return user;
-};
-
-export const generateUserToken = async (user: {
-  id: number;
+export const createUser = async ({
+  organizationId,
+  firstName,
+  lastName,
+  email,
+  username,
+  password,
+  profilePictureUrl,
+}: {
+  organizationId: number;
   firstName: string;
   lastName: string;
   email: string;
   username: string;
-  organizationId: number;
+  password: string;
+  profilePictureUrl?: string;
 }) => {
-  const access_token_payload = {
-    id: user.id,
-  };
-  const access_token = jwt.sign(access_token_payload, ACCESS_TOKEN_SECRET, {
-    expiresIn: "1h",
+  const newUser = await Prisma.user.create({
+    data: {
+      firstName,
+      lastName,
+      email,
+      username,
+      password: await bcrypt.hash(password, 10),
+      organizationId,
+      profilePictureUrl,
+    },
   });
 
-  return { access_token };
+  return newUser;
+};
+
+export const getUserById = async ({ id }: { id: number }) => {
+  const user = await Prisma.user.findFirst({
+    where: {
+      AND: {
+        deletedAt: null,
+        id,
+      },
+    },
+  });
+
+  return user;
+};
+
+export const getUserByEmail = async ({ email }: { email: string }) => {
+  const user = await Prisma.user.findFirst({
+    where: {
+      AND: {
+        deletedAt: null,
+        email,
+      },
+    },
+  });
+
+  return user;
+};
+
+export const getUserByUsername = async ({ username }: { username: string }) => {
+  const user = await Prisma.user.findFirst({
+    where: {
+      AND: {
+        deletedAt: null,
+        username,
+      },
+    },
+  });
+
+  return user;
 };
