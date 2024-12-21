@@ -102,6 +102,7 @@ export const getExistingUser = async ({
   else if (username) user = await getUserByUsername({ username });
   else if (email) user = await getUserByEmail({ email });
 
+  if (!user) return null;
   return {
     ...user,
     role: (() => {

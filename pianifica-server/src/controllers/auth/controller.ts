@@ -1,7 +1,10 @@
 import { COOKIE_SETTINGS } from "../../constants";
 import controllerWrapper from "../../lib/controllerWrapper";
 import { userInfoSchema } from "../../lib/schema";
-import { createNewUser, validateUserCredentials } from "../../service/user-service";
+import {
+  createNewUser,
+  validateUserCredentials,
+} from "../../service/user-service";
 import { loginUserSchema, registerNewUserSchema } from "./schema";
 
 // POST /api/auth/register

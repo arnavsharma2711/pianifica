@@ -6,6 +6,7 @@ import {
 } from "../../service/user-service";
 import { updateUserSchema } from "./schema";
 import { userInfoSchema } from "../../lib/schema";
+import { isAdmin } from "../../lib/utils";
 
 export const getUsers = controllerWrapper(async (req, res) => {
   const users = await prisma.user.findMany({
@@ -27,7 +28,7 @@ export const updateUser = controllerWrapper(async (req, res) => {
     req.body
   );
 
-  if (req.user && req.user.id !== Number(id)) {
+  if (req.user && req.user.id !== Number(id) && !isAdmin(req.user.role)) {
     res.unauthorized({
       message: "Unauthorized access",
       error: "You are not authorized to update this user",
@@ -60,7 +61,7 @@ export const deleteUser = controllerWrapper(async (req, res) => {
     return;
   }
 
-  if (req.user && req.user.id !== Number(id)) {
+  if (req.user && req.user.id !== Number(id) && !isAdmin(req.user.role)) {
     res.unauthorized({
       message: "Unauthorized access",
       error: "You are not authorized to delete this user",
