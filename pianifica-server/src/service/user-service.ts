@@ -4,9 +4,11 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import {
   createUser,
+  deleteUser,
   getUserByEmail,
   getUserById,
   getUserByUsername,
+  updateUser,
 } from "../model/user-model";
 
 export const createNewUser = async ({
@@ -58,6 +60,32 @@ export const createNewUser = async ({
   const { accessToken } = await generateUserToken(createdUser);
 
   return { accessToken, userDetails: createdUser };
+};
+
+export const updateExistingUser = async ({
+  id,
+  firstName,
+  lastName,
+  profilePictureUrl,
+}: {
+  id: number;
+  firstName: string;
+  lastName: string;
+  profilePictureUrl?: string;
+}) => {
+  const existingUser = await getExistingUser({ id });
+  if (!existingUser) {
+    throw new CustomError(404, "Not Found", "User not found!");
+  }
+
+  const updatedUser = await updateUser({
+    id,
+    firstName,
+    lastName,
+    profilePictureUrl,
+  });
+
+  return updatedUser;
 };
 
 export const getExistingUser = async ({
@@ -133,4 +161,13 @@ export const validateUserCredentials = async ({
   });
 
   return { accessToken, userDetails: user };
+};
+
+export const deleteExistingUser = async ({ id }: { id: number }) => {
+  const user = await getExistingUser({ id });
+  if (!user) {
+    throw new CustomError(404, "Not Found", "User not found!");
+  }
+
+  await deleteUser({ id });
 };

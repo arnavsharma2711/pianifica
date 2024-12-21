@@ -71,3 +71,39 @@ export const getUserByUsername = async ({ username }: { username: string }) => {
 
   return user;
 };
+
+export const updateUser = async ({
+  id,
+  firstName,
+  lastName,
+  profilePictureUrl,
+}: {
+  id: number;
+  firstName: string;
+  lastName: string;
+  profilePictureUrl?: string;
+}) => {
+  const updatedUser = await Prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      firstName,
+      lastName,
+      profilePictureUrl,
+    },
+  });
+
+  return updatedUser;
+};
+
+export const deleteUser = async ({ id }: { id: number }) => {
+  await Prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      deletedAt: new Date(),
+    },
+  });
+};
