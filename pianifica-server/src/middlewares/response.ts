@@ -48,13 +48,19 @@ const responseMiddleware = (
     message = "Request successful",
     data = null,
     total_count = null,
-  }: Payload) =>
-    res.status(status).json({
+  }: Payload): Response => {
+    const response: Payload = {
       success: true,
       message,
       data,
-      total_count,
-    });
+    };
+
+    if (total_count !== null) {
+      response.total_count = total_count;
+    }
+
+    return res.status(status).json(response);
+  };
 
   next();
 };
