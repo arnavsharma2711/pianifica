@@ -36,11 +36,11 @@ const ListView = ({ id, handleTaskModel }: ListViewProps) => {
 					isSmallText
 				/>
 			</div>
-			{tasks?.length === 0 ? (
+			{tasks?.data?.length === 0 ? (
 				<div className="text-center mt-5">No Task Assigned to the project</div>
 			) : (
 				<div className="flex flex-col">
-					{tasks?.map((task: Task) => (
+					{tasks?.data?.map((task: Task) => (
 						<TaskCard key={task.id} task={task} />
 					))}
 				</div>

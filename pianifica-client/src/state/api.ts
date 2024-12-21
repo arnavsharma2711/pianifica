@@ -1,16 +1,22 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { Project, Search, Task, Team, User } from "@/interface";
 
+type ApiResponse<T> = {
+  success: boolean;
+  message: string;
+  data: T;
+};
+
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL }),
   reducerPath: "api",
   tagTypes: ["Projects", "Tasks", "Users", "Teams"],
   endpoints: (build) => ({
-    getProjects: build.query<Project[], void>({
+    getProjects: build.query<ApiResponse<Project[]>, void>({
       query: () => "project",
       providesTags: ["Projects"],
     }),
-    createProject: build.mutation<Project, Partial<Project>>({
+    createProject: build.mutation<ApiResponse<Project>, Partial<Project>>({
       query: (project) => ({
         url: "project",
         method: "POST",
@@ -18,14 +24,14 @@ export const api = createApi({
       }),
       invalidatesTags: ["Projects"],
     }),
-    getTasks: build.query<Task[], { projectId: number }>({
+    getTasks: build.query<ApiResponse<Task[]>, { projectId: number }>({
       query: ({ projectId }) => `task?projectId=${projectId}`,
       providesTags: (result) =>
         result
-          ? result.map(({ id }) => ({ type: "Tasks", id }))
+          ? result.data.map(({ id }) => ({ type: "Tasks", id }))
           : [{ type: "Tasks" }],
     }),
-    createTask: build.mutation<Task, Partial<Task>>({
+    createTask: build.mutation<ApiResponse<Task>, Partial<Task>>({
       query: (task) => ({
         url: "task",
         method: "POST",
@@ -33,7 +39,10 @@ export const api = createApi({
       }),
       invalidatesTags: ["Tasks"],
     }),
-    updateTaskStatus: build.mutation<Task, { taskId: number; status: string }>({
+    updateTaskStatus: build.mutation<
+      ApiResponse<Task>,
+      { taskId: number; status: string }
+    >({
       query: ({ taskId, status }) => ({
         url: `task/${taskId}/status`,
         method: "PATCH",
@@ -43,15 +52,15 @@ export const api = createApi({
         { type: "Tasks", id: taskId },
       ],
     }),
-    getUsers: build.query<User[], void>({
+    getUsers: build.query<ApiResponse<User[]>, void>({
       query: () => "users",
       providesTags: ["Users"],
     }),
-    getTeams: build.query<Team[], void>({
+    getTeams: build.query<ApiResponse<Team[]>, void>({
       query: () => "teams",
       providesTags: ["Teams"],
     }),
-    searchTaskProjectUser: build.query<Search, string>({
+    searchTaskProjectUser: build.query<ApiResponse<Search>, string>({
       query: (query) => `search?q=${query}`,
     }),
   }),

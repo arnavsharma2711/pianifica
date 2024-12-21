@@ -29,7 +29,7 @@ const Timeline = ({ id, handleTaskModel }: Props) => {
 
 	const ganttTasks = useMemo(() => {
 		return (
-			tasks?.map((task) => ({
+			tasks?.data?.map((task) => ({
 				start: new Date(task.startDate as string),
 				end: new Date(task.dueDate as string),
 				name: task.title,

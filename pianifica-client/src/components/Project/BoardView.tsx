@@ -293,7 +293,7 @@ const BoardView = ({ id, handleTaskModel }: BoardViewProps) => {
 							<TaskColumn
 								key={status}
 								status={status}
-								tasks={tasks || []}
+								tasks={tasks?.data || []}
 								moveTask={moveTask}
 								handleTaskModel={handleTaskModel}
 							/>

@@ -11,7 +11,7 @@ const Users = () => {
 	const { data: users, isLoading, isError } = useGetUsersQuery();
 
 	if (isLoading) return <div>Loading...</div>;
-	if (isError || !users) return <div>Error fetching users</div>;
+	if (isError || !users?.success) return <div>Error fetching users</div>;
 
 	const userColumns = [
 		{
@@ -96,7 +96,7 @@ const Users = () => {
 		<div className="flex w-full flex-col p-8">
 			<Header name="Users" />
 			<DataTable
-				data={users}
+				data={users?.data}
 				columns={userColumns}
 				withIndex={true}
 				actionHeader="Actions"

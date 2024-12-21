@@ -20,7 +20,8 @@ const TableView = ({ id, handleTaskModel }: TableViewProps) => {
 	} = useGetTasksQuery({ projectId: Number(id) });
 
 	if (isLoading) return <div>Loading...</div>;
-	if (error || !tasks) return <div>An error occurred while fetching tasks</div>;
+	if (error || !tasks?.success)
+		return <div>An error occurred while fetching tasks</div>;
 
 	const taskColumns = [
 		{
@@ -76,12 +77,12 @@ const TableView = ({ id, handleTaskModel }: TableViewProps) => {
 					}
 					isSmallText
 				/>
-				{tasks?.length === 0 ? (
+				{tasks?.data?.length === 0 ? (
 					<div className="text-center mt-5">
 						No Task Assigned to the project
 					</div>
 				) : (
-					<DataTable data={tasks} columns={taskColumns} />
+					<DataTable data={tasks?.data} columns={taskColumns} />
 				)}
 			</div>
 		</div>

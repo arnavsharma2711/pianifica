@@ -2,7 +2,7 @@
 
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
-import StoreProvider, { useAppSelector } from "./redux";
+import { useAppSelector } from "./redux";
 import { useEffect } from "react";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
@@ -36,11 +36,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
-	return (
-		<StoreProvider>
-			<DashboardLayout>{children}</DashboardLayout>
-		</StoreProvider>
-	);
+	return <DashboardLayout>{children}</DashboardLayout>;
 };
 
 export default DashboardWrapper;

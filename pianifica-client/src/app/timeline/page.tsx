@@ -21,7 +21,7 @@ const Timeline = () => {
 
 	const ganttTasks = useMemo(() => {
 		return (
-			projects?.map((project) => ({
+			projects?.data?.map((project) => ({
 				start: new Date(project.startDate as string),
 				end: new Date(project.endDate as string),
 				name: project.name,

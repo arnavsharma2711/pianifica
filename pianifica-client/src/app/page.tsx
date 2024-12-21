@@ -36,9 +36,10 @@ const Dashboard = () => {
 	const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
 	if (tasksLoading || isProjectsLoading) return <div>Loading..</div>;
-	if (tasksError || !tasks || !projects) return <div>Error fetching data</div>;
+	if (tasksError || !tasks?.success || !projects?.success)
+		return <div>Error fetching data</div>;
 
-	const priorityCount = tasks.reduce(
+	const priorityCount = tasks?.data.reduce(
 		(acc: Record<string, number>, task: Task) => {
 			const { priority } = task;
 			acc[priority as Priority] = (acc[priority as Priority] || 0) + 1;
@@ -52,7 +53,7 @@ const Dashboard = () => {
 		count: priorityCount[key],
 	}));
 
-	const statusCount = projects.reduce(
+	const statusCount = projects?.data.reduce(
 		(acc: Record<string, number>, project: Project) => {
 			const status =
 				project.endDate && new Date(project.endDate) < new Date()
@@ -154,7 +155,7 @@ const Dashboard = () => {
 					<h3 className="mb-4 text-lg font-semibold dark:text-white">
 						Your Tasks
 					</h3>
-					<DataTable data={tasks} columns={taskColumns} />
+					<DataTable data={tasks.data} columns={taskColumns} />
 				</div>
 			</div>
 		</div>

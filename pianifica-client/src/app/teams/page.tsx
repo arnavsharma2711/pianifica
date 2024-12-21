@@ -9,7 +9,7 @@ const Teams = () => {
 	const { data: teams, isLoading, isError } = useGetTeamsQuery();
 
 	if (isLoading) return <div>Loading...</div>;
-	if (isError || !teams) return <div>Error fetching teams</div>;
+	if (isError || !teams?.success) return <div>Error fetching teams</div>;
 
 	const teamColumns = [
 		{
@@ -30,7 +30,7 @@ const Teams = () => {
 	return (
 		<div className="flex w-full flex-col p-8">
 			<Header name="Teams" />
-			<DataTable data={teams} columns={teamColumns} />
+			<DataTable data={teams?.data} columns={teamColumns} />
 		</div>
 	);
 };
