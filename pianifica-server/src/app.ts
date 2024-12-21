@@ -7,6 +7,7 @@ import cookieParserMiddleware from "cookie-parser";
 import path from "node:path";
 
 import { handleError, handleNotFound } from "./middlewares/middlewares";
+import responseHandlers from "./middlewares/response";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -18,6 +19,7 @@ expressApp.use(corsMiddleware());
 expressApp.use(bodyParser.json());
 expressApp.use(express.json());
 expressApp.use(cookieParserMiddleware());
+expressApp.use(responseHandlers);
 
 // Define root route
 expressApp.get("/", (_req, res) => {
