@@ -102,7 +102,24 @@ export const getExistingUser = async ({
   else if (username) user = await getUserByUsername({ username });
   else if (email) user = await getUserByEmail({ email });
 
-  return user;
+  return {
+    ...user,
+    role: (() => {
+      if (
+        user?.userRoles?.some(
+          (userRole) => userRole.role?.name === "SUPER_ADMIN"
+        )
+      ) {
+        return "SUPER_ADMIN";
+      }
+      if (
+        user?.userRoles?.some((userRole) => userRole.role?.name === "ORG_ADMIN")
+      ) {
+        return "ORG_ADMIN";
+      }
+      return "MEMBER";
+    })(),
+  } as typeof user & { role: string };
 };
 
 export const generateUserToken = async ({

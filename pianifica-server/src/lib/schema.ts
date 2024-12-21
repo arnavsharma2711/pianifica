@@ -32,4 +32,9 @@ export const userInfoSchema = z.object({
       invalid_type_error: "Profile picture URL must be a text",
     })
     .optional(),
+  role: z
+    .string({
+      invalid_type_error: "Role must be a text",
+    })
+    .optional(),
 });

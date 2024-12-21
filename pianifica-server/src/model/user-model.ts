@@ -41,6 +41,13 @@ export const getUserById = async ({ id }: { id: number }) => {
         id,
       },
     },
+    include: {
+      userRoles: {
+        select: {
+          role: true,
+        },
+      },
+    },
   });
 
   return user;
@@ -54,6 +61,13 @@ export const getUserByEmail = async ({ email }: { email: string }) => {
         email,
       },
     },
+    include: {
+      userRoles: {
+        select: {
+          role: true,
+        },
+      },
+    },
   });
 
   return user;
@@ -65,6 +79,13 @@ export const getUserByUsername = async ({ username }: { username: string }) => {
       AND: {
         deletedAt: null,
         username,
+      },
+    },
+    include: {
+      userRoles: {
+        select: {
+          role: true,
+        },
       },
     },
   });

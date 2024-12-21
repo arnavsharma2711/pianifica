@@ -16,6 +16,7 @@ declare global {
         email: string;
         username: string;
         organizationId: number;
+        role: string | null;
       };
     }
 

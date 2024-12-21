@@ -21,7 +21,6 @@ export const authenticationMiddleware = controllerWrapper(
     const userDetails = await getExistingUser({ id: decodedToken?.id });
 
     if (!userDetails) {
-      res.sendStatus(401);
       throw new CustomError(401, "Unauthorized", "Invalid Access Token");
     }
 
@@ -30,6 +29,7 @@ export const authenticationMiddleware = controllerWrapper(
       email: userDetails.email,
       username: userDetails.username,
       organizationId: userDetails.organizationId,
+      role: userDetails.role,
     };
     next();
   }
