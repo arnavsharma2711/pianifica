@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
   getTeams,
-} from "../controllers/team-controller";
+} from "../controllers/team/controller";
 
 const router = Router();
 

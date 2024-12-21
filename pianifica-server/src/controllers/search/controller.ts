@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import prisma from "../utils/prisma";
+import prisma from "../../utils/prisma";
 
 export const search = async (req: Request, res: Response): Promise<void> => {
   try {
