@@ -20,10 +20,18 @@ export function handleError(
   res: Response,
   next: NextFunction
 ) {
-  res.failure({
-    message: GENERIC_ERROR_MESSAGE,
-    error: err.message,
-  });
+  if (err instanceof SyntaxError) {
+    res.failure({
+      status: 400,
+      message: "Invalid JSON payload",
+      error: err.message,
+    });
+  } else {
+    res.failure({
+      message: GENERIC_ERROR_MESSAGE,
+      error: err.message,
+    });
+  }
   next();
 }
 

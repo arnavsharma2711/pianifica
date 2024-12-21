@@ -14,12 +14,11 @@ dotenv.config();
 
 const expressApp = express();
 expressApp.use(morganLogger("dev"));
+expressApp.use(responseHandlers);
 expressApp.use(helmetSecurity());
 expressApp.use(corsMiddleware());
-expressApp.use(bodyParser.json());
 expressApp.use(express.json());
 expressApp.use(cookieParserMiddleware());
-expressApp.use(responseHandlers);
 
 // Define root route
 expressApp.get("/", (_req, res) => {
