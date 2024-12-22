@@ -1,5 +1,24 @@
 import { z } from "zod";
 
+export const organizationSchema = z.object({
+  id: z.number({
+    required_error: "ID is required",
+    invalid_type_error: "ID must be a number",
+  }),
+  name: z.string({
+    required_error: "Organization name is required",
+    invalid_type_error: "Organization name must be a text",
+  }),
+  createdAt: z.date({
+    required_error: "Created at is required",
+    invalid_type_error: "Created at must be a date",
+  }),
+  updatedAt: z.date({
+    required_error: "Updated at is required",
+    invalid_type_error: "Updated at must be a date",
+  }),
+});
+
 export const userInfoSchema = z.object({
   id: z.number({
     required_error: "ID is required",

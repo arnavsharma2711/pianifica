@@ -27,11 +27,51 @@ import {
   getProjects,
   updateProject,
 } from "./controllers/project/controller";
+import { superAdminAuthenticationMiddleware } from "./middlewares/super-admin-authentication";
+import {
+  createOrganization,
+  deleteOrganization,
+  getOrganization,
+  getOrganizations,
+  updateOrganization,
+} from "./controllers/organization/controller";
 
 const router = Router();
 
 router.use("/auth", authRoutes);
 router.use("/task", authenticationMiddleware, taskRoutes);
+
+//Organization routes
+router.get(
+  "/organizations",
+  authenticationMiddleware,
+  superAdminAuthenticationMiddleware,
+  getOrganizations
+);
+router.get(
+  "/organization/:id",
+  authenticationMiddleware,
+  superAdminAuthenticationMiddleware,
+  getOrganization
+);
+router.post(
+  "/organization",
+  authenticationMiddleware,
+  superAdminAuthenticationMiddleware,
+  createOrganization
+);
+router.put(
+  "/organization",
+  authenticationMiddleware,
+  superAdminAuthenticationMiddleware,
+  updateOrganization
+);
+router.delete(
+  "/organization/:id",
+  authenticationMiddleware,
+  superAdminAuthenticationMiddleware,
+  deleteOrganization
+);
 
 // Project routes
 router.get("/projects", authenticationMiddleware, getProjects);
