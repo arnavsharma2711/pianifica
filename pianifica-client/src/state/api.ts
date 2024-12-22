@@ -21,6 +21,7 @@ export const api = createApi({
         method: "POST",
         body: { emailOrUsername, password },
       }),
+      invalidatesTags: ["Projects", "Tasks", "Users", "Teams"],
     }),
     registerUser: build.mutation<
       ApiResponse<{ accessToken: string; userInfo: User }>,
@@ -52,10 +53,11 @@ export const api = createApi({
           password,
         },
       }),
+      invalidatesTags: ["Projects", "Tasks", "Users", "Teams"],
     }),
     getProjects: build.query<ApiResponse<Project[]>, void>({
       query: () => ({
-        url: "project",
+        url: "projects",
         headers: {
           "Content-Type": "application/json",
           Authorization: sessionStorage.getItem("accessToken") || undefined,
