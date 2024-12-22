@@ -1,27 +1,79 @@
-import prisma from "../../utils/prisma";
 import controllerWrapper from "../../lib/controllerWrapper";
 import {
   deleteExistingUser,
+  getExistingUser,
+  getExistingUsers,
   updateExistingUser,
 } from "../../service/user-service";
 import { updateUserSchema } from "./schema";
 import { userInfoSchema } from "../../lib/schema";
 import { isAdmin } from "../../lib/utils";
 
+// GET api/users
 export const getUsers = controllerWrapper(async (req, res) => {
-  const users = await prisma.user.findMany({
-    where: { deletedAt: null },
-    orderBy: {
-      updatedAt: "desc",
-    },
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to view users",
+    });
+    return;
+  }
+
+  const { users, totalCount } = await getExistingUsers({
+    organizationId: req.user?.organizationId,
   });
+
+  const userInfo = users.map((user) => userInfoSchema.parse(user));
 
   res.success({
     message: "User fetched successfully!",
-    data: users,
+    data: userInfo,
+    total_count: totalCount,
   });
 });
 
+// GET api/user/:username
+export const getUser = controllerWrapper(async (req, res) => {
+  const { username } = req.params;
+
+  if (!username) {
+    res.invalid({
+      message: "Missing required parameter: username",
+      error: "username is required to fetch the user",
+    });
+    return;
+  }
+
+  const user = await getExistingUser({
+    username,
+    organizationId: req.user?.organizationId,
+  });
+
+  if (!user) {
+    res.invalid({
+      message: "User not found!",
+      error: "User with the given username does not exist",
+    });
+    return;
+  }
+
+  const userInfo = userInfoSchema.parse(user);
+  res.success({
+    message: "User fetched successfully!",
+    data: userInfo,
+  });
+});
+
+// GET api/user
+export const getCurrentUser = controllerWrapper(async (req, res) => {
+  const userInfo = userInfoSchema.parse(req.user);
+  res.success({
+    message: "User fetched successfully!",
+    data: userInfo,
+  });
+});
+
+// POST api/user/:id
 export const updateUser = controllerWrapper(async (req, res) => {
   const { id } = req.params;
   const { firstName, lastName, profilePictureUrl } = updateUserSchema.parse(
@@ -50,6 +102,7 @@ export const updateUser = controllerWrapper(async (req, res) => {
   });
 });
 
+// DELETE api/user/:id
 export const deleteUser = controllerWrapper(async (req, res) => {
   const { id } = req.params;
 

@@ -3,7 +3,7 @@ import controllerWrapper from "../../lib/controllerWrapper";
 
 export const getProjects = controllerWrapper(async (req, res) => {
   const projects = await prisma.project.findMany({
-    where: { deletedAt: null },
+    where: { deletedAt: null, organizationId: req.user?.organizationId },
     orderBy: {
       updatedAt: "desc",
     },

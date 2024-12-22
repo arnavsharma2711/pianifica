@@ -3,6 +3,7 @@ import { ACCESS_TOKEN_SECRET } from "../constants";
 import { CustomError } from "../lib/error/custom.error";
 import controllerWrapper from "../lib/controllerWrapper";
 import { getExistingUser } from "../service/user-service";
+import { userInfoSchema } from "../lib/schema";
 
 export const authenticationMiddleware = controllerWrapper(
   async (req, res, next) => {
@@ -24,13 +25,8 @@ export const authenticationMiddleware = controllerWrapper(
       throw new CustomError(401, "Unauthorized", "Invalid Access Token");
     }
 
-    req.user = {
-      id: userDetails.id,
-      email: userDetails.email,
-      username: userDetails.username,
-      organizationId: userDetails.organizationId,
-      role: userDetails.role,
-    };
+    const userInfo = userInfoSchema.parse(userDetails);
+    req.user = userInfo;
     next();
   }
 );

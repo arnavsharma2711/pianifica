@@ -33,6 +33,39 @@ export const createUser = async ({
   return newUser;
 };
 
+export const getUsers = async ({
+  organizationId,
+}: {
+  organizationId: number;
+}) => {
+  const users = await Prisma.user.findMany({
+    where: {
+      AND: {
+        deletedAt: null,
+        organizationId,
+      },
+    },
+    include: {
+      userRoles: {
+        select: {
+          role: true,
+        },
+      },
+    },
+  });
+
+  const totalCount = await Prisma.user.count({
+    where: {
+      AND: {
+        deletedAt: null,
+        organizationId,
+      },
+    },
+  });
+
+  return { users, totalCount };
+};
+
 export const getUserById = async ({ id }: { id: number }) => {
   const user = await Prisma.user.findFirst({
     where: {
@@ -73,13 +106,26 @@ export const getUserByEmail = async ({ email }: { email: string }) => {
   return user;
 };
 
-export const getUserByUsername = async ({ username }: { username: string }) => {
+export const getUserByUsername = async ({
+  username,
+  organizationId,
+}: {
+  username: string;
+  organizationId?: number;
+}) => {
+  const queryParameters: {
+    deletedAt: null;
+    username: string;
+    organizationId?: number;
+  } = {
+    deletedAt: null,
+    username,
+  };
+  if (organizationId) queryParameters.organizationId = organizationId;
+
   const user = await Prisma.user.findFirst({
     where: {
-      AND: {
-        deletedAt: null,
-        username,
-      },
+      AND: queryParameters,
     },
     include: {
       userRoles: {

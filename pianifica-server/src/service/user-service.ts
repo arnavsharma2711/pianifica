@@ -8,8 +8,20 @@ import {
   getUserByEmail,
   getUserById,
   getUserByUsername,
+  getUsers,
   updateUser,
 } from "../model/user-model";
+
+const determineHighestRole = ({
+  userRoles,
+}: {
+  userRoles: { role: { name: string } }[];
+}) => {
+  const roleNames = userRoles?.map((userRole) => userRole.role?.name) || [];
+  if (roleNames.includes("SUPER_ADMIN")) return "SUPER_ADMIN";
+  if (roleNames.includes("ORG_ADMIN")) return "ORG_ADMIN";
+  return "MEMBER";
+};
 
 export const createNewUser = async ({
   organizationId,
@@ -88,38 +100,45 @@ export const updateExistingUser = async ({
   return updatedUser;
 };
 
+export const getExistingUsers = async ({
+  organizationId,
+}: {
+  organizationId: number;
+}) => {
+  const { users, totalCount } = await getUsers({ organizationId });
+
+  const usersWithRole = users.map((user) => ({
+    ...user,
+    role: determineHighestRole({ userRoles: user.userRoles }),
+  }));
+
+  return { users: usersWithRole, totalCount };
+};
+
 export const getExistingUser = async ({
   id,
   username,
   email,
+  organizationId,
 }: {
   id?: number;
   username?: string;
   email?: string;
+  organizationId?: number;
 }) => {
   let user = null;
-  if (id) user = await getUserById({ id });
-  else if (username) user = await getUserByUsername({ username });
-  else if (email) user = await getUserByEmail({ email });
+  if (organizationId) {
+    if (username) user = await getUserByUsername({ username, organizationId });
+  } else {
+    if (id) user = await getUserById({ id });
+    else if (username) user = await getUserByUsername({ username });
+    else if (email) user = await getUserByEmail({ email });
+  }
 
   if (!user) return null;
   return {
     ...user,
-    role: (() => {
-      if (
-        user?.userRoles?.some(
-          (userRole) => userRole.role?.name === "SUPER_ADMIN"
-        )
-      ) {
-        return "SUPER_ADMIN";
-      }
-      if (
-        user?.userRoles?.some((userRole) => userRole.role?.name === "ORG_ADMIN")
-      ) {
-        return "ORG_ADMIN";
-      }
-      return "MEMBER";
-    })(),
+    role: determineHighestRole({ userRoles: user.userRoles }),
   } as typeof user & { role: string };
 };
 

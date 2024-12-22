@@ -16,7 +16,10 @@ declare global {
         email: string;
         username: string;
         organizationId: number;
-        role: string | null;
+        firstName: string;
+        lastName: string;
+        profilePictureUrl: string | null;
+        role?: string | null;
       };
     }
 
