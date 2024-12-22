@@ -16,6 +16,7 @@ interface DataTableProps<T> {
 		cell?: (item: T) => React.ReactNode;
 	}[];
 	withIndex?: boolean;
+	emptyStr?: string;
 	actionHeader?: string;
 	action?: (item: T) => React.ReactNode;
 }
@@ -24,11 +25,12 @@ export function DataTable<T>({
 	data,
 	columns,
 	withIndex = false,
+	emptyStr = "No data available",
 	actionHeader,
 	action,
 }: DataTableProps<T>) {
 	return (
-		<Table>
+		<Table isEmpty={data.length === 0} emptyStr={emptyStr}>
 			<TableHeader>
 				<TableRow header={true}>
 					{withIndex && <TableHead>S. No.</TableHead>}

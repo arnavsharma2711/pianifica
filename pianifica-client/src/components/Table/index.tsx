@@ -1,9 +1,14 @@
-const Table = ({ children }: { children: React.ReactNode }) => {
+const Table = ({
+	children,
+	isEmpty = false,
+	emptyStr = "No data available",
+}: { children: React.ReactNode; isEmpty?: boolean; emptyStr?: string }) => {
 	return (
 		<div className="relative border-2 dark:border-zinc-800 overflow-x-auto shadow-md sm:rounded-lg">
 			<table className="w-full text-md text-left rtl:text-right">
 				{children}
 			</table>
+			{isEmpty && <EmptyTable str={emptyStr} />}
 		</div>
 	);
 };
@@ -51,6 +56,14 @@ const TableRow = ({
 
 const TableCell = ({ children }: { children: React.ReactNode }) => {
 	return <td className="px-6 py-4 whitespace-nowrap">{children}</td>;
+};
+
+const EmptyTable = ({ str = "No data available" }: { str?: string }) => {
+	return (
+		<div className="h-72 w-full flex items-center justify-center text-lg bg-grey-100 dark:bg-dark-secondary">
+			{str}
+		</div>
+	);
 };
 
 export { Table, TableHeader, TableBody, TableHead, TableRow, TableCell };
