@@ -1,6 +1,5 @@
 import { Router } from "express";
 import authRoutes from "./routes/auth-routes";
-import projectRoutes from "./routes/project-routes";
 import taskRoutes from "./routes/task-routes";
 import searchRoutes from "./routes/search-routes";
 import { authenticationMiddleware } from "./middlewares/authentication";
@@ -21,12 +20,25 @@ import {
   updateTeam,
   deleteTeam,
 } from "./controllers/team/controller";
+import {
+  createProject,
+  deleteProject,
+  getProject,
+  getProjects,
+  updateProject,
+} from "./controllers/project/controller";
 
 const router = Router();
 
 router.use("/auth", authRoutes);
-router.use("/project", authenticationMiddleware, projectRoutes);
 router.use("/task", authenticationMiddleware, taskRoutes);
+
+// Project routes
+router.get("/projects", authenticationMiddleware, getProjects);
+router.get("/project/:id", authenticationMiddleware, getProject);
+router.post("/project", authenticationMiddleware, createProject);
+router.put("/project", authenticationMiddleware, updateProject);
+router.delete("/project/:projectId", authenticationMiddleware, deleteProject);
 
 // Team routes
 router.get("/teams", authenticationMiddleware, getTeams);

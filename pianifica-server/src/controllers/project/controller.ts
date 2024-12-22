@@ -1,74 +1,163 @@
-import prisma from "../../utils/prisma";
 import controllerWrapper from "../../lib/controllerWrapper";
+import {
+  createNewProject,
+  deleteExistingProject,
+  getExistingProject,
+  getExistingProjects,
+  updateExistingProject,
+} from "../../service/project-service";
+import { isAdmin } from "../../lib/utils";
+import { createProjectSchema, updateProjectSchema } from "./schema";
+import { projectSchema } from "../../lib/schema";
 
+// GET api/projects
 export const getProjects = controllerWrapper(async (req, res) => {
-  const projects = await prisma.project.findMany({
-    where: { deletedAt: null, organizationId: req.user?.organizationId },
-    orderBy: {
-      updatedAt: "desc",
-    },
-  });
-  res.success({ message: "Projects fetched successfully.", data: projects });
-});
-
-export const createProject = controllerWrapper(async (req, res) => {
-  const { name, description, startDate, endDate, organizationId } = req.body;
-
-  if (!name || !startDate || !endDate || !organizationId) {
-    res.invalid({
-      message: "Validation Error",
-      error:
-        "Missing required fields: Name, Start Date, End Date, and Organization ID are mandatory to create a project.",
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to get project from the organization.",
     });
     return;
   }
-  const newProject = await prisma.project.create({
-    data: {
-      name,
-      description,
-      startDate,
-      endDate,
-      organizationId,
-    },
+
+  const projects = await getExistingProjects({
+    organizationId: req.user?.organizationId,
   });
+
+  const projectData = projects.map((project) => projectSchema.parse(project));
+
   res.success({
-    status: 201,
-    message: "Project created successfully.",
-    data: newProject,
+    message: "Projects fetched successfully.",
+    data: projectData,
   });
 });
 
-export const updateProject = controllerWrapper(async (req, res) => {
-  const { projectId } = req.params;
-  const { name, description, startDate, endDate } = req.body;
-
-  if (!projectId) {
-    res.invalid({
-      message: "Missing required parameter: Project ID",
-      error: "Project ID is required to update the project.",
+// GET api/project/:id
+export const getProject = controllerWrapper(async (req, res) => {
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to get project from the organization.",
     });
     return;
   }
 
-  const updatedProject = await prisma.project.update({
-    where: { id: Number(projectId) },
-    data: {
-      name,
-      description,
-      startDate,
-      endDate,
-      updatedAt: new Date(),
-    },
+  const { id } = req.params;
+
+  const project = await getExistingProject({
+    id: Number(id),
+    organizationId: req.user?.organizationId,
   });
+  if (!project) {
+    res.invalid({
+      message: "Project not found",
+      error: "Project with the given ID does not exist.",
+    });
+    return;
+  }
+  const projectData = projectSchema.parse(project);
+
+  res.success({
+    message: "Projects fetched successfully.",
+    data: projectData,
+  });
+});
+
+// POST api/project
+export const createProject = controllerWrapper(async (req, res) => {
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to remove project from the organization.",
+    });
+    return;
+  }
+
+  if (!isAdmin(req.user?.role)) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to remove project from the organization.",
+    });
+    return;
+  }
+
+  const { name, description, startDate, endDate } = createProjectSchema.parse(
+    req.body
+  );
+
+  const updatedProject = await createNewProject({
+    organizationId: req.user?.organizationId,
+    name,
+    description,
+    startDate: startDate ? new Date(startDate) : null,
+    endDate: endDate ? new Date(endDate) : null,
+  });
+
+  const projectData = projectSchema.parse(updatedProject);
 
   res.success({
     message: "Project updated successfully.",
-    data: updatedProject,
+    data: projectData,
   });
 });
 
+// PUT api/project
+export const updateProject = controllerWrapper(async (req, res) => {
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to remove project from the organization.",
+    });
+    return;
+  }
+
+  if (!isAdmin(req.user?.role)) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to remove project from the organization.",
+    });
+    return;
+  }
+
+  const { id, name, description, startDate, endDate } =
+    updateProjectSchema.parse(req.body);
+
+  const updatedProject = await updateExistingProject({
+    id: Number(id),
+    organizationId: req.user?.organizationId,
+    name,
+    description,
+    startDate: startDate ? new Date(startDate) : null,
+    endDate: endDate ? new Date(endDate) : null,
+  });
+
+  const projectData = projectSchema.parse(updatedProject);
+
+  res.success({
+    message: "Project updated successfully.",
+    data: projectData,
+  });
+});
+
+// DELETE api/project/:projectId
 export const deleteProject = controllerWrapper(async (req, res) => {
   const { projectId } = req.params;
+
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to remove project from the organization.",
+    });
+    return;
+  }
+
+  if (!isAdmin(req.user?.role)) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to remove project from the organization.",
+    });
+    return;
+  }
 
   if (!projectId) {
     res.invalid({
@@ -78,13 +167,10 @@ export const deleteProject = controllerWrapper(async (req, res) => {
     return;
   }
 
-  const deletedProject = await prisma.project.update({
-    where: { id: Number(projectId) },
-    data: { deletedAt: new Date() },
+  await deleteExistingProject({
+    id: Number(projectId),
+    organizationId: req.user?.organizationId,
   });
 
-  res.success({
-    message: "Project deleted successfully.",
-    data: deletedProject,
-  });
+  res.success({ message: "Project deleted successfully." });
 });

@@ -58,3 +58,33 @@ export const teamSchema = z.object({
   teamLead: userInfoSchema,
   teamManager: userInfoSchema,
 });
+
+export const projectSchema = z.object({
+  id: z.number({
+    required_error: "ID is required",
+    invalid_type_error: "ID must be a number",
+  }),
+  name: z.string({
+    required_error: "Project name is required",
+    invalid_type_error: "Project name must be a text",
+  }),
+  organizationId: z.number({
+    required_error: "Organization ID is required",
+    invalid_type_error: "Organization ID must be a number",
+  }),
+  description: z
+    .string({
+      invalid_type_error: "Project description must be a text",
+    })
+    .optional(),
+  startDate: z
+    .date({
+      invalid_type_error: "Start date must be a date",
+    })
+    .optional(),
+  endDate: z
+    .date({
+      invalid_type_error: "End date must be a date",
+    })
+    .optional(),
+});
