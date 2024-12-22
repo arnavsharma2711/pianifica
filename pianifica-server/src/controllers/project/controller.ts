@@ -6,9 +6,10 @@ import {
   getExistingProjects,
   updateExistingProject,
 } from "../../service/project-service";
+import { getExistingTasks } from "../../service/task-service";
 import { isAdmin } from "../../lib/utils";
 import { createProjectSchema, updateProjectSchema } from "./schema";
-import { projectSchema } from "../../lib/schema";
+import { projectSchema, taskSchema } from "../../lib/schema";
 
 // GET api/projects
 export const getProjects = controllerWrapper(async (req, res) => {
@@ -60,6 +61,36 @@ export const getProject = controllerWrapper(async (req, res) => {
   res.success({
     message: "Projects fetched successfully.",
     data: projectData,
+  });
+});
+
+// GET api/project/:id/tasks
+export const getProjectTasks = controllerWrapper(async (req, res) => {
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to fetch task from the project.",
+    });
+    return;
+  }
+  const { id } = req.params;
+  if (!id) {
+    res.invalid({
+      message: "Missing required parameter: id",
+      error: "Project id is required to fetch tasks.",
+    });
+    return;
+  }
+
+  const tasks = await getExistingTasks({
+    projectId: Number(id),
+    organizationId: req.user?.organizationId,
+  });
+
+  const taskData = tasks.map((task) => taskSchema.parse(task));
+  res.success({
+    message: "Tasks fetched successfully.",
+    data: taskData,
   });
 });
 

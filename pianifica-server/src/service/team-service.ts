@@ -267,8 +267,8 @@ export const addNewTeamMember = async ({
     );
   }
 
-  const existingUser = await getExistingUser({ id: userId });
-  if (!existingUser || existingUser.organizationId !== organizationId) {
+  const existingUser = await getExistingUser({ id: userId, organizationId });
+  if (!existingUser) {
     throw new CustomError(
       400,
       "User not found!",

@@ -1,35 +1,34 @@
-import type { Request, Response } from "express";
-import prisma from "../../utils/prisma";
 import controllerWrapper from "../../lib/controllerWrapper";
+import {
+  createNewTask,
+  deleteExistingTask,
+  getExistingTask,
+  getExistingUserTasks,
+  updateExistingTask,
+  updateExistingTaskAssignedUser,
+  updateExistingTaskPriority,
+  updateExistingTaskStatus,
+} from "../../service/task-service";
+import {
+  createTaskSchema,
+  updateTaskAssigneeSchema,
+  updateTaskPrioritySchema,
+  updateTaskSchema,
+  updateTaskStatusSchema,
+  userTaskSchema,
+} from "./schema";
+import { taskSchema } from "../../lib/schema";
+import type { Priority, Status } from "@prisma/client";
 
-export const getTasks = controllerWrapper(async (req, res) => {
-  const { projectId } = req.query;
-  if (!projectId) {
-    res.invalid({
-      message: "Missing required parameter: Project ID",
-      error: "Project ID is required to fetch tasks.",
+export const createTask = controllerWrapper(async (req, res) => {
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to create task for the project.",
     });
     return;
   }
-  const tasks = await prisma.task.findMany({
-    where: {
-      projectId: Number(projectId),
-      deletedAt: null,
-    },
-    include: {
-      author: true,
-      assignee: true,
-      comments: true,
-      attachments: true,
-    },
-    orderBy: {
-      updatedAt: "desc",
-    },
-  });
-  res.success({ message: "Tasks fetched successfully.", data: tasks });
-});
 
-export const createTask = controllerWrapper(async (req, res) => {
   const {
     title,
     description,
@@ -40,44 +39,105 @@ export const createTask = controllerWrapper(async (req, res) => {
     dueDate,
     points,
     projectId,
-    authorId,
     assigneeId,
-  } = req.body;
+  } = createTaskSchema.parse(req.body);
 
-  if (!title || !projectId || !authorId) {
-    res.invalid({
-      message: "Validation Error",
-      error:
-        "Missing required fields: Title, Project ID, and Author ID are mandatory to create a task.",
+  const createdTask = await createNewTask({
+    organizationId: req.user?.organizationId,
+    title,
+    description,
+    status,
+    priority,
+    tags,
+    startDate: startDate ? new Date(startDate) : null,
+    dueDate: dueDate ? new Date(dueDate) : null,
+    points,
+    projectId,
+    authorId: req.user?.id,
+    assigneeId: assigneeId || req.user?.id,
+  });
+
+  const taskData = taskSchema.parse(createdTask);
+  res.success({
+    message: "Task Created Successfully.",
+    data: taskData,
+  });
+});
+
+export const getTasks = controllerWrapper(async (req, res) => {
+  if (req.user?.id === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to fetch task.",
+    });
+    return;
+  }
+  const { priority, status } = userTaskSchema.parse(req.query);
+
+  const tasks = await getExistingUserTasks({
+    userId: req.user?.id,
+    filters: {
+      priority: priority as Priority | null | undefined,
+      status: status as Status | null | undefined,
+    },
+  });
+
+  const taskData = tasks.map((task) => taskSchema.parse(task));
+  res.success({
+    message: "Tasks fetched successfully.",
+    data: taskData,
+  });
+});
+
+export const getTask = controllerWrapper(async (req, res) => {
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to fetch task for the project.",
     });
     return;
   }
 
-  const newTask = await prisma.task.create({
-    data: {
-      title,
-      description,
-      status,
-      priority,
-      tags,
-      startDate,
-      dueDate,
-      points,
-      projectId,
-      authorId,
-      assigneeId,
-    },
+  const { id } = req.params;
+  if (!id) {
+    res.invalid({
+      message: "Missing required parameter: id",
+      error: "Task id is required to fetch the task.",
+    });
+    return;
+  }
+
+  const task = await getExistingTask({
+    id: Number(id),
+    organizationId: req.user?.organizationId,
+    withUserData: true,
   });
+  if (!task) {
+    res.invalid({
+      message: "Task not found",
+      error: "Task with the given id not found.",
+    });
+    return;
+  }
+
+  const taskData = taskSchema.parse(task);
   res.success({
-    status: 201,
-    message: "Created Task Successfully.",
-    data: newTask,
+    message: "Task fetched successfully.",
+    data: taskData,
   });
 });
 
 export const updateTask = controllerWrapper(async (req, res) => {
-  const { taskId } = req.params;
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to update task for the project.",
+    });
+    return;
+  }
+
   const {
+    id,
     title,
     description,
     status,
@@ -86,83 +146,141 @@ export const updateTask = controllerWrapper(async (req, res) => {
     startDate,
     dueDate,
     points,
-    projectId,
-    authorId,
     assigneeId,
-  } = req.body;
+  } = updateTaskSchema.parse(req.body);
 
-  if (!taskId) {
-    res.invalid({
-      message: "Missing required parameter: Task ID",
-      error: "Task ID is required to update the task.",
-    });
-    return;
-  }
-
-  const updatedTask = await prisma.task.update({
-    where: { id: Number(taskId) },
-    data: {
-      title,
-      description,
-      status,
-      priority,
-      tags,
-      startDate,
-      dueDate,
-      points,
-      projectId,
-      authorId,
-      assigneeId,
-      updatedAt: new Date(),
-    },
+  const updatedTask = await updateExistingTask({
+    id,
+    organizationId: req.user?.organizationId,
+    title,
+    description,
+    status,
+    priority,
+    tags,
+    startDate: startDate ? new Date(startDate) : null,
+    dueDate: dueDate ? new Date(dueDate) : null,
+    points,
+    assigneeId,
   });
+
+  const taskData = taskSchema.parse(updatedTask);
   res.success({
-    message: "Updated Task Successfully.",
-    data: updatedTask,
+    message: "Task Updated Successfully.",
+    data: taskData,
   });
 });
 
 export const deleteTask = controllerWrapper(async (req, res) => {
-  const { taskId } = req.params;
-
-  if (!taskId) {
-    res.invalid({
-      message: "Missing required parameter: Task ID",
-      error: "Task ID is required to delete the task.",
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to update task from the project.",
     });
     return;
   }
 
-  const deletedTask = await prisma.task.update({
-    where: { id: Number(taskId) },
-    data: { deletedAt: new Date() },
+  const { id } = req.params;
+  if (!id) {
+    res.invalid({
+      message: "Missing required parameter: id",
+      error: "Task id is required to delete the task.",
+    });
+    return;
+  }
+
+  await deleteExistingTask({
+    id: Number(id),
+    organizationId: req.user?.organizationId,
   });
+
   res.success({
     message: "Deleted Task Successfully.",
-    data: deletedTask,
   });
 });
 
 export const updateTaskStatus = controllerWrapper(async (req, res) => {
-  const { taskId } = req.params;
-  const { status } = req.body;
-
-  if (!taskId || !status) {
-    res.invalid({
-      message: "Missing required parameters: Task ID and Status",
-      error: "Task ID and Status are required to update the task status.",
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to update task from the project.",
     });
     return;
   }
 
-  const updatedTask = await prisma.task.update({
-    where: {
-      id: Number(taskId),
-    },
-    data: {
-      status: status,
-      updatedAt: new Date(),
-    },
+  const { id } = req.params;
+  const { status } = updateTaskStatusSchema.parse(req.body);
+  if (!id) {
+    res.invalid({
+      message: "Missing required parameters: id",
+      error: "Task id are required to update the task status.",
+    });
+    return;
+  }
+
+  const updatedTask = await updateExistingTaskStatus({
+    id: Number(id),
+    status,
+    organizationId: req.user?.organizationId,
+  });
+  res.success({
+    message: "Updated Task Status Successfully.",
+    data: updatedTask,
+  });
+});
+
+export const updateTaskPriority = controllerWrapper(async (req, res) => {
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to update task from the project.",
+    });
+    return;
+  }
+
+  const { id } = req.params;
+  const { priority } = updateTaskPrioritySchema.parse(req.body);
+  if (!id) {
+    res.invalid({
+      message: "Missing required parameters: id",
+      error: "Task id are required to update the task status.",
+    });
+    return;
+  }
+
+  const updatedTask = await updateExistingTaskPriority({
+    id: Number(id),
+    priority,
+    organizationId: req.user?.organizationId,
+  });
+  res.success({
+    message: "Updated Task Status Successfully.",
+    data: updatedTask,
+  });
+});
+
+export const updateTaskAssignee = controllerWrapper(async (req, res) => {
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to update task from the project.",
+    });
+    return;
+  }
+
+  const { id } = req.params;
+  const { assigneeId } = updateTaskAssigneeSchema.parse(req.body);
+  if (!id) {
+    res.invalid({
+      message: "Missing required parameters: id",
+      error: "Task id are required to update the task status.",
+    });
+    return;
+  }
+
+  const updatedTask = await updateExistingTaskAssignedUser({
+    id: Number(id),
+    assigneeId,
+    organizationId: req.user?.organizationId,
   });
   res.success({
     message: "Updated Task Status Successfully.",

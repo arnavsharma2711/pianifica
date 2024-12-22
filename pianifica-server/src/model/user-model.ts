@@ -66,14 +66,25 @@ export const getUsers = async ({
   return { users, totalCount };
 };
 
-export const getUserById = async ({ id }: { id: number }) => {
+export const getUserById = async ({
+  id,
+  organizationId,
+}: {
+  id: number;
+  organizationId?: number;
+}) => {
+  const queryParameters: {
+    deletedAt: null;
+    id: number;
+    organizationId?: number;
+  } = {
+    deletedAt: null,
+    id,
+  };
+  if (organizationId) queryParameters.organizationId = organizationId;
+
   const user = await Prisma.user.findFirst({
-    where: {
-      AND: {
-        deletedAt: null,
-        id,
-      },
-    },
+    where: { AND: queryParameters },
     include: {
       userRoles: {
         select: {

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Priority, Status } from "@prisma/client";
 
 export const organizationSchema = z.object({
   id: z.number({
@@ -106,4 +107,48 @@ export const projectSchema = z.object({
       invalid_type_error: "End date must be a date",
     })
     .optional(),
+});
+
+export const taskSchema = z.object({
+  id: z.number({
+    required_error: "ID is required",
+    invalid_type_error: "ID must be a number",
+  }),
+  title: z.string({
+    required_error: "Task title is required",
+    invalid_type_error: "Task title must be a text",
+  }),
+  description: z
+    .string({
+      invalid_type_error: "Task description must be a text",
+    })
+    .optional(),
+  status: z.nativeEnum(Status),
+  priority: z.nativeEnum(Priority),
+  tags: z
+    .string({
+      invalid_type_error: "Task tags must be a text",
+    })
+    .optional(),
+  startDate: z
+    .date({
+      invalid_type_error: "Start date must be a date",
+    })
+    .optional(),
+  dueDate: z
+    .date({
+      invalid_type_error: "Due date must be a date",
+    })
+    .optional(),
+  points: z
+    .number({
+      invalid_type_error: "Points must be a number",
+    })
+    .optional(),
+  projectId: z.number({
+    required_error: "Project ID is required",
+    invalid_type_error: "Project ID must be a number",
+  }),
+  author: userInfoSchema.optional(),
+  assignee: userInfoSchema.optional(),
 });

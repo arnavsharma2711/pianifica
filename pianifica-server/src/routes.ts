@@ -1,6 +1,5 @@
 import { Router } from "express";
 import authRoutes from "./routes/auth-routes";
-import taskRoutes from "./routes/task-routes";
 import searchRoutes from "./routes/search-routes";
 import { authenticationMiddleware } from "./middlewares/authentication";
 import {
@@ -25,6 +24,7 @@ import {
   deleteProject,
   getProject,
   getProjects,
+  getProjectTasks,
   updateProject,
 } from "./controllers/project/controller";
 import { superAdminAuthenticationMiddleware } from "./middlewares/super-admin-authentication";
@@ -35,11 +35,20 @@ import {
   getOrganizations,
   updateOrganization,
 } from "./controllers/organization/controller";
+import {
+  createTask,
+  deleteTask,
+  getTask,
+  getTasks,
+  updateTask,
+  updateTaskAssignee,
+  updateTaskPriority,
+  updateTaskStatus,
+} from "./controllers/task/controller";
 
 const router = Router();
 
 router.use("/auth", authRoutes);
-router.use("/task", authenticationMiddleware, taskRoutes);
 
 //Organization routes
 router.get(
@@ -76,9 +85,28 @@ router.delete(
 // Project routes
 router.get("/projects", authenticationMiddleware, getProjects);
 router.get("/project/:id", authenticationMiddleware, getProject);
+router.get("/project/:id/tasks", authenticationMiddleware, getProjectTasks);
 router.post("/project", authenticationMiddleware, createProject);
 router.put("/project", authenticationMiddleware, updateProject);
 router.delete("/project/:projectId", authenticationMiddleware, deleteProject);
+
+// Task routes
+router.get("/tasks", authenticationMiddleware, getTasks);
+router.get("/task/:id", authenticationMiddleware, getTask);
+router.post("/task", authenticationMiddleware, createTask);
+router.put("/task", authenticationMiddleware, updateTask);
+router.patch("/task/:id/status", authenticationMiddleware, updateTaskStatus);
+router.patch(
+  "/task/:id/priority",
+  authenticationMiddleware,
+  updateTaskPriority
+);
+router.patch(
+  "/task/:id/assignedUser",
+  authenticationMiddleware,
+  updateTaskAssignee
+);
+router.delete("/task/:id", authenticationMiddleware, deleteTask);
 
 // Team routes
 router.get("/teams", authenticationMiddleware, getTeams);

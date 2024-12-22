@@ -129,6 +129,7 @@ export const getExistingUser = async ({
   let user = null;
   if (organizationId) {
     if (username) user = await getUserByUsername({ username, organizationId });
+    if (id) user = await getUserById({ id, organizationId });
   } else {
     if (id) user = await getUserById({ id });
     else if (username) user = await getUserByUsername({ username });
