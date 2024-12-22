@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 import { faker } from "@faker-js/faker";
+import bcrypt from "bcrypt";
 
 async function createData(model: any, data: object) {
   try {
@@ -12,24 +13,31 @@ async function createData(model: any, data: object) {
 
 async function deleteAllData() {
   const modelNames = [
-    "Comment",
-    "Attachment",
-    "Task",
-    "ProjectTeam",
-    "Team",
-    "Project",
-    "UserRole",
-    "Role",
-    "User",
-    "Organization",
+    { name: "Comment", hasIdSequence: true },
+    { name: "Attachment", hasIdSequence: true },
+    { name: "Task", hasIdSequence: true },
+    { name: "UserTeam", hasIdSequence: false },
+    { name: "ProjectTeam", hasIdSequence: false },
+    { name: "Team", hasIdSequence: true },
+    { name: "Project", hasIdSequence: true },
+    { name: "UserRole", hasIdSequence: false },
+    { name: "Role", hasIdSequence: true },
+    { name: "User", hasIdSequence: true },
+    { name: "Organization", hasIdSequence: true },
   ];
   for (const modelName of modelNames) {
     try {
-      await prisma.$executeRawUnsafe(`DELETE FROM "${modelName}";`);
-      await prisma.$executeRawUnsafe(
-        `ALTER SEQUENCE "${modelName}_id_seq" RESTART WITH 1;`
+      await prisma.$executeRawUnsafe(`DELETE FROM "${modelName.name}";`);
+      if (modelName.hasIdSequence) {
+        await prisma.$executeRawUnsafe(
+          `ALTER SEQUENCE "${modelName.name}_id_seq" RESTART WITH 1;`
+        );
+      }
+      console.log(
+        `Cleared data from ${modelName.name}${
+          modelName.hasIdSequence ? " and reset id sequence." : "."
+        }`
       );
-      console.log(`Cleared data from ${modelName} and reset ID sequence`);
     } catch (error) {
       console.error(`Error clearing data from ${modelName}:`, error);
     }
@@ -54,6 +62,7 @@ const RoleModel: any = prisma["Role" as keyof typeof prisma];
 const UserRoleModel: any = prisma["UserRole" as keyof typeof prisma];
 const ProjectModel: any = prisma["Project" as keyof typeof prisma];
 const TeamModel: any = prisma["Team" as keyof typeof prisma];
+const UserTeamModel: any = prisma["UserTeam" as keyof typeof prisma];
 const ProjectTeamModel: any = prisma["ProjectTeam" as keyof typeof prisma];
 const TaskModel: any = prisma["Task" as keyof typeof prisma];
 const AttachmentModel: any = prisma["Attachment" as keyof typeof prisma];
@@ -84,12 +93,27 @@ async function createUser() {
     lastName: "Sharma",
     username: "arnavsharma2711",
     email: "arnavsharma2711@gmail.com",
-    password: "password",
-    profilePictureUrl: faker.image.avatar(),
+    password: bcrypt.hashSync("password", 10),
+    profilePictureUrl:
+      "https://utfs.io/f/DTNeoJKzjEnaxZ4f6n5XimWVey0lE3NdSHzKBu7j1TqMGt8h",
   });
 
   const orgUsers: { [key: number]: number[] } = {};
-
+  const profilePictureUrls = [
+    "https://utfs.io/f/DTNeoJKzjEnaRihbJz3aCjEzvNgrPGB4mb8W5xeft0FlohIX",
+    "https://utfs.io/f/DTNeoJKzjEnaJ5WayRrAXg1DAUZLGCmHWjufkVEPeihNpq82",
+    "https://utfs.io/f/DTNeoJKzjEna6wD48rC0vL9Bt4z8325eCWkx7lPHRdfgbNiA",
+    "https://utfs.io/f/DTNeoJKzjEnaMyglhtemF1taoGCZVSjIeW32fJhlAXvDQxR8",
+    "https://utfs.io/f/DTNeoJKzjEnaotvQyQYM4TZMJf9XKhidyF3wUzHOuEjVeIvn",
+    "https://utfs.io/f/DTNeoJKzjEnaISOQB0GLQ4C5F7TaNXiWh0ovRnG9Y12UmlDA",
+    "https://utfs.io/f/DTNeoJKzjEnalqsi3uSnJ0SLwdF96srQoPKI7WZbVU2ytB43",
+    "https://utfs.io/f/DTNeoJKzjEnatOVVoKJj8bxod69YOukKVy2J1WsrlP53AvNa",
+    "https://utfs.io/f/DTNeoJKzjEna1NlcWONVDJ3zw0rmSpLOntsMKycBGeq7gxj4",
+    "https://utfs.io/f/DTNeoJKzjEnac56saE9QmTzhxip0k92jHKMDAlcXEty3GWeI",
+    "https://utfs.io/f/DTNeoJKzjEnak8emcLREh8TMvGngWPt0awIY2UeBmsZulSA1",
+    "https://utfs.io/f/DTNeoJKzjEnaWlj1HQI7rsJnDMbI9CkYQ2qdpzTjlh4g0XBK",
+    "https://utfs.io/f/DTNeoJKzjEna825O5a6TulJYX23PrWiGnjsbSZVxEfaqNdkK",
+  ];
   for (const organization of organizations) {
     const userData = Array.from({ length: 5 }, () => {
       const firstName = faker.person.firstName();
@@ -108,8 +132,11 @@ async function createUser() {
         lastName: lastName,
         username: username.toLowerCase(),
         email: email.toLowerCase(),
-        password: faker.internet.password(),
-        profilePictureUrl: faker.image.avatar(),
+        password: bcrypt.hashSync("password", 10),
+        profilePictureUrl:
+          profilePictureUrls[
+            Math.floor(Math.random() * profilePictureUrls.length)
+          ],
       };
     });
 
@@ -130,11 +157,11 @@ async function createRole() {
   console.log("Creating roles...");
   const roleData = [
     {
-      name: "Super Admin",
+      name: "SUPER_ADMIN",
       description: "The user has access to all privileges",
     },
     {
-      name: "Organization Admin",
+      name: "ORG_ADMIN",
       description:
         "The user has access to all privileges within the organization",
     },
@@ -220,6 +247,7 @@ async function createTeam(admins: { [key: number]: number }) {
       name: faker.commerce.department(),
       managerId: admins[user.organizationId],
       leadId: user.id,
+      organizationId: user.organizationId,
     }));
 
     for (const team of teams) {
@@ -231,6 +259,15 @@ async function createTeam(admins: { [key: number]: number }) {
         await createData(ProjectTeamModel, {
           teamId: createdTeam.id,
           projectId: project.id,
+        });
+      }
+      const orgUsers = await UserModel.findMany({
+        where: { organizationId: user.organizationId },
+      });
+      for (const user of orgUsers) {
+        await createData(UserTeamModel, {
+          userId: user.id,
+          teamId: createdTeam.id,
         });
       }
     }

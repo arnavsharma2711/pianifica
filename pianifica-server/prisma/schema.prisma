@@ -35,6 +35,11 @@ model User {
   organization  Organization @relation(fields: [organizationId], references: [id])
   teamManagers  Team[]       @relation("TeamManager")
   teamLeads     Team[]       @relation("TeamLead")
+  userTeam      UserTeam[]
+
+  @@index([organizationId])
+  @@index([username])
+  @@index([email])
 }
 
 model UserRole {
@@ -57,17 +62,32 @@ model Role {
 }
 
 model Team {
-  id        Int       @id @default(autoincrement())
-  name      String
-  leadId    Int?
-  managerId Int?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
-  deletedAt DateTime?
+  id             Int       @id @default(autoincrement())
+  organizationId Int
+  name           String
+  leadId         Int?
+  managerId      Int?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now())
+  deletedAt      DateTime?
 
   teamManager  User?         @relation("TeamManager", fields: [managerId], references: [id])
   teamLead     User?         @relation("TeamLead", fields: [leadId], references: [id])
+  organization Organization  @relation(fields: [organizationId], references: [id])
   projectTeams ProjectTeam[]
+  userTeam     UserTeam[]
+}
+
+model UserTeam {
+  userId    Int
+  teamId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  team Team @relation(fields: [teamId], references: [id])
+
+  @@id([userId, teamId])
 }
 
 model Organization {
@@ -79,6 +99,7 @@ model Organization {
 
   users    User[]
   projects Project[]
+  teams    Team[]
 }
 
 model Project {
@@ -98,7 +119,6 @@ model Project {
 }
 
 model ProjectTeam {
-  id        Int      @id @default(autoincrement())
   teamId    Int
   projectId Int
   createdAt DateTime @default(now())
@@ -106,6 +126,7 @@ model ProjectTeam {
 
   team    Team    @relation(fields: [teamId], references: [id])
   project Project @relation(fields: [projectId], references: [id])
+  @@id([teamId, projectId])
 }
 
 enum Status {
