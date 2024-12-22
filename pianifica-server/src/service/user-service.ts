@@ -160,7 +160,7 @@ export const generateUserToken = async ({
     organizationId,
   };
   const accessToken = jwt.sign(accessTokenPayload, ACCESS_TOKEN_SECRET, {
-    expiresIn: "1h",
+    expiresIn: "8h",
   });
 
   return { accessToken };

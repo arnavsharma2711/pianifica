@@ -41,3 +41,20 @@ export const userInfoSchema = z.object({
     })
     .optional(),
 });
+
+export const teamSchema = z.object({
+  id: z.number({
+    required_error: "ID is required",
+    invalid_type_error: "ID must be a number",
+  }),
+  name: z.string({
+    required_error: "Team name is required",
+    invalid_type_error: "Team name must be a text",
+  }),
+  organizationId: z.number({
+    required_error: "Organization ID is required",
+    invalid_type_error: "Organization ID must be a number",
+  }),
+  teamLead: userInfoSchema,
+  teamManager: userInfoSchema,
+});

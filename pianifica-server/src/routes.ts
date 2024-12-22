@@ -2,7 +2,6 @@ import { Router } from "express";
 import authRoutes from "./routes/auth-routes";
 import projectRoutes from "./routes/project-routes";
 import taskRoutes from "./routes/task-routes";
-import teamRoutes from "./routes/team-routes";
 import searchRoutes from "./routes/search-routes";
 import { authenticationMiddleware } from "./middlewares/authentication";
 import {
@@ -12,13 +11,32 @@ import {
   updateUser,
   deleteUser,
 } from "./controllers/user/controller";
+import {
+  addTeamMember,
+  getTeamMembers,
+  getTeams,
+  getTeam,
+  removeTeamMember,
+  addTeam,
+  updateTeam,
+  deleteTeam,
+} from "./controllers/team/controller";
 
 const router = Router();
 
 router.use("/auth", authRoutes);
 router.use("/project", authenticationMiddleware, projectRoutes);
 router.use("/task", authenticationMiddleware, taskRoutes);
-router.use("/teams", authenticationMiddleware, teamRoutes);
+
+// Team routes
+router.get("/teams", authenticationMiddleware, getTeams);
+router.post("/team", authenticationMiddleware, addTeam);
+router.put("/team", authenticationMiddleware, updateTeam);
+router.delete("/team/:id", authenticationMiddleware, deleteTeam);
+router.get("/team/:id", authenticationMiddleware, getTeam);
+router.get("/team/:id/members", authenticationMiddleware, getTeamMembers);
+router.post("/team/:id/member", authenticationMiddleware, addTeamMember);
+router.delete("/team/:id/member", authenticationMiddleware, removeTeamMember);
 
 // User routes
 router.get("/users", authenticationMiddleware, getUsers);
