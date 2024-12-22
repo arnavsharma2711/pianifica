@@ -54,19 +54,35 @@ export const api = createApi({
       }),
     }),
     getProjects: build.query<ApiResponse<Project[]>, void>({
-      query: () => "project",
+      query: () => ({
+        url: "project",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+      }),
       providesTags: ["Projects"],
     }),
     createProject: build.mutation<ApiResponse<Project>, Partial<Project>>({
       query: (project) => ({
         url: "project",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
         method: "POST",
         body: project,
       }),
       invalidatesTags: ["Projects"],
     }),
     getTasks: build.query<ApiResponse<Task[]>, { projectId: number }>({
-      query: ({ projectId }) => `task?projectId=${projectId}`,
+      query: ({ projectId }) => ({
+        url: `task?projectId=${projectId}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+      }),
       providesTags: (result) =>
         result
           ? result.data.map(({ id }) => ({ type: "Tasks", id }))
@@ -75,6 +91,10 @@ export const api = createApi({
     createTask: build.mutation<ApiResponse<Task>, Partial<Task>>({
       query: (task) => ({
         url: "task",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
         method: "POST",
         body: task,
       }),
@@ -86,6 +106,10 @@ export const api = createApi({
     >({
       query: ({ taskId, status }) => ({
         url: `task/${taskId}/status`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
         method: "PATCH",
         body: { status },
       }),
@@ -94,15 +118,33 @@ export const api = createApi({
       ],
     }),
     getUsers: build.query<ApiResponse<User[]>, void>({
-      query: () => "users",
+      query: () => ({
+        url: "users",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+      }),
       providesTags: ["Users"],
     }),
     getTeams: build.query<ApiResponse<Team[]>, void>({
-      query: () => "teams",
+      query: () => ({
+        url: "teams",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+      }),
       providesTags: ["Teams"],
     }),
     searchTaskProjectUser: build.query<ApiResponse<Search>, string>({
-      query: (query) => `search?q=${query}`,
+      query: (query) => ({
+        url: `search?q=${query}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+      }),
     }),
   }),
 });

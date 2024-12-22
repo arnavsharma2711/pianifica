@@ -41,6 +41,7 @@ const AuthenticationForm = () => {
 					"userDetails",
 					JSON.stringify(user.data.userInfo),
 				);
+				sessionStorage.setItem("accessToken", user.data.accessToken);
 			} else {
 				setError(user?.message);
 			}
@@ -70,6 +71,7 @@ const AuthenticationForm = () => {
 					"userDetails",
 					JSON.stringify(user.data.userInfo),
 				);
+				sessionStorage.setItem("accessToken", user.data.accessToken);
 			} else {
 				setError(user?.message);
 			}
