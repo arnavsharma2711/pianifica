@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
 import "./globals.css";
 import DashboardWrapper from "./dashboard-wrapper";
+import AuthWrapper from "./auth-provider";
 
 const raleway = Raleway({
 	subsets: ["latin"],
@@ -23,7 +24,9 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body className={`${raleway.className} antialiased`}>
-				<DashboardWrapper>{children}</DashboardWrapper>
+				<AuthWrapper>
+					<DashboardWrapper>{children}</DashboardWrapper>
+				</AuthWrapper>
 			</body>
 		</html>
 	);

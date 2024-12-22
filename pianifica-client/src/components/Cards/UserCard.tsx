@@ -7,7 +7,7 @@ type Props = {
 
 const UserCard = ({ user }: Props) => {
 	return (
-		<div className="flex items-center rounded border p-4 shadow">
+		<div className="flex gap-2 items-center rounded border p-4 shadow">
 			{user.profilePictureUrl && (
 				<Image
 					src={user.profilePictureUrl || "/default-profile-picture.webp"}

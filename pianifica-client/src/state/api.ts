@@ -12,6 +12,47 @@ export const api = createApi({
   reducerPath: "api",
   tagTypes: ["Projects", "Tasks", "Users", "Teams"],
   endpoints: (build) => ({
+    loginUser: build.mutation<
+      ApiResponse<{ accessToken: string; userInfo: User }>,
+      { emailOrUsername: string; password: string }
+    >({
+      query: ({ emailOrUsername, password }) => ({
+        url: "auth/login",
+        method: "POST",
+        body: { emailOrUsername, password },
+      }),
+    }),
+    registerUser: build.mutation<
+      ApiResponse<{ accessToken: string; userInfo: User }>,
+      {
+        organizationId: number;
+        firstName: string;
+        lastName: string;
+        username: string;
+        email: string;
+        password: string;
+      }
+    >({
+      query: ({
+        organizationId,
+        firstName,
+        lastName,
+        username,
+        email,
+        password,
+      }) => ({
+        url: "auth/register",
+        method: "POST",
+        body: {
+          organizationId,
+          firstName,
+          lastName,
+          username,
+          email,
+          password,
+        },
+      }),
+    }),
     getProjects: build.query<ApiResponse<Project[]>, void>({
       query: () => "project",
       providesTags: ["Projects"],
@@ -67,6 +108,8 @@ export const api = createApi({
 });
 
 export const {
+  useLoginUserMutation,
+  useRegisterUserMutation,
   useGetProjectsQuery,
   useCreateProjectMutation,
   useGetTasksQuery,

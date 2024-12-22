@@ -2,6 +2,7 @@ import type { Priority, Status } from "@/enum";
 
 export interface User {
   id?: number;
+  organizationId: number;
   username: string;
   firstName: string;
   lastName: string;
