@@ -1,7 +1,10 @@
 import Header from "@/components/Header";
 import { Priority, Status } from "@/enum";
 import type { Task as TaskType } from "@/interface";
-import { useGetTasksQuery, useUpdateTaskStatusMutation } from "@/state/api";
+import {
+	useGetProjectTasksQuery,
+	useUpdateTaskStatusMutation,
+} from "@/state/api";
 import { EllipsisVertical, MessageSquareMore, Plus } from "lucide-react";
 import Image from "next/image";
 import React from "react";
@@ -258,7 +261,7 @@ const BoardView = ({ id, handleTaskModel }: BoardViewProps) => {
 		data: tasks,
 		isLoading,
 		error,
-	} = useGetTasksQuery({ projectId: Number(id) });
+	} = useGetProjectTasksQuery({ projectId: Number(id) });
 
 	const [updateTaskStatus] = useUpdateTaskStatusMutation();
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetProjectsQuery, useGetTasksQuery } from "@/state/api";
+import { useGetProjectsQuery, useGetUserTasksQuery } from "@/state/api";
 import React from "react";
 import Header from "@/components/Header";
 import {
@@ -29,7 +29,7 @@ const Dashboard = () => {
 		data: tasks,
 		isLoading: tasksLoading,
 		isError: tasksError,
-	} = useGetTasksQuery({ projectId: Number.parseInt("1") });
+	} = useGetUserTasksQuery({});
 	const { data: projects, isLoading: isProjectsLoading } =
 		useGetProjectsQuery();
 

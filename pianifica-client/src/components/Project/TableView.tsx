@@ -1,4 +1,4 @@
-import { useGetTasksQuery } from "@/state/api";
+import { useGetProjectTasksQuery } from "@/state/api";
 import type React from "react";
 import Header from "@/components/Header";
 import type { Task } from "@/interface";
@@ -17,7 +17,7 @@ const TableView = ({ id, handleTaskModel }: TableViewProps) => {
 		data: tasks,
 		error,
 		isLoading,
-	} = useGetTasksQuery({ projectId: Number(id) });
+	} = useGetProjectTasksQuery({ projectId: Number(id) });
 
 	if (isLoading) return <div>Loading...</div>;
 	if (error || !tasks?.success)

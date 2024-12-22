@@ -1,7 +1,7 @@
 import { useAppSelector } from "@/app/redux";
 import Header from "@/components/Header";
 import type { Task } from "@/interface";
-import { useGetTasksQuery } from "@/state/api";
+import { useGetProjectTasksQuery } from "@/state/api";
 import { type DisplayOption, Gantt, ViewMode } from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
 import type React from "react";
@@ -20,7 +20,7 @@ const Timeline = ({ id, handleTaskModel }: Props) => {
 		data: tasks,
 		error,
 		isLoading,
-	} = useGetTasksQuery({ projectId: Number(id) });
+	} = useGetProjectTasksQuery({ projectId: Number(id) });
 
 	const [displayOptions, setDisplayOptions] = useState<DisplayOption>({
 		viewMode: ViewMode.Month,

@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { Project, Search, Task, Team, User } from "@/interface";
+import type { Priority, Status } from "@/enum";
 
 type ApiResponse<T> = {
   success: boolean;
@@ -10,8 +11,17 @@ type ApiResponse<T> = {
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL }),
   reducerPath: "api",
-  tagTypes: ["Projects", "Tasks", "Users", "Teams"],
+  tagTypes: ["Projects", "Tasks", "UserTasks", "Users", "Teams"],
   endpoints: (build) => ({
+    getCurrentUser: build.query<ApiResponse<User>, void>({
+      query: () => ({
+        url: "user",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+      }),
+    }),
     loginUser: build.mutation<
       ApiResponse<{ accessToken: string; userInfo: User }>,
       { emailOrUsername: string; password: string }
@@ -87,9 +97,9 @@ export const api = createApi({
       }),
       invalidatesTags: ["Projects"],
     }),
-    getTasks: build.query<ApiResponse<Task[]>, { projectId: number }>({
+    getProjectTasks: build.query<ApiResponse<Task[]>, { projectId: number }>({
       query: ({ projectId }) => ({
-        url: `task?projectId=${projectId}`,
+        url: `project/${projectId}/tasks`,
         headers: {
           "Content-Type": "application/json",
           Authorization: sessionStorage.getItem("accessToken") || undefined,
@@ -99,6 +109,25 @@ export const api = createApi({
         result
           ? result.data.map(({ id }) => ({ type: "Tasks", id }))
           : [{ type: "Tasks" }],
+    }),
+    getUserTasks: build.query<
+      ApiResponse<Task[]>,
+      { priority?: Priority; status?: Status }
+    >({
+      query: ({ priority, status }) => {
+        const params = new URLSearchParams();
+        if (priority) params.append("priority", priority.toUpperCase());
+        if (status) params.append("status", status.toUpperCase());
+
+        return {
+          url: `tasks?${params.toString()}`,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: sessionStorage.getItem("accessToken") || undefined,
+          },
+        };
+      },
+      providesTags: ["UserTasks"],
     }),
     createTask: build.mutation<ApiResponse<Task>, Partial<Task>>({
       query: (task) => ({
@@ -164,10 +193,12 @@ export const api = createApi({
 export const {
   useLoginUserMutation,
   useRegisterUserMutation,
+  useGetCurrentUserQuery,
   useGetProjectsQuery,
   useGetProjectQuery,
   useCreateProjectMutation,
-  useGetTasksQuery,
+  useGetProjectTasksQuery,
+  useGetUserTasksQuery,
   useCreateTaskMutation,
   useUpdateTaskStatusMutation,
   useGetUsersQuery,

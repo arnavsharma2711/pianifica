@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import TaskCard from "../Cards/TaskCard";
 import type { Task } from "@/interface";
-import { useGetTasksQuery } from "@/state/api";
+import { useGetProjectTasksQuery } from "@/state/api";
 import React from "react";
 
 type ListViewProps = {
@@ -14,7 +14,7 @@ const ListView = ({ id, handleTaskModel }: ListViewProps) => {
 		data: tasks,
 		error,
 		isLoading,
-	} = useGetTasksQuery({ projectId: Number(id) });
+	} = useGetProjectTasksQuery({ projectId: Number(id) });
 
 	if (isLoading) return <div>Loading...</div>;
 	if (error) return <div>An error occurred while fetching tasks</div>;
