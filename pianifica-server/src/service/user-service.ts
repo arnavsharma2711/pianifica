@@ -26,7 +26,7 @@ export const createNewUser = async ({
   email: string;
   username: string;
   password: string;
-  profilePictureUrl?: string;
+  profilePictureUrl?: string | null;
 }) => {
   const existingUserWithEmail = await getExistingUser({
     email,

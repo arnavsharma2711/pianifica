@@ -35,7 +35,10 @@ export const registerNewUserSchema = z.object({
     .string({
       invalid_type_error: "Profile picture URL must be a text",
     })
-    .optional(),
+    .url()
+    .optional()
+    .nullable()
+    .default(null),
 });
 
 export const loginUserSchema = z.object({
