@@ -43,11 +43,16 @@ const TabButton = ({
 	);
 };
 type Props = {
+	projectName: string;
 	activeTab: string;
 	setActiveTab: (tabName: string) => void;
 };
 
-const ProjectHeader = ({ activeTab, setActiveTab }: Props) => {
+const ProjectHeader = ({
+	projectName = "Project Board",
+	activeTab,
+	setActiveTab,
+}: Props) => {
 	const [isModalNewProjectOpen, setIsModalNewProjectOpen] = useState(false);
 
 	return (
@@ -58,7 +63,7 @@ const ProjectHeader = ({ activeTab, setActiveTab }: Props) => {
 			/>
 			<div className="pb-6 pt-6 lg:pb-4 lg:pt-8">
 				<Header
-					name="Project Design Development"
+					name={projectName}
 					buttonComponent={
 						<button
 							type="button"

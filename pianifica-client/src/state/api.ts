@@ -65,6 +65,16 @@ export const api = createApi({
       }),
       providesTags: ["Projects"],
     }),
+    getProject: build.query<ApiResponse<Project>, { projectId: number }>({
+      query: ({ projectId }) => ({
+        url: `project/${projectId}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+      }),
+      providesTags: ["Projects"],
+    }),
     createProject: build.mutation<ApiResponse<Project>, Partial<Project>>({
       query: (project) => ({
         url: "project",
@@ -155,6 +165,7 @@ export const {
   useLoginUserMutation,
   useRegisterUserMutation,
   useGetProjectsQuery,
+  useGetProjectQuery,
   useCreateProjectMutation,
   useGetTasksQuery,
   useCreateTaskMutation,

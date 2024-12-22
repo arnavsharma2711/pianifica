@@ -16,6 +16,7 @@ import {
 	type LucideIcon,
 	Menu,
 	Search,
+	Presentation,
 	ShieldAlert,
 	User,
 	Users,
@@ -103,10 +104,11 @@ const Sidebar = () => {
 				</div>
 				<nav className="z-10 w-full">
 					<SidebarLink icon={HomeIcon} label="Home" href="/" />
-					<SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
 					<SidebarLink icon={Search} label="Search" href="/search" />
-					<SidebarLink icon={User} label="Users" href="/users" />
+					<SidebarLink icon={Presentation} label="Projects" href="/projects" />
+					<SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
 					<SidebarLink icon={Users} label="Teams" href="/teams" />
+					<SidebarLink icon={User} label="Users" href="/users" />
 				</nav>
 
 				{/* Projects */}

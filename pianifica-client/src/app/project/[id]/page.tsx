@@ -8,6 +8,7 @@ import React, { useState, useEffect } from "react";
 import TableView from "@/components/Project/TableView";
 import NewTaskModal from "@/components/Modal/NewTaskModal";
 import type { Task } from "@/interface";
+import { useGetProjectQuery } from "@/state/api";
 
 type Props = {
 	params: Promise<{ id: string }>;
@@ -18,6 +19,10 @@ const Project = ({ params }: Props) => {
 	const [activeTab, setActiveTab] = useState("Board");
 	const [task, setTask] = useState<Task>();
 	const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
+
+	const { data: project, isLoading } = useGetProjectQuery({
+		projectId: Number(id),
+	});
 
 	const handleTaskModel = (action: string, task?: Task) => {
 		if (action === "edit") {
@@ -32,7 +37,7 @@ const Project = ({ params }: Props) => {
 		});
 	}, [params]);
 
-	if (!id) {
+	if (!id || isLoading) {
 		return <div>Loading...</div>;
 	}
 
@@ -44,7 +49,11 @@ const Project = ({ params }: Props) => {
 				project={Number(id)}
 				task={task}
 			/>
-			<ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} />
+			<ProjectHeader
+				activeTab={activeTab}
+				setActiveTab={setActiveTab}
+				projectName={project?.data?.name || "Project Board"}
+			/>
 			{activeTab === "Board" && (
 				<Board id={id} handleTaskModel={handleTaskModel} />
 			)}
