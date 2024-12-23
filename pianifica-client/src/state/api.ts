@@ -1,15 +1,30 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { Project, Search, Task, Team, User } from "@/interface";
 import type { Priority, Status } from "@/enum";
-
+import toast from "react-hot-toast";
 type ApiResponse<T> = {
   success: boolean;
   message: string;
+  error?: string;
   data: T;
 };
 
+const baseQuery = fetchBaseQuery({
+  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+});
+
+const baseQueryWithErrorHandling = async (args, api, extraOptions) => {
+  const result = await baseQuery(args, api, extraOptions);
+  if (result.error) {
+    toast.error(result.error.data?.error || "Server not reachable");
+  } else if (result.data && !result.data.success) {
+    toast.error(result.data.error || "Something went wrong");
+  }
+  return result;
+};
+
 export const api = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL }),
+  baseQuery: baseQueryWithErrorHandling,
   reducerPath: "api",
   tagTypes: ["Projects", "Tasks", "UserTasks", "Users", "Teams"],
   endpoints: (build) => ({

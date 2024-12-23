@@ -3,7 +3,7 @@ import { Raleway } from "next/font/google";
 import "./globals.css";
 import DashboardWrapper from "./dashboard-wrapper";
 import AuthWrapper from "./auth-provider";
-
+import { Toaster } from "react-hot-toast";
 const raleway = Raleway({
 	subsets: ["latin"],
 	display: "swap",
@@ -24,6 +24,10 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body className={`${raleway.className} antialiased`}>
+				<Toaster
+					position="bottom-left"
+					toastOptions={{ className: "dark:text-white dark:bg-zinc-800" }}
+				/>
 				<AuthWrapper>
 					<DashboardWrapper>{children}</DashboardWrapper>
 				</AuthWrapper>
