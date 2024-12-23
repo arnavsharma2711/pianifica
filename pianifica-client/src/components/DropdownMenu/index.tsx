@@ -43,7 +43,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ toggle, options }) => {
 				{toggle}
 			</button>
 			{isOpen && (
-				<ul className="absolute right-0 flex flex-col gap-0.5 mt-2 w-max max-w-xs border bg-gray-300 dark:border-zinc-700 dark:bg-zinc-700 border-gray-300 shadow-lg z-10 rounded-lg overflow-hidden">
+				<ul className="absolute right-0 -translate-x-full flex flex-col gap-0.5 mt-2 w-max max-w-xs border bg-gray-300 dark:border-zinc-700 dark:bg-zinc-700 border-gray-300 shadow-lg z-10 rounded-lg overflow-hidden">
 					{options.map((option) => (
 						<li
 							onClick={option.onClick}

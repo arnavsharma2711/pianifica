@@ -48,6 +48,11 @@ const Users = () => {
 						/>
 					</div>
 					{user.username}
+					{(user.role === "ORG_ADMIN" || user.role === "SUPER_ADMIN") && (
+						<span className="bg-blue-300 text-blue-600 rounded-full px-2">
+							ADMIN
+						</span>
+					)}
 				</div>
 			),
 		},

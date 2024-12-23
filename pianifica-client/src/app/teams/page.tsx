@@ -6,6 +6,7 @@ import { DataTable } from "@/components/DataTable";
 import type { Team } from "@/interface";
 import { CirclePlus } from "lucide-react";
 import Loading from "@/components/Loading";
+import Image from "next/image";
 
 const Teams = () => {
 	const { data: teams, isLoading, isError } = useGetTeamsQuery();
@@ -23,14 +24,46 @@ const Teams = () => {
 			accessorKey: "name" as keyof Team,
 		},
 		{
-			header: "Project Manager",
+			header: "Team Manager",
 			accessorKey: "teamManager" as keyof Team,
-			cell: (team: Team) => team.teamManager?.username ?? "N/A",
+			cell: (team: Team) => (
+				<div className="flex flex-row items-center gap-2">
+					<div className="h-9 w-9">
+						<Image
+							src={
+								team.teamManager?.profilePictureUrl ||
+								"/default-profile-picture.webp"
+							}
+							alt={team.teamManager?.username || "N/A"}
+							width={100}
+							height={50}
+							className="h-full rounded-full object-cover"
+						/>
+					</div>
+					{team.teamManager?.firstName} {team.teamManager?.lastName}
+				</div>
+			),
 		},
 		{
-			header: "Project Lead",
+			header: "Team Lead",
 			accessorKey: "teamLead" as keyof Team,
-			cell: (team: Team) => team.teamLead?.username ?? "N/A",
+			cell: (team: Team) => (
+				<div className="flex flex-row items-center gap-2">
+					<div className="h-9 w-9">
+						<Image
+							src={
+								team.teamLead?.profilePictureUrl ||
+								"/default-profile-picture.webp"
+							}
+							alt={team.teamLead?.username || "N/A"}
+							width={100}
+							height={50}
+							className="h-full rounded-full object-cover"
+						/>
+					</div>
+					{team.teamLead?.firstName} {team.teamLead?.lastName}
+				</div>
+			),
 		},
 	];
 	return (

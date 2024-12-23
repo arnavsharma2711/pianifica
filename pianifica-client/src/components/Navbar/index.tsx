@@ -53,13 +53,14 @@ const Navbar = () => {
 						{user?.firstName} {user?.lastName}
 					</div>
 					{user.profilePictureUrl && (
-						<Image
-							src={user.profilePictureUrl || "/default-profile-picture.webp"}
-							alt="profile picture"
-							width={32}
-							height={32}
-							className="rounded-full"
-						/>
+						<div className="h-9 w-9 overflow-hidden rounded-full flex items-center justify-center">
+							<Image
+								src={user.profilePictureUrl || "/default-profile-picture.webp"}
+								alt="profile picture"
+								width={100}
+								height={50}
+							/>
+						</div>
 					)}
 				</button>
 				{isOpen && (

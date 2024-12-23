@@ -8,6 +8,7 @@ export interface User {
   lastName: string;
   email: string;
   profilePictureUrl?: string;
+  role?: string;
 }
 
 export interface Team {
