@@ -17,6 +17,7 @@ import {
 } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Loading from "../Loading";
+import ErrorComponent from "../Error";
 
 type TaskColumnProps = {
 	status: Status;
@@ -271,7 +272,8 @@ const BoardView = ({ id, handleTaskModel }: BoardViewProps) => {
 	};
 
 	if (isLoading) return <Loading />;
-	if (error) return <div>An error occurred while fetching tasks</div>;
+	if (error)
+		return <ErrorComponent message={"An error occurred while fetching task"} />;
 
 	return (
 		<div className="px-4 pb-8 xl:px-6">

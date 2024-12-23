@@ -1,6 +1,7 @@
 "use client";
 
 import { useAppSelector } from "@/app/redux";
+import ErrorComponent from "@/components/Error";
 import Header from "@/components/Header";
 import Loading from "@/components/Loading";
 import { useGetProjectsQuery } from "@/state/api";
@@ -45,7 +46,7 @@ const Timeline = () => {
 
 	if (isLoading) return <Loading />;
 	if (error || !projects)
-		return <div>An error occurred while fetching projects</div>;
+		return <ErrorComponent message={"An error occurred while fetching projects"} />
 
 	return (
 		<div className="max-w-full p-8">

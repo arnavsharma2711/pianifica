@@ -11,6 +11,7 @@ import { useState } from "react";
 import ConfirmationModal from "@/components/Modal/ConfirmationModel";
 import UserCard from "@/components/Cards/UserCard";
 import Loading from "@/components/Loading";
+import ErrorComponent from "@/components/Error";
 
 const Users = () => {
 	const [isUserModalOpen, setIsUserModalOpen] = useState(false);
@@ -30,7 +31,7 @@ const Users = () => {
 	};
 
 	if (isLoading) return <Loading />;
-	if (isError || !users?.success) return <div>Error fetching users</div>;
+	if (isError || !users?.success) return <ErrorComponent message="An error occurred while fetching users" />;
 
 	const userColumns = [
 		{

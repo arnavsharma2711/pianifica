@@ -7,6 +7,7 @@ import "gantt-task-react/dist/index.css";
 import type React from "react";
 import { useMemo, useState } from "react";
 import Loading from "../Loading";
+import ErrorComponent from "../Error";
 
 type Props = {
 	id: string;
@@ -52,7 +53,8 @@ const Timeline = ({ id, handleTaskModel }: Props) => {
 	};
 
 	if (isLoading) return <Loading />;
-	if (error || !tasks) return <div>An error occurred while fetching tasks</div>;
+	if (error || !tasks)
+		return <ErrorComponent message={"An error occurred while fetching task"} />;
 
 	return (
 		<div className="px-4 xl:px-6">

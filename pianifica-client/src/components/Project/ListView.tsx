@@ -4,6 +4,7 @@ import type { Task } from "@/interface";
 import { useGetProjectTasksQuery } from "@/state/api";
 import React from "react";
 import Loading from "../Loading";
+import ErrorComponent from "../Error";
 
 type ListViewProps = {
 	id: string;
@@ -18,7 +19,8 @@ const ListView = ({ id, handleTaskModel }: ListViewProps) => {
 	} = useGetProjectTasksQuery({ projectId: Number(id) });
 
 	if (isLoading) return <Loading />;
-	if (error) return <div>An error occurred while fetching tasks</div>;
+	if (error)
+		return <ErrorComponent message={"An error occurred while fetching task"} />;
 
 	return (
 		<div className="px-4 pb-8 xl:px-6">

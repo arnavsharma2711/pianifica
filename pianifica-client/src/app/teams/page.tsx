@@ -7,6 +7,7 @@ import type { Team } from "@/interface";
 import { CirclePlus } from "lucide-react";
 import Loading from "@/components/Loading";
 import Image from "next/image";
+import ErrorComponent from "@/components/Error";
 
 const Teams = () => {
 	const { data: teams, isLoading, isError } = useGetTeamsQuery();
@@ -16,7 +17,8 @@ const Teams = () => {
 	};
 
 	if (isLoading) return <Loading />;
-	if (isError || !teams?.success) return <div>Error fetching teams</div>;
+	if (isError || !teams?.success)
+		return <ErrorComponent message="An error occurred while fetching teams" />;
 
 	const teamColumns = [
 		{

@@ -7,6 +7,7 @@ import StatusTag from "../StatusTag";
 
 import { DataTable } from "../DataTable";
 import Loading from "../Loading";
+import ErrorComponent from "../Error";
 
 type TableViewProps = {
 	id: string;
@@ -22,7 +23,7 @@ const TableView = ({ id, handleTaskModel }: TableViewProps) => {
 
 	if (isLoading) return <Loading />;
 	if (error || !tasks?.success)
-		return <div>An error occurred while fetching tasks</div>;
+		return <ErrorComponent message={"An error occurred while fetching task"} />;
 
 	const taskColumns = [
 		{
