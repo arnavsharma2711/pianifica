@@ -16,6 +16,7 @@ import {
 	useDrop,
 } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import Loading from "../Loading";
 
 type TaskColumnProps = {
 	status: Status;
@@ -269,7 +270,7 @@ const BoardView = ({ id, handleTaskModel }: BoardViewProps) => {
 		updateTaskStatus({ taskId, status });
 	};
 
-	if (isLoading) return <div>Loading...</div>;
+	if (isLoading) return <Loading />;
 	if (error) return <div>An error occurred while fetching tasks</div>;
 
 	return (

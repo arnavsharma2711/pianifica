@@ -3,6 +3,7 @@ import TaskCard from "../Cards/TaskCard";
 import type { Task } from "@/interface";
 import { useGetProjectTasksQuery } from "@/state/api";
 import React from "react";
+import Loading from "../Loading";
 
 type ListViewProps = {
 	id: string;
@@ -16,7 +17,7 @@ const ListView = ({ id, handleTaskModel }: ListViewProps) => {
 		isLoading,
 	} = useGetProjectTasksQuery({ projectId: Number(id) });
 
-	if (isLoading) return <div>Loading...</div>;
+	if (isLoading) return <Loading />;
 	if (error) return <div>An error occurred while fetching tasks</div>;
 
 	return (

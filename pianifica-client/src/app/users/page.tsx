@@ -10,6 +10,7 @@ import UserModal from "@/components/Modal/UserModal";
 import { useState } from "react";
 import ConfirmationModal from "@/components/Modal/ConfirmationModel";
 import UserCard from "@/components/Cards/UserCard";
+import Loading from "@/components/Loading";
 
 const Users = () => {
 	const [isUserModalOpen, setIsUserModalOpen] = useState(false);
@@ -28,7 +29,7 @@ const Users = () => {
 		setIsUserModalOpen(true);
 	};
 
-	if (isLoading) return <div>Loading...</div>;
+	if (isLoading) return <Loading />;
 	if (isError || !users?.success) return <div>Error fetching users</div>;
 
 	const userColumns = [

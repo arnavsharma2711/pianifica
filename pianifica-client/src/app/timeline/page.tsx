@@ -2,6 +2,7 @@
 
 import { useAppSelector } from "@/app/redux";
 import Header from "@/components/Header";
+import Loading from "@/components/Loading";
 import { useGetProjectsQuery } from "@/state/api";
 import { type DisplayOption, Gantt, ViewMode } from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
@@ -42,7 +43,7 @@ const Timeline = () => {
 		}));
 	};
 
-	if (isLoading) return <div>Loading...</div>;
+	if (isLoading) return <Loading />;
 	if (error || !projects)
 		return <div>An error occurred while fetching projects</div>;
 

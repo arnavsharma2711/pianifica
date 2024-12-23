@@ -6,6 +6,7 @@ import { Status } from "@/enum";
 import StatusTag from "../StatusTag";
 
 import { DataTable } from "../DataTable";
+import Loading from "../Loading";
 
 type TableViewProps = {
 	id: string;
@@ -19,7 +20,7 @@ const TableView = ({ id, handleTaskModel }: TableViewProps) => {
 		isLoading,
 	} = useGetProjectTasksQuery({ projectId: Number(id) });
 
-	if (isLoading) return <div>Loading...</div>;
+	if (isLoading) return <Loading />;
 	if (error || !tasks?.success)
 		return <div>An error occurred while fetching tasks</div>;
 

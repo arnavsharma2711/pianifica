@@ -6,6 +6,7 @@ import { type DisplayOption, Gantt, ViewMode } from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
 import type React from "react";
 import { useMemo, useState } from "react";
+import Loading from "../Loading";
 
 type Props = {
 	id: string;
@@ -50,7 +51,7 @@ const Timeline = ({ id, handleTaskModel }: Props) => {
 		}));
 	};
 
-	if (isLoading) return <div>Loading...</div>;
+	if (isLoading) return <Loading />;
 	if (error || !tasks) return <div>An error occurred while fetching tasks</div>;
 
 	return (

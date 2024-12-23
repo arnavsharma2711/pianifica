@@ -2,6 +2,7 @@
 
 import { DataTable } from "@/components/DataTable";
 import Header from "@/components/Header";
+import Loading from "@/components/Loading";
 import NewProjectModal from "@/components/Modal/NewProjectModal";
 import type { Project } from "@/interface";
 import { useGetProjectsQuery } from "@/state/api";
@@ -14,7 +15,7 @@ const Projects = () => {
 
 	const { data: projects, error, isLoading } = useGetProjectsQuery();
 
-	if (isLoading) return <div>Loading...</div>;
+	if (isLoading) return <Loading />;
 	if (error || !projects)
 		return <div>An error occurred while fetching projects</div>;
 
