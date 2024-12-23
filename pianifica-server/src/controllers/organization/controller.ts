@@ -22,7 +22,7 @@ export const createOrganization = controllerWrapper(async (req, res) => {
   });
 });
 
-// GET api/organization
+// GET api/organizations
 export const getOrganizations = controllerWrapper(async (req, res) => {
   const organizations = await getExistingOrganizations();
 

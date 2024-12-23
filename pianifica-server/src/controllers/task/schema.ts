@@ -16,7 +16,8 @@ export const createTaskSchema = z.object({
     invalid_type_error: "Project ID must be a number.",
   }),
   assigneeId: z
-    .number({
+    .string({
+      required_error: "Assignee ID is required.",
       invalid_type_error: "Assignee ID must be a number.",
     })
     .nullable(),

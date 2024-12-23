@@ -1,13 +1,13 @@
 import { Router } from "express";
-import authRoutes from "./routes/auth-routes";
-import searchRoutes from "./routes/search-routes";
 import { authenticationMiddleware } from "./middlewares/authentication";
+import { superAdminAuthenticationMiddleware } from "./middlewares/super-admin-authentication";
 import {
   getUsers,
   getUser,
   getCurrentUser,
   updateUser,
   deleteUser,
+  getUserOrganization,
 } from "./controllers/user/controller";
 import {
   addTeamMember,
@@ -27,7 +27,6 @@ import {
   getProjectTasks,
   updateProject,
 } from "./controllers/project/controller";
-import { superAdminAuthenticationMiddleware } from "./middlewares/super-admin-authentication";
 import {
   createOrganization,
   deleteOrganization,
@@ -45,10 +44,14 @@ import {
   updateTaskPriority,
   updateTaskStatus,
 } from "./controllers/task/controller";
+import { loginUser, registerNewUser } from "./controllers/auth/controller";
+import { search } from "./controllers/search/controller";
 
 const router = Router();
 
-router.use("/auth", authRoutes);
+// Auth routes
+router.post("/auth/login", loginUser);
+router.post("/auth/register", registerNewUser);
 
 //Organization routes
 router.get(
@@ -121,10 +124,12 @@ router.delete("/team/:id/member", authenticationMiddleware, removeTeamMember);
 // User routes
 router.get("/users", authenticationMiddleware, getUsers);
 router.get("/user", authenticationMiddleware, getCurrentUser);
+router.get("/user/organization", authenticationMiddleware, getUserOrganization);
 router.get("/user/:username", authenticationMiddleware, getUser);
 router.post("/user/:id", authenticationMiddleware, updateUser);
 router.delete("/user/:id", authenticationMiddleware, deleteUser);
 
-router.use("/search", authenticationMiddleware, searchRoutes);
+// Search routes
+router.use("/search", authenticationMiddleware, search);
 
 export default router;

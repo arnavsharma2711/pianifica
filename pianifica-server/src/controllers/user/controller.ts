@@ -6,8 +6,9 @@ import {
   updateExistingUser,
 } from "../../service/user-service";
 import { updateUserSchema } from "./schema";
-import { userInfoSchema } from "../../lib/schema";
+import { organizationSchema, userInfoSchema } from "../../lib/schema";
 import { isAdmin } from "../../lib/utils";
+import { getExistingOrganization } from "../../service/organization-service";
 
 // GET api/users
 export const getUsers = controllerWrapper(async (req, res) => {
@@ -70,6 +71,27 @@ export const getCurrentUser = controllerWrapper(async (req, res) => {
   res.success({
     message: "User fetched successfully!",
     data: userInfo,
+  });
+});
+
+// GET api/user/organization
+export const getUserOrganization = controllerWrapper(async (req, res) => {
+  const organization = await getExistingOrganization({
+    id: Number(req.user?.organizationId),
+  });
+
+  if (!organization) {
+    res.invalid({
+      message: "Organization not found.",
+      error: "Organization with provided id not found.",
+    });
+    return;
+  }
+
+  const organizationData = organizationSchema.parse(organization);
+  res.success({
+    message: "Organization fetched successfully.",
+    data: organizationData,
   });
 });
 
