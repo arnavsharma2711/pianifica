@@ -8,12 +8,11 @@ import { redirect } from "next/navigation";
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const accessToken = useAppSelector((state) => state.global.accessToken);
 	const dispatch = useAppDispatch();
+	const { data: user } = useGetCurrentUserQuery();
 
 	if (accessToken === null && window.location.pathname !== "/") redirect("/");
 	const userDetails = JSON.parse(sessionStorage.getItem("userDetails") || "{}");
 	if (accessToken && userDetails && Object.keys(userDetails).length === 0) {
-		const { data: user, isLoading } = useGetCurrentUserQuery();
-
 		if (user?.success) {
 			sessionStorage.setItem("userDetails", JSON.stringify(user.data));
 			sessionStorage.setItem("accessToken", accessToken);
