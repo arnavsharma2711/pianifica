@@ -20,10 +20,10 @@ const Project = ({ params }: Props) => {
 	const [task, setTask] = useState<Task>();
 	const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
 
-	const { data: project, isLoading } = useGetProjectQuery({
-		projectId: Number(id),
-	});
-
+	const { data: project, isLoading } = useGetProjectQuery(
+		{ projectId: Number(id) },
+		{ skip: id === null }
+	);
 	const handleTaskModel = (action: string, task?: Task) => {
 		if (action === "edit") {
 			setTask(task);

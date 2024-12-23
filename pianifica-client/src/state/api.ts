@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { Project, Search, Task, Team, User } from "@/interface";
+import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import type { Priority, Status } from "@/enum";
 import toast from "react-hot-toast";
 type ApiResponse<T> = {
@@ -13,12 +14,18 @@ const baseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
 });
 
-const baseQueryWithErrorHandling = async (args, api, extraOptions) => {
+
+const baseQueryWithErrorHandling: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
+  args,
+  api,
+  extraOptions
+) => {
   const result = await baseQuery(args, api, extraOptions);
   if (result.error) {
-    toast.error(result.error.data?.error || "Server not reachable");
-  } else if (result.data && !result.data.success) {
-    toast.error(result.data.error || "Something went wrong");
+    const errorMessage = (result.error.data as { error?: string })?.error || "Server not reachable";
+    toast.error(errorMessage);
+  } else if (result.data && !(result.data as ApiResponse<unknown>).success) {
+    toast.error((result.data as ApiResponse<unknown>).error || "Something went wrong");
   }
   return result;
 };
