@@ -4,7 +4,7 @@ type InputFieldProps = {
 	onChange: (
 		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
 	) => void;
-	type?: "text" | "textarea" | "date" | "number" | "password";
+	type?: "text" | "textarea" | "date" | "number" | "password" | "email";
 	placeholder?: string;
 };
 
@@ -23,43 +23,16 @@ const InputField = ({
 				{label}
 			</label>
 
-			{type === "text" && (
-				<input
-					type="text"
-					className={className}
-					placeholder={placeholder || label}
-					value={value}
-					onChange={onChange}
-				/>
-			)}
-			{type === "date" && (
-				<input
-					type="date"
-					className={className}
-					value={value}
-					onChange={onChange}
-				/>
-			)}
-			{type === "textarea" && (
+			{type === "textarea" ? (
 				<textarea
 					className={className}
 					placeholder={placeholder || label}
 					value={value}
 					onChange={onChange}
 				/>
-			)}
-			{type === "number" && (
+			) : (
 				<input
-					type="number"
-					className={className}
-					placeholder={placeholder || label}
-					value={value}
-					onChange={onChange}
-				/>
-			)}
-			{type === "password" && (
-				<input
-					type="password"
+					type={type}
 					className={className}
 					placeholder={placeholder || label}
 					value={value}

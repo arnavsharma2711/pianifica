@@ -1,14 +1,32 @@
 "use client";
 import { useGetUsersQuery } from "@/state/api";
-import React, { useEffect, useRef, useState } from "react";
 import Header from "@/components/Header";
 import Image from "next/image";
 import { EllipsisVertical, Pencil, Trash } from "lucide-react";
 import { DataTable } from "@/components/DataTable";
 import type { User } from "@/interface";
+import DropdownMenu from "@/components/DropdownMenu";
+import UserModal from "@/components/Modal/UserModal";
+import { useState } from "react";
+import ConfirmationModal from "@/components/Modal/ConfirmationModel";
+import UserCard from "@/components/Cards/UserCard";
 
 const Users = () => {
+	const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+	const [modelUser, setModalUser] = useState<User | null>(null);
+	const [action, setAction] = useState<"create" | "edit">("create");
+	const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 	const { data: users, isLoading, isError } = useGetUsersQuery();
+	const handleUserModel = (action: string, user?: User) => {
+		if (action === "create") {
+			setAction("create");
+			setModalUser(null);
+		} else if (action === "edit" && user) {
+			setAction("edit");
+			setModalUser(user);
+		}
+		setIsUserModalOpen(true);
+	};
 
 	if (isLoading) return <div>Loading...</div>;
 	if (isError || !users?.success) return <div>Error fetching users</div>;
@@ -47,54 +65,69 @@ const Users = () => {
 	];
 
 	const UserAction = ({ user }: { user: User }) => {
-		const [isOpen, setIsOpen] = useState(false);
-		const ref = useRef<HTMLDivElement>(null);
-
-		const handleButtonClick = () => {
-			setIsOpen(!isOpen);
-		};
-
-		const handleClickOutside = (event: MouseEvent) => {
-			if (ref.current && !ref.current.contains(event.target as Node)) {
-				setIsOpen(false);
+		const handleButtonClick2 = (str: string) => {
+			if (str === "delete") {
+				setModalUser(user);
+				setIsConfirmationModalOpen(true);
+			} else if (str === "edit") {
+				handleUserModel("edit", user);
 			}
 		};
-
-		useEffect(() => {
-			document.addEventListener("mousedown", handleClickOutside);
-			return () => {
-				document.removeEventListener("mousedown", handleClickOutside);
-			};
-		}, []);
-
 		return (
-			<div className="relative" ref={ref}>
-				<button
-					onClick={handleButtonClick}
-					type="button"
-					className="flex h-6 w-5 items-center justify-center dark:text-neutral-500"
-				>
-					<EllipsisVertical size={26} />
-				</button>
-				{isOpen && (
-					<ul className="absolute z-30 left-0 -ml-20 mt-2 w-max bg-gray-200 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-md shadow-lg">
-						<li className="flex flex-row gap-2 justify-end items-center font-bold text-blue-600 px-4 py-2 hover:bg-blue-100">
-							Edit
-							<Pencil size={20} color="#2096F3" />
-						</li>
-						<li className="flex flex-row gap-2 justify-end items-center font-bold text-red-600 px-4 py-2 hover:bg-red-100">
-							Delete
-							<Trash size={20} color="#F34234" />
-						</li>
-					</ul>
-				)}
-			</div>
+			<DropdownMenu
+				toggle={<EllipsisVertical size={20} />}
+				options={[
+					{
+						key: "edit",
+						icon: <Pencil size={15} />,
+						value: "Edit",
+						onClick: () => handleButtonClick2("edit"),
+						className:
+							"hover:bg-blue-300 hover:text-blue-600 dark:hover:text-white dark:hover:bg-blue-700",
+					},
+					{
+						key: "delete",
+						icon: <Trash size={15} />,
+						value: "Delete",
+						onClick: () => handleButtonClick2("delete"),
+						className:
+							"hover:bg-red-100 hover:text-red-600 hover:dark:text-white dark:hover:bg-red-700",
+					},
+				]}
+			/>
 		);
 	};
 
 	return (
 		<div className="flex w-full flex-col p-8">
-			<Header name="Users" />
+			<ConfirmationModal
+				isOpen={isConfirmationModalOpen}
+				onClose={() => setIsConfirmationModalOpen(false)}
+				onConfirm={() => {
+					console.log("delete");
+				}}
+				message="Are you sure you want to delete this user?"
+				component={modelUser && <UserCard user={modelUser} />}
+			/>
+			<UserModal
+				isOpen={isUserModalOpen}
+				onClose={() => setIsUserModalOpen(false)}
+				user={modelUser}
+				action={action}
+			/>
+			<Header
+				name="Users"
+				buttonComponent={
+					<button
+						type="button"
+						className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+						onClick={() => handleUserModel("create")}
+					>
+						Add User
+					</button>
+				}
+			/>
+
 			<DataTable
 				data={users?.data}
 				columns={userColumns}
