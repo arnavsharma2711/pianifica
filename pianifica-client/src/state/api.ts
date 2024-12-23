@@ -13,6 +13,18 @@ export const api = createApi({
   reducerPath: "api",
   tagTypes: ["Projects", "Tasks", "UserTasks", "Users", "Teams"],
   endpoints: (build) => ({
+    getUserOrganization: build.query<
+      ApiResponse<{ id: number; name: string }>,
+      void
+    >({
+      query: () => ({
+        url: "user/organization",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+      }),
+    }),
     getCurrentUser: build.query<ApiResponse<User>, void>({
       query: () => ({
         url: "user",
@@ -191,6 +203,7 @@ export const api = createApi({
 });
 
 export const {
+  useGetUserOrganizationQuery,
   useLoginUserMutation,
   useRegisterUserMutation,
   useGetCurrentUserQuery,
