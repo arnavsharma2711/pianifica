@@ -37,12 +37,12 @@ const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
 	const isActive =
 		pathname === href || (pathname === "/" && href === "/dashboard");
 	return (
-		<Link href={href} className="w-full">
+		<Link href={href} className="w-full min-w-max">
 			<div
-				className={`relative flex cursor-pointer items-center gap-3 transition-colors hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-700 ${isActive ? "bg-gray-100 text-white dark:bg-gray-600" : ""} justify-start px-8 py-3`}
+				className={`relative flex cursor-pointer items-center gap-3 transition-colors hover:bg-gray-200 dark:bg-black dark:hover:bg-zinc-800 ${isActive ? "bg-gray-100 text-white dark:bg-zinc-900" : ""} justify-start px-8 py-3`}
 			>
 				{isActive && (
-					<div className="absolute left-0 top-0 h-full w-[5px] bg-blue-200" />
+					<div className="absolute right-0 top-0 h-full w-[5px] bg-blue-200" />
 				)}
 				<Icon className="h-6 w-6 text-gray-800 dark:text-gray-100" />
 
@@ -68,23 +68,19 @@ const Sidebar = () => {
 	return (
 		<div
 			className={`
-		fixed flex flex-col h-full justify-between shadow-xl transition-all duration-300 z-40 dark:bg-black overflow-y-auto bg-white ${isSidebarCollapsed ? "w-0 hidden" : "w-64"}
-	`}
+				fixed flex flex-col h-full justify-between shadow-xl transition-all duration-300 z-40 dark:bg-black overflow-y-auto bg-white ${isSidebarCollapsed ? "w-0 opacity-0" : "w-64 opacity-100"}
+			`}
 		>
 			<div className="flex h-full w-full flex-col justify-start">
 				{/* Pianifica Logo */}
-				<div className="z-50 flex min-h-[56px] w-64 items-center justify-between bg-white px-6 dark:bg-black">
-					{!isSidebarCollapsed && (
-						<button
-							type="button"
-							className="rounded p-3 dark:hover:bg-gray-700 hover:bg-gray-200"
-							onClick={() =>
-								dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))
-							}
-						>
-							<Menu className="text-gray-800 dark:text-white" />
-						</button>
-					)}
+				<div className="z-50 flex min-h-[59.5px] w-64 gap-2 items-center bg-white px-4 dark:bg-black">
+					<button
+						type="button"
+						className="rounded-full p-2 dark:hover:bg-zinc-800 hover:bg-gray-200"
+						onClick={() => dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))}
+					>
+						<Menu className="text-gray-800 dark:text-white" />
+					</button>
 					<div className="text-xl font-bold text-gray-800 dark:text-white font-mono">
 						PIANIFICA
 					</div>
@@ -94,7 +90,7 @@ const Sidebar = () => {
 				<div className="flex items-center gap-5 border-y-[1.5px] border-gray-200 px-8 py-4 dark:border-gray-700">
 					<Image src="/team.png" width={40} height={40} alt="logo" />
 					<div>
-						<h3 className="text-md font-bold tracking-wide dark:text-gray-200">
+						<h3 className="w-max text-md font-bold tracking-wide dark:text-gray-200">
 							{organization?.data?.name}
 						</h3>
 						<div className="mt-1 flex items-start gap-2">

@@ -55,7 +55,7 @@ const TableRow = ({
 };
 
 const TableCell = ({ children }: { children: React.ReactNode }) => {
-	return <td className="px-6 py-4 whitespace-nowrap">{children}</td>;
+	return <td className="px-6 py-4 whitespace-nowrap w-max">{children}</td>;
 };
 
 const EmptyTable = ({ str = "No data available" }: { str?: string }) => {

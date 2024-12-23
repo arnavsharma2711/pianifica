@@ -5,14 +5,21 @@ interface DropdownMenuProps {
 	toggle: React.ReactNode;
 	options: {
 		key: string;
-		icon: React.ReactNode;
+		icon?: React.ReactNode;
 		value: string;
 		onClick?: () => void;
 		className?: string;
 	}[];
+	position?: "center" | "left" | "right";
+	marginTop?: string;
 }
 
-const DropdownMenu: React.FC<DropdownMenuProps> = ({ toggle, options }) => {
+const DropdownMenu: React.FC<DropdownMenuProps> = ({
+	toggle,
+	options,
+	position = "center",
+	marginTop = "mt-10",
+}) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
 
@@ -34,16 +41,21 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ toggle, options }) => {
 	}, []);
 
 	return (
-		<div ref={menuRef} className="relative">
+		<div
+			ref={menuRef}
+			className={`relative flex ${position === "center" ? "justify-center" : position === "left" ? "justify-start" : "justify-end"}`}
+		>
 			<button
 				type="button"
 				onClick={toggleMenu}
-				className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-zinc-700 ${isOpen ? "bg-gray-200 dark:bg-zinc-700" : ""}`}
+				className={`p-1 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 ${isOpen ? "bg-gray-200 dark:bg-zinc-700" : ""}`}
 			>
 				{toggle}
 			</button>
 			{isOpen && (
-				<ul className="absolute right-0 -translate-x-full flex flex-col gap-0.5 mt-2 w-max max-w-xs border bg-gray-300 dark:border-zinc-700 dark:bg-zinc-700 border-gray-300 shadow-lg z-10 rounded-lg overflow-hidden">
+				<ul
+					className={`absolute ${position === "center" ? "left-1/2 transform -translate-x-1/2" : position === "left" ? "left-0" : "right-0"} flex flex-col gap-0.5 ${marginTop} w-max max-w-xs border bg-gray-300 dark:border-zinc-700 dark:bg-zinc-700 border-gray-300 shadow-lg z-10 rounded-lg overflow-hidden`}
+				>
 					{options.map((option) => (
 						<li
 							onClick={option.onClick}
