@@ -86,6 +86,15 @@ const Dashboard = () => {
 			pieFill: "#82ca9d",
 			text: "#000000",
 		};
+
+	const pagination = {
+		page,
+		limit,
+		total: tasks.total_count || 10,
+		setPage,
+		setLimit,
+	}
+
 	const taskColumns = [
 		{
 			header: "Title",
@@ -109,64 +118,58 @@ const Dashboard = () => {
 		},
 	];
 	return (
-		<div className="container h-full w-[100%] bg-gray-100 bg-transparent p-8">
+		<div className="h-full w-full bg-gray-100 bg-transparent p-8">
 			<Header name="Project Management Dashboard" />
-			<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-				<div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
-					<h3 className="mb-4 text-lg font-semibold dark:text-white">
-						Task Priority Distribution
-					</h3>
-					<ResponsiveContainer width="100%" height={300}>
-						<BarChart data={taskDistribution}>
-							<CartesianGrid
-								strokeDasharray="3 3"
-								stroke={chartColors.barGrid}
-							/>
-							<XAxis dataKey="name" stroke={chartColors.text} />
-							<YAxis stroke={chartColors.text} />
-							<Tooltip
-								contentStyle={{
-									width: "min-content",
-									height: "min-content",
-								}}
-							/>
-							<Legend />
-							<Bar dataKey="count" fill={chartColors.bar} />
-						</BarChart>
-					</ResponsiveContainer>
-				</div>
-				<div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
-					<h3 className="mb-4 text-lg font-semibold dark:text-white">
-						Project Status
-					</h3>
-					<ResponsiveContainer width="100%" height={300}>
-						<PieChart>
-							<Pie dataKey="count" data={projectStatus} fill="#82ca9d" label>
-								{projectStatus.map((entry) => (
-									<Cell
-										key={entry.name}
-										fill={COLORS[projectStatus.indexOf(entry) % COLORS.length]}
-									/>
-								))}
-							</Pie>
-							<Tooltip />
-							<Legend />
-						</PieChart>
-					</ResponsiveContainer>
+			<div className="flex flex-col select-none gap-6 ">
+				<div className="w-full gap-6 flex items-center justify-center flex-row">
+					<div className="w-full rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
+						<h3 className="mb-4 text-lg font-semibold dark:text-white">
+							Task Priority Distribution
+						</h3>
+						<ResponsiveContainer width="100%" height={300}>
+							<BarChart data={taskDistribution}>
+								<CartesianGrid
+									strokeDasharray="3 3"
+									stroke={chartColors.barGrid}
+								/>
+								<XAxis dataKey="name" stroke={chartColors.text} />
+								<YAxis stroke={chartColors.text} />
+								<Tooltip
+									contentStyle={{
+										width: "min-content",
+										height: "min-content",
+									}}
+								/>
+								<Legend />
+								<Bar dataKey="count" fill={chartColors.bar} />
+							</BarChart>
+						</ResponsiveContainer>
+					</div>
+					<div className="w-full  rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
+						<h3 className="mb-4 text-lg font-semibold dark:text-white">
+							Project Status
+						</h3>
+						<ResponsiveContainer width="100%" height={300}>
+							<PieChart>
+								<Pie dataKey="count" data={projectStatus} fill="#82ca9d" label>
+									{projectStatus.map((entry) => (
+										<Cell
+											key={entry.name}
+											fill={COLORS[projectStatus.indexOf(entry) % COLORS.length]}
+										/>
+									))}
+								</Pie>
+								<Tooltip />
+								<Legend />
+							</PieChart>
+						</ResponsiveContainer>
+					</div>
 				</div>
 				<div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary md:col-span-2">
 					<h3 className="mb-4 text-lg font-semibold dark:text-white">
 						Your Tasks
 					</h3>
-					<DataTable data={tasks.data} columns={taskColumns} showPagination={true} pagination={
-						{
-							page,
-							limit,
-							total: tasks.total_count || 10,
-							setPage,
-							setLimit,
-						}
-					} />
+					<DataTable data={tasks.data} columns={taskColumns} showPagination={true} pagination={pagination} />
 				</div>
 			</div>
 		</div>
