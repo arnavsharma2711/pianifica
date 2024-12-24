@@ -53,24 +53,22 @@ const Navbar = () => {
 	};
 
 	return (
-		<div className="flex items-center justify-between bg-white px-4 py-3 dark:bg-black">
+		<div className="fixed w-full z-40 flex items-center justify-between bg-white px-4 py-3 shadow-md dark:bg-black mb-40">
 			<div className="flex items-center gap-8">
-				{isSidebarCollapsed && (
-					<div className="flex items-center gap-2">
-						<button
-							type="button"
-							className="rounded-full p-2 dark:hover:bg-zinc-800 hover:bg-gray-200"
-							onClick={() =>
-								dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))
-							}
-						>
-							<Menu className="text-gray-800 dark:text-white" />
-						</button>
-						<div className="text-xl font-bold text-gray-800 dark:text-white font-mono">
-							PIANIFICA
-						</div>
+				<div className="flex items-center gap-2">
+					<button
+						type="button"
+						className="rounded-full p-2 dark:hover:bg-zinc-800 hover:bg-gray-200"
+						onClick={() =>
+							dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))
+						}
+					>
+						<Menu className="text-gray-800 dark:text-white" />
+					</button>
+					<div className="text-xl font-bold text-gray-800 dark:text-white font-mono">
+						PIANIFICA
 					</div>
-				)}
+				</div>
 			</div>
 			{/* Search Bar */}
 			<div className="hidden md:flex relative items-center w-[400px]">

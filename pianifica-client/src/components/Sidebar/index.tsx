@@ -39,7 +39,7 @@ const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
 	return (
 		<Link href={href} className="w-full min-w-max">
 			<div
-				className={`relative flex cursor-pointer items-center gap-3 transition-colors hover:bg-gray-200 dark:bg-black dark:hover:bg-zinc-800 ${isActive ? "bg-gray-100 text-white dark:bg-zinc-900" : ""} justify-start px-8 py-3`}
+				className={`relative flex cursor-pointer items-center gap-3 transition-colors hover:bg-gray-200 dark:bg-black dark:hover:bg-zinc-800 ${isActive ? "bg-gray-100 text-white dark:bg-zinc-900" : ""} justify-start px-5 py-3`}
 			>
 				{isActive && (
 					<div className="absolute right-0 top-0 h-full w-[5px] bg-blue-200" />
@@ -68,12 +68,12 @@ const Sidebar = () => {
 	return (
 		<div
 			className={`
-				fixed flex flex-col h-full justify-between shadow-xl transition-all duration-300 z-40 dark:bg-black overflow-y-auto bg-white ${isSidebarCollapsed ? "w-0 opacity-0" : "w-64 opacity-100"}
+				fixed flex flex-col h-full justify-between shadow-xl transition-all duration-300 z-50 dark:bg-black overflow-y-auto bg-white ${isSidebarCollapsed ? "w-0 opacity-0" : "w-64 opacity-100"}
 			`}
 		>
 			<div className="flex h-full w-full flex-col justify-start">
 				{/* Pianifica Logo */}
-				<div className="z-50 flex min-h-[59.5px] w-64 gap-2 items-center bg-white px-4 dark:bg-black">
+				<div className="flex min-h-[59.5px] gap-2 items-center bg-white px-4 dark:bg-black">
 					<button
 						type="button"
 						className="rounded-full p-2 dark:hover:bg-zinc-800 hover:bg-gray-200"
@@ -112,7 +112,7 @@ const Sidebar = () => {
 				<button
 					type="button"
 					onClick={() => setShowProjects((prev) => !prev)}
-					className="flex w-full items-center justify-between px-8 py-3 text-gray-500 "
+					className="flex w-full items-center justify-between px-4 py-3 text-gray-500 "
 				>
 					<span className="">Projects</span>
 					{showProjects ? (
@@ -137,7 +137,7 @@ const Sidebar = () => {
 				<button
 					type="button"
 					onClick={() => setShowPriority((prev) => !prev)}
-					className="flex w-full items-center justify-between px-8 py-3 text-gray-500 "
+					className="flex w-full items-center justify-between px-4 py-3 text-gray-500 "
 				>
 					<span className="">Priority</span>
 					{showPriority ? (
