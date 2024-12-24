@@ -19,6 +19,14 @@ interface DataTableProps<T> {
 	emptyStr?: string;
 	actionHeader?: string;
 	action?: (item: T) => React.ReactNode;
+	showPagination?: boolean;
+	pagination?: {
+		page: number;
+		limit: number;
+		total: number;
+		setPage: React.Dispatch<React.SetStateAction<number>>;
+		setLimit: React.Dispatch<React.SetStateAction<number>>;
+	}
 }
 
 export function DataTable<T>({
@@ -28,9 +36,31 @@ export function DataTable<T>({
 	emptyStr = "No data available",
 	actionHeader,
 	action,
+	showPagination = false,
+	pagination = {
+		page: 1,
+		limit: 10,
+		total: 10,
+		setPage: () => { },
+		setLimit: () => { },
+	}
 }: DataTableProps<T>) {
+	const handlePageChange = (value: number) => {
+		pagination.setPage(value);
+	}
+	const handleLimitChange = (value: number) => {
+		pagination.setPage(1);
+		pagination.setLimit(value);
+	}
 	return (
-		<Table isEmpty={data.length === 0} emptyStr={emptyStr}>
+		<Table isEmpty={data.length === 0} emptyStr={emptyStr} showPagination={showPagination} pagination={{
+			page: pagination.page,
+			limit: pagination.limit,
+			total: pagination.total,
+			setPage: handlePageChange,
+			setLimit: handleLimitChange,
+		}
+		}>
 			<TableHeader>
 				<TableRow header={true}>
 					{withIndex && <TableHead>S. No.</TableHead>}
