@@ -1,7 +1,7 @@
 "use client";
 
 import { useGetProjectsQuery, useGetUserTasksQuery } from "@/state/api";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import {
 	Bar,
@@ -25,11 +25,14 @@ import StatusTag from "@/components/StatusTag";
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const Dashboard = () => {
+	const [page, setPage] = useState(1);
+	const [limit, setLimit] = useState(10);
+
 	const {
 		data: tasks,
 		isLoading: tasksLoading,
 		isError: tasksError,
-	} = useGetUserTasksQuery({});
+	} = useGetUserTasksQuery({ limit: limit, page: page });
 	const { data: projects, isLoading: isProjectsLoading } =
 		useGetProjectsQuery();
 
@@ -72,17 +75,17 @@ const Dashboard = () => {
 
 	const chartColors = isDarkMode
 		? {
-				bar: "#8884d8",
-				barGrid: "#303030",
-				pieFill: "#4A90E2",
-				text: "#FFFFFF",
-			}
+			bar: "#8884d8",
+			barGrid: "#303030",
+			pieFill: "#4A90E2",
+			text: "#FFFFFF",
+		}
 		: {
-				bar: "#8884d8",
-				barGrid: "#E0E0E0",
-				pieFill: "#82ca9d",
-				text: "#000000",
-			};
+			bar: "#8884d8",
+			barGrid: "#E0E0E0",
+			pieFill: "#82ca9d",
+			text: "#000000",
+		};
 	const taskColumns = [
 		{
 			header: "Title",
@@ -155,7 +158,15 @@ const Dashboard = () => {
 					<h3 className="mb-4 text-lg font-semibold dark:text-white">
 						Your Tasks
 					</h3>
-					<DataTable data={tasks.data} columns={taskColumns} />
+					<DataTable data={tasks.data} columns={taskColumns} showPagination={true} pagination={
+						{
+							page,
+							limit,
+							total: tasks.total_count || 10,
+							setPage,
+							setLimit,
+						}
+					} />
 				</div>
 			</div>
 		</div>

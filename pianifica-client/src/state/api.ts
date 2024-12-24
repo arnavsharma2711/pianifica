@@ -1,31 +1,40 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { Project, Search, Task, Team, User } from "@/interface";
-import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import type {
+  BaseQueryFn,
+  FetchArgs,
+  FetchBaseQueryError,
+} from "@reduxjs/toolkit/query";
 import type { Priority, Status } from "@/enum";
 import toast from "react-hot-toast";
+
 type ApiResponse<T> = {
   success: boolean;
   message: string;
   error?: string;
+  total_count?: number;
   data: T;
 };
 
-const baseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
-});
+export const baseQueryWithErrorHandling: BaseQueryFn<
+  string | FetchArgs,
+  unknown,
+  FetchBaseQueryError
+> = async (args, api, extraOptions) => {
+  const baseQuery = fetchBaseQuery({
+    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+  });
 
-
-const baseQueryWithErrorHandling: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
-  args,
-  api,
-  extraOptions
-) => {
   const result = await baseQuery(args, api, extraOptions);
   if (result.error) {
-    const errorMessage = (result.error.data as { error?: string })?.error || "Server not reachable";
+    const errorMessage =
+      (result.error.data as { error?: string })?.error ||
+      "Server not reachable";
     toast.error(errorMessage);
   } else if (result.data && !(result.data as ApiResponse<unknown>).success) {
-    toast.error((result.data as ApiResponse<unknown>).error || "Something went wrong");
+    toast.error(
+      (result.data as ApiResponse<unknown>).error || "Something went wrong",
+    );
   }
   return result;
 };
@@ -146,10 +155,23 @@ export const api = createApi({
     }),
     getUserTasks: build.query<
       ApiResponse<Task[]>,
-      { priority?: Priority; status?: Status }
+      {
+        search?: string;
+        page?: number;
+        limit?: number;
+        sortBy?: string;
+        order?: string;
+        priority?: Priority;
+        status?: Status;
+      }
     >({
-      query: ({ priority, status }) => {
+      query: ({ search, page, limit, sortBy, order, priority, status }) => {
         const params = new URLSearchParams();
+        if (search) params.append("search", search);
+        if (page) params.append("page", page.toString());
+        if (limit) params.append("limit", limit.toString());
+        if (sortBy) params.append("sortBy", sortBy);
+        if (order) params.append("order", order);
         if (priority) params.append("priority", priority.toUpperCase());
         if (status) params.append("status", status.toUpperCase());
 
