@@ -8,7 +8,7 @@ import {
   removeExistingTeamMember,
   updateExistingTeam,
 } from "../../service/team-service";
-import { teamSchema } from "../../lib/schema";
+import { filterSchema, teamSchema } from "../../lib/schema";
 import {
   createTeamSchema,
   teamReturnSchema,
@@ -16,6 +16,7 @@ import {
   updateTeamSchema,
 } from "./schema";
 import { isAdmin } from "../../lib/utils";
+import { getFilters } from "../../lib/filters";
 
 export const getTeams = controllerWrapper(async (req, res) => {
   if (req.user?.organizationId === undefined) {
@@ -25,16 +26,20 @@ export const getTeams = controllerWrapper(async (req, res) => {
     });
     return;
   }
+  const filters = filterSchema.parse(req.query);
 
-  const teams = await getExistingTeams({
+  const { teams, totalCount } = await getExistingTeams({
     organizationId: req.user?.organizationId,
+    filters: getFilters(filters, "teams"),
   });
 
-  const teamData = teams.map((team) => teamSchema.parse(team));
+  let teamData: object[] = [];
+  if (teams.length > 0) teamData = teams.map((team) => teamSchema.parse(team));
 
   res.success({
     message: "Team fetched successfully!",
     data: teamData,
+    total_count: totalCount,
   });
 });
 

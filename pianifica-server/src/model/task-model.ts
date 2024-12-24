@@ -1,5 +1,6 @@
 import type { Priority, Status } from "@prisma/client";
 import prisma from "../utils/prisma";
+import type { Filter } from "../lib/filters";
 
 export const createTask = async ({
   title,
@@ -71,35 +72,58 @@ export const getUserTasks = async ({
   filters,
 }: {
   userId: number;
-  filters?: {
-    priority?: Priority | null;
-    status?: Status | null;
-  };
+  filters: Filter;
 }) => {
-  let filterParameters = {};
-  if (filters?.priority)
-    filterParameters = { ...filterParameters, priority: filters.priority };
-  if (filters?.status)
-    filterParameters = { ...filterParameters, status: filters.status };
-
-  return prisma.task.findMany({
-    where: {
-      OR: [
-        {
-          assigneeId: userId,
-        },
-        {
-          authorId: userId,
-        },
-      ],
-      ...filterParameters,
+  const whereClause: {
+    AND: {
+      deletedAt: null;
+      OR: {
+        title?: { contains: string; mode: "insensitive" };
+        assigneeId?: number;
+        authorId?: number;
+      }[];
+      priority?: Priority;
+      status?: Status;
+    };
+  } = {
+    AND: {
       deletedAt: null,
+      OR: [{ assigneeId: userId }, { authorId: userId }],
     },
+  };
+
+  if (filters.search) {
+    whereClause.AND.OR.push({
+      title: { contains: filters.search, mode: "insensitive" },
+    });
+  }
+
+  if (filters.priority) {
+    whereClause.AND.priority = filters.priority as Priority;
+  }
+
+  if (filters.status) {
+    whereClause.AND.status = filters.status as Status;
+  }
+
+  const tasks = await prisma.task.findMany({
+    where: whereClause,
     include: {
       author: true,
       assignee: true,
     },
+    skip: (filters.page - 1) * filters.limit,
+    take: filters.limit,
+    orderBy: {
+      [filters.sortBy]: filters.order,
+    },
   });
+
+  const totalCount = await prisma.task.count({
+    where: whereClause,
+  });
+
+  return { tasks, totalCount };
 };
 
 export const getTaskById = async ({

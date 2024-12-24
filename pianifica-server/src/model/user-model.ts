@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import Prisma from "../utils/prisma";
+import type { Filter } from "../lib/filters";
 
 export const createUser = async ({
   organizationId,
@@ -35,16 +36,40 @@ export const createUser = async ({
 
 export const getUsers = async ({
   organizationId,
+  filters,
 }: {
   organizationId: number;
+  filters: Filter;
 }) => {
-  const users = await Prisma.user.findMany({
-    where: {
-      AND: {
-        deletedAt: null,
-        organizationId,
-      },
+  const whereClause: {
+    AND: {
+      deletedAt: null;
+      organizationId: number;
+      OR?: {
+        username?: { contains: string };
+        email?: { contains: string };
+        firstName?: { contains: string };
+        lastName?: { contains: string };
+      }[];
+    };
+  } = {
+    AND: {
+      deletedAt: null,
+      organizationId,
     },
+  };
+
+  if (filters.search) {
+    whereClause.AND.OR = [
+      { username: { contains: filters.search } },
+      { firstName: { contains: filters.search } },
+      { lastName: { contains: filters.search } },
+      { email: { contains: filters.search } },
+    ];
+  }
+
+  const users = await Prisma.user.findMany({
+    where: whereClause,
     include: {
       userRoles: {
         select: {
@@ -52,15 +77,15 @@ export const getUsers = async ({
         },
       },
     },
+    skip: (filters.page - 1) * filters.limit,
+    take: filters.limit,
+    orderBy: {
+      [filters.sortBy]: filters.order,
+    },
   });
 
   const totalCount = await Prisma.user.count({
-    where: {
-      AND: {
-        deletedAt: null,
-        organizationId,
-      },
-    },
+    where: whereClause,
   });
 
   return { users, totalCount };

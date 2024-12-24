@@ -1,4 +1,5 @@
 import prisma from "../utils/prisma";
+import type { Filter } from "../lib/filters";
 
 const getIncludeMembers = (withTeamMembers: "data" | "mapping" | "none") => {
   switch (withTeamMembers) {
@@ -42,20 +43,48 @@ export const createTeam = async ({
 
 export const getTeams = async ({
   organizationId,
+  filters,
 }: {
   organizationId: number;
+  filters: Filter;
 }) => {
-  const teams = await prisma.team.findMany({
-    where: {
-      AND: [{ organizationId }, { deletedAt: null }],
+  const whereClause: {
+    AND: {
+      deletedAt: null;
+      organizationId: number;
+      OR?: { name: { contains: string; mode: "insensitive" | "default" } }[];
+    };
+  } = {
+    AND: {
+      deletedAt: null,
+      organizationId,
     },
+  };
+
+  if (filters.search) {
+    whereClause.AND.OR = [
+      { name: { contains: filters.search, mode: "insensitive" } },
+    ];
+  }
+
+  const teams = await prisma.team.findMany({
+    where: whereClause,
     include: {
       teamLead: true,
       teamManager: true,
     },
+    skip: (filters.page - 1) * filters.limit,
+    take: filters.limit,
+    orderBy: {
+      [filters.sortBy]: filters.order,
+    },
   });
 
-  return teams;
+  const totalCount = await prisma.team.count({
+    where: whereClause,
+  });
+
+  return { teams, totalCount };
 };
 
 export const getTeamById = async ({

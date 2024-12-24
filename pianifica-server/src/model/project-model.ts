@@ -1,3 +1,4 @@
+import type { Filter } from "../lib/filters";
 import prisma from "../utils/prisma";
 
 export const createProject = async ({
@@ -28,16 +29,38 @@ export const createProject = async ({
 
 export const getProjects = async ({
   organizationId,
+  filters,
 }: {
   organizationId: number;
+  filters: Filter;
 }) => {
-  const projects = await prisma.project.findMany({
-    where: {
-      AND: [{ organizationId }, { deletedAt: null }],
+  const whereClause: {
+    AND: {
+      deletedAt: null;
+      organizationId: number;
+      OR?: { name: { contains: string; mode: "insensitive" | "default" } }[];
+    };
+  } = {
+    AND: {
+      deletedAt: null,
+      organizationId,
     },
+  };
+
+  if (filters.search) {
+    whereClause.AND.OR = [
+      { name: { contains: filters.search, mode: "insensitive" } },
+    ];
+  }
+  const projects = await prisma.project.findMany({
+    where: whereClause,
   });
 
-  return projects;
+  const totalCount = await prisma.project.count({
+    where: whereClause,
+  });
+
+  return { projects, totalCount };
 };
 
 export const getProjectById = async ({

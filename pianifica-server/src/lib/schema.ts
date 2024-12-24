@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Priority, Status } from "@prisma/client";
+import { Order } from "./filters";
 
 export const organizationSchema = z.object({
   id: z.number({
@@ -152,3 +153,21 @@ export const taskSchema = z.object({
   author: userInfoSchema.optional(),
   assignee: userInfoSchema.optional(),
 });
+
+export const filterSchema = z.object({
+  search: z.string().optional().nullable().default(""),
+  page: z
+    .union([z.string(), z.null()])
+    .optional()
+    .nullable()
+    .transform((val) => Number.parseInt(val ?? "1", 10)),
+  limit: z
+    .union([z.string(), z.null()])
+    .optional()
+    .nullable()
+    .transform((val) => Number.parseInt(val ?? "10", 10)),
+  sortBy: z.string().optional().nullable().default("createdAt"),
+  order: z.nativeEnum(Order).optional().nullable().default(Order.ASC),
+});
+
+

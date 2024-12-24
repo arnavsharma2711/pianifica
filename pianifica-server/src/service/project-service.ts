@@ -1,4 +1,5 @@
 import { CustomError } from "../lib/error/custom.error";
+import type { Filter } from "../lib/filters";
 import {
   createProject,
   deleteProject,
@@ -50,12 +51,17 @@ export const createNewProject = async ({
 
 export const getExistingProjects = async ({
   organizationId,
+  filters,
 }: {
   organizationId: number;
+  filters: Filter;
 }) => {
-  const projects = await getProjects({ organizationId });
+  const { projects, totalCount } = await getProjects({
+    organizationId,
+    filters,
+  });
 
-  return projects;
+  return { projects, totalCount };
 };
 
 export const getExistingProject = async ({

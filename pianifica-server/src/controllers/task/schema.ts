@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Priority, Status } from "@prisma/client";
+import { filterSchema } from "../../lib/schema";
 
 export const createTaskSchema = z.object({
   title: z.string({
@@ -20,7 +21,8 @@ export const createTaskSchema = z.object({
       required_error: "Assignee ID is required.",
       invalid_type_error: "Assignee ID must be a number.",
     })
-    .nullable(),
+    .nullable()
+    .transform((val) => (val === "" ? null : Number(val))),
   status: z.nativeEnum(Status),
   priority: z.nativeEnum(Priority),
   tags: z
@@ -64,10 +66,11 @@ export const updateTaskSchema = z.object({
     invalid_type_error: "Project ID must be a number.",
   }),
   assigneeId: z
-    .number({
+    .string({
       invalid_type_error: "Assignee ID must be a number.",
     })
-    .nullable(),
+    .nullable()
+    .transform((val) => (val === "" ? null : Number(val))),
   status: z.nativeEnum(Status),
   priority: z.nativeEnum(Priority),
   tags: z
@@ -92,12 +95,11 @@ export const updateTaskSchema = z.object({
     .nullable(),
 });
 
-export const userTaskSchema = z.object({
+export const userTaskSchema = filterSchema.extend({
   priority: z
-    .union([z.nativeEnum(Priority), z.string()])
+    .union([z.nativeEnum(Priority), z.literal(""), z.null()])
     .optional()
-    .nullable()
-    .transform((val) => (val === "" ? null : val)),
+    .nullable(),
   status: z
     .union([z.nativeEnum(Status), z.string()])
     .optional()

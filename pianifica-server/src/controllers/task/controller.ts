@@ -19,6 +19,7 @@ import {
 } from "./schema";
 import { taskSchema } from "../../lib/schema";
 import type { Priority, Status } from "@prisma/client";
+import { getFilters } from "../../lib/filters";
 
 export const createTask = controllerWrapper(async (req, res) => {
   if (req.user?.organizationId === undefined) {
@@ -72,20 +73,19 @@ export const getTasks = controllerWrapper(async (req, res) => {
     });
     return;
   }
-  const { priority, status } = userTaskSchema.parse(req.query);
+  const filters = userTaskSchema.parse(req.query);
 
-  const tasks = await getExistingUserTasks({
+  const { tasks, totalCount } = await getExistingUserTasks({
     userId: req.user?.id,
-    filters: {
-      priority: priority as Priority | null | undefined,
-      status: status as Status | null | undefined,
-    },
+    filters: getFilters(filters, "tasks"),
   });
 
-  const taskData = tasks.map((task) => taskSchema.parse(task));
+  let taskData: object[] = [];
+  if (tasks.length > 0) taskData = tasks.map((task) => taskSchema.parse(task));
   res.success({
     message: "Tasks fetched successfully.",
     data: taskData,
+    total_count: totalCount,
   });
 });
 

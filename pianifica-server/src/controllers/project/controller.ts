@@ -9,7 +9,8 @@ import {
 import { getExistingTasks } from "../../service/task-service";
 import { isAdmin } from "../../lib/utils";
 import { createProjectSchema, updateProjectSchema } from "./schema";
-import { projectSchema, taskSchema } from "../../lib/schema";
+import { filterSchema, projectSchema, taskSchema } from "../../lib/schema";
+import { getFilters } from "../../lib/filters";
 
 // GET api/projects
 export const getProjects = controllerWrapper(async (req, res) => {
@@ -21,15 +22,21 @@ export const getProjects = controllerWrapper(async (req, res) => {
     return;
   }
 
-  const projects = await getExistingProjects({
+  const filters = filterSchema.parse(req.query);
+
+  const { projects, totalCount } = await getExistingProjects({
     organizationId: req.user?.organizationId,
+    filters: getFilters(filters, "projects"),
   });
 
-  const projectData = projects.map((project) => projectSchema.parse(project));
-
+  let projectData: object[] = [];
+  if (projects.length > 0) {
+    projectData = projects.map((project) => projectSchema.parse(project));
+  }
   res.success({
     message: "Projects fetched successfully.",
     data: projectData,
+    total_count: totalCount,
   });
 });
 

@@ -6,9 +6,14 @@ import {
   updateExistingUser,
 } from "../../service/user-service";
 import { updateUserSchema } from "./schema";
-import { organizationSchema, userInfoSchema } from "../../lib/schema";
+import {
+  filterSchema,
+  organizationSchema,
+  userInfoSchema,
+} from "../../lib/schema";
 import { isAdmin } from "../../lib/utils";
 import { getExistingOrganization } from "../../service/organization-service";
+import { getFilters } from "../../lib/filters";
 
 // GET api/users
 export const getUsers = controllerWrapper(async (req, res) => {
@@ -20,8 +25,11 @@ export const getUsers = controllerWrapper(async (req, res) => {
     return;
   }
 
+  const filters = filterSchema.parse(req.query);
+
   const { users, totalCount } = await getExistingUsers({
     organizationId: req.user?.organizationId,
+    filters: getFilters(filters, "users"),
   });
 
   const userInfo = users.map((user) => userInfoSchema.parse(user));

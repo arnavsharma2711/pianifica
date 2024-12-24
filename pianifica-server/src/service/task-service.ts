@@ -14,6 +14,7 @@ import {
 } from "../model/task-model";
 import { getExistingUser } from "./user-service";
 import { getExistingProject } from "./project-service";
+import type { Filter } from "../lib/filters";
 
 export const createNewTask = async ({
   title,
@@ -110,13 +111,10 @@ export const getExistingTasks = async ({
 
 export const getExistingUserTasks = async ({
   userId,
-  filters = {},
+  filters,
 }: {
   userId: number;
-  filters?: {
-    priority?: Priority | null;
-    status?: Status | null;
-  };
+  filters: Filter;
 }) => {
   const tasks = await getUserTasks({ userId, filters });
 

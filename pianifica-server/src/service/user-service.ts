@@ -11,6 +11,7 @@ import {
   getUsers,
   updateUser,
 } from "../model/user-model";
+import type { Filter } from "../lib/filters";
 
 const determineHighestRole = ({
   userRoles,
@@ -102,10 +103,15 @@ export const updateExistingUser = async ({
 
 export const getExistingUsers = async ({
   organizationId,
+  filters,
 }: {
   organizationId: number;
+  filters: Filter;
 }) => {
-  const { users, totalCount } = await getUsers({ organizationId });
+  const { users, totalCount } = await getUsers({
+    organizationId,
+    filters,
+  });
 
   const usersWithRole = users.map((user) => ({
     ...user,
