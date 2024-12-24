@@ -58,7 +58,7 @@ const Sidebar = () => {
 	const [showProjects, setShowProjects] = useState(true);
 	const [showPriority, setShowPriority] = useState(true);
 
-	const { data: project } = useGetProjectsQuery();
+	const { data: project } = useGetProjectsQuery({});
 	const { data: organization } = useGetUserOrganizationQuery();
 
 	const dispatch = useAppDispatch();

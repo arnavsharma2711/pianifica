@@ -14,7 +14,7 @@ type TaskTypeItems = "task" | "milestone" | "project";
 
 const Timeline = () => {
 	const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
-	const { data: projects, error, isLoading } = useGetProjectsQuery();
+	const { data: projects, error, isLoading } = useGetProjectsQuery({});
 
 	const [displayOptions, setDisplayOptions] = useState<DisplayOption>({
 		viewMode: ViewMode.Month,

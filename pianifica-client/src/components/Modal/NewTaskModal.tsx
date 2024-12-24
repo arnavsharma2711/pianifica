@@ -23,7 +23,7 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 	const [startDate, setStartDate] = useState("");
 	const [dueDate, setDueDate] = useState("");
 	const [authorId, setAuthorId] = useState(1);
-	const [assignedId, setAssignedId] = useState(1);
+	const [assigneeId, setAssigneeId] = useState(1);
 	const [projectId, setProjectId] = useState(project || 1);
 
 	useEffect(() => {
@@ -36,7 +36,7 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 			setStartDate(task.startDate || "");
 			setDueDate(task.dueDate || "");
 			setAuthorId(task.authorId || 1);
-			setAssignedId(task.assignedId || 1);
+			setAssigneeId(task.assigneeId || 1);
 			setProjectId(task.projectId || 1);
 		}
 	}, [task]);
@@ -60,7 +60,7 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 			startDate: formattedStartDate,
 			dueDate: formattedDueDate,
 			authorId: authorId,
-			assignedId: assignedId,
+			assigneeId: assigneeId,
 			projectId,
 		});
 
@@ -164,8 +164,8 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 				<InputField
 					label="Assigned User"
 					placeholder="Assigned User ID"
-					value={assignedId.toString()}
-					onChange={(e) => setAssignedId(Number(e.target.value))}
+					value={assigneeId.toString()}
+					onChange={(e) => setAssigneeId(Number(e.target.value))}
 					type="number"
 				/>
 

@@ -14,11 +14,13 @@ import Loading from "@/components/Loading";
 import ErrorComponent from "@/components/Error";
 
 const Users = () => {
+	const [page, setPage] = useState(1);
+	const [limit, setLimit] = useState(10);
 	const [isUserModalOpen, setIsUserModalOpen] = useState(false);
 	const [modelUser, setModalUser] = useState<User | null>(null);
 	const [action, setAction] = useState<"create" | "edit">("create");
 	const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
-	const { data: users, isLoading, isError } = useGetUsersQuery();
+	const { data: users, isLoading, isError } = useGetUsersQuery({page,limit});
 	const handleUserModel = (action: string, user?: User) => {
 		if (action === "create") {
 			setAction("create");
@@ -32,6 +34,14 @@ const Users = () => {
 
 	if (isLoading) return <Loading />;
 	if (isError || !users?.success) return <ErrorComponent message="An error occurred while fetching users" />;
+
+	const pagination = {
+		page,
+		limit,
+		total: users.total_count || 10,
+		setPage,
+		setLimit,
+	};
 
 	const userColumns = [
 		{
@@ -139,6 +149,8 @@ const Users = () => {
 				data={users?.data}
 				columns={userColumns}
 				withIndex={true}
+				showPagination={true}
+				pagination={pagination}
 				actionHeader="Actions"
 				action={(user: User) => <UserAction user={user} />}
 			/>

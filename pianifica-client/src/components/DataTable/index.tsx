@@ -75,7 +75,7 @@ export function DataTable<T>({
 			<TableBody>
 				{data.map((item, index) => (
 					<TableRow key={item[columns[0].accessorKey] as string} index={index}>
-						{withIndex && <TableCell>{index + 1}</TableCell>}
+						{withIndex && <TableCell>{(pagination.page - 1) * pagination.limit + index + 1}</TableCell>}
 						{columns.map((column) => (
 							<TableCell key={column.accessorKey as string}>
 								{column.cell

@@ -108,14 +108,32 @@ export const api = createApi({
       }),
       invalidatesTags: ["Projects", "Tasks", "Users", "Teams"],
     }),
-    getProjects: build.query<ApiResponse<Project[]>, void>({
-      query: () => ({
-        url: "projects",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: sessionStorage.getItem("accessToken") || undefined,
-        },
-      }),
+    getProjects: build.query<
+      ApiResponse<Project[]>,
+      {
+        search?: string;
+        page?: number;
+        limit?: number;
+        sortBy?: string;
+        order?: string;
+      }
+    >({
+      query: ({ search, page, limit, sortBy, order }) => {
+        const params = new URLSearchParams();
+        if (search) params.append("search", search);
+        if (page) params.append("page", page.toString());
+        if (limit) params.append("limit", limit.toString());
+        if (sortBy) params.append("sortBy", sortBy);
+        if (order) params.append("order", order);
+
+        return {
+          url: `projects?${params.toString()}`,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: sessionStorage.getItem("accessToken") || undefined,
+          },
+        };
+      },
       providesTags: ["Projects"],
     }),
     getProject: build.query<ApiResponse<Project>, { projectId: number }>({
@@ -214,24 +232,60 @@ export const api = createApi({
         { type: "Tasks", id: taskId },
       ],
     }),
-    getUsers: build.query<ApiResponse<User[]>, void>({
-      query: () => ({
-        url: "users",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: sessionStorage.getItem("accessToken") || undefined,
-        },
-      }),
+    getUsers: build.query<
+      ApiResponse<User[]>,
+      {
+        search?: string;
+        page?: number;
+        limit?: number;
+        sortBy?: string;
+        order?: string;
+      }
+    >({
+      query: ({ search, page, limit, sortBy, order }) => {
+        const params = new URLSearchParams();
+        if (search) params.append("search", search);
+        if (page) params.append("page", page.toString());
+        if (limit) params.append("limit", limit.toString());
+        if (sortBy) params.append("sortBy", sortBy);
+        if (order) params.append("order", order);
+
+        return {
+          url: `users?${params.toString()}`,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: sessionStorage.getItem("accessToken") || undefined,
+          },
+        };
+      },
       providesTags: ["Users"],
     }),
-    getTeams: build.query<ApiResponse<Team[]>, void>({
-      query: () => ({
-        url: "teams",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: sessionStorage.getItem("accessToken") || undefined,
-        },
-      }),
+    getTeams: build.query<
+      ApiResponse<Team[]>,
+      {
+        search?: string;
+        page?: number;
+        limit?: number;
+        sortBy?: string;
+        order?: string;
+      }
+    >({
+      query: ({ search, page, limit, sortBy, order }) => {
+        const params = new URLSearchParams();
+        if (search) params.append("search", search);
+        if (page) params.append("page", page.toString());
+        if (limit) params.append("limit", limit.toString());
+        if (sortBy) params.append("sortBy", sortBy);
+        if (order) params.append("order", order);
+
+        return {
+          url: `teams?${params.toString()}`,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: sessionStorage.getItem("accessToken") || undefined,
+          },
+        };
+      },
       providesTags: ["Teams"],
     }),
     searchTaskProjectUser: build.query<ApiResponse<Search>, string>({

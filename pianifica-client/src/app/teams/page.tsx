@@ -1,6 +1,6 @@
 "use client";
 import { useGetTeamsQuery } from "@/state/api";
-import React from "react";
+import React, { useState } from "react";
 import Header from "@/components/Header";
 import { DataTable } from "@/components/DataTable";
 import type { Team } from "@/interface";
@@ -10,7 +10,9 @@ import Image from "next/image";
 import ErrorComponent from "@/components/Error";
 
 const Teams = () => {
-	const { data: teams, isLoading, isError } = useGetTeamsQuery();
+	const [page, setPage] = useState(1);
+	const [limit, setLimit] = useState(10);
+	const { data: teams, isLoading, isError } = useGetTeamsQuery({ page, limit });
 
 	const handleTeamModel = (action: string, user?: Team) => {
 		console.log(action, user);
@@ -20,6 +22,13 @@ const Teams = () => {
 	if (isError || !teams?.success)
 		return <ErrorComponent message="An error occurred while fetching teams" />;
 
+	const pagination = {
+		page,
+		limit,
+		total: teams.total_count || 10,
+		setPage,
+		setLimit,
+	};
 	const teamColumns = [
 		{
 			header: "Team Name",
@@ -83,7 +92,7 @@ const Teams = () => {
 					</button>
 				}
 			/>
-			<DataTable data={teams?.data} columns={teamColumns} />
+			<DataTable data={teams?.data} columns={teamColumns} withIndex showPagination={true} pagination={pagination} />
 		</div>
 	);
 };

@@ -12,13 +12,23 @@ import Link from "next/link";
 import { useState } from "react";
 
 const Projects = () => {
+	const [page, setPage] = useState(1);
+	const [limit, setLimit] = useState(10);
 	const [isModalNewProjectOpen, setIsModalNewProjectOpen] = useState(false);
 
-	const { data: projects, error, isLoading } = useGetProjectsQuery();
+	const { data: projects, error, isLoading } = useGetProjectsQuery({});
 
 	if (isLoading) return <Loading />;
 	if (error || !projects)
 		return <ErrorComponent message={"An error occurred while fetching projects"} />
+
+	const pagination = {
+		page,
+		limit,
+		total: projects.total_count || 10,
+		setPage,
+		setLimit,
+	};
 
 	const projectColumns = [
 		{
@@ -74,6 +84,8 @@ const Projects = () => {
 				data={projects?.data}
 				columns={projectColumns}
 				withIndex={true}
+				showPagination={true}
+				pagination={pagination}
 			/>
 		</div>
 	);
