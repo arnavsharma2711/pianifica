@@ -2,9 +2,9 @@ import express from "express";
 import morganLogger from "morgan";
 import helmetSecurity from "helmet";
 import corsMiddleware from "cors";
-import bodyParser from "body-parser";
 import cookieParserMiddleware from "cookie-parser";
 import path from "node:path";
+import serverless from "serverless-http";
 
 import { handleError, handleNotFound } from "./middlewares/middlewares";
 import responseHandlers from "./middlewares/response";
@@ -33,4 +33,5 @@ expressApp.use("/api", routes);
 expressApp.use(handleNotFound);
 expressApp.use(handleError);
 
+export const handler = serverless(expressApp);
 export default expressApp;
