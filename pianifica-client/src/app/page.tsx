@@ -1,7 +1,7 @@
 "use client";
 
 import { useGetProjectsQuery, useGetUserTasksQuery } from "@/state/api";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Header from "@/components/Header";
 import {
 	Bar,
@@ -34,7 +34,7 @@ const Dashboard = () => {
 		isError: tasksError,
 	} = useGetUserTasksQuery({ limit: limit, page: page });
 	const { data: projects, isLoading: isProjectsLoading } =
-		useGetProjectsQuery();
+		useGetProjectsQuery({});
 
 	const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 

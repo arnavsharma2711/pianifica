@@ -28,6 +28,7 @@
     "redux-persist": "^6.0.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.13",
     "@types/node": "^22.10.2",
     "@types/numeral": "^2.0.5",
     "@types/react": "^18.3.18",
