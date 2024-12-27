@@ -1,10 +1,11 @@
 import Modal from "@/components/Modal";
-import { useCreateTaskMutation } from "@/state/api";
+import { useCreateTaskMutation, useGetCurrentUserQuery, useGetProjectsQuery, useGetUsersQuery } from "@/state/api";
 import React, { useEffect, useState } from "react";
 import { formatISO } from "date-fns";
 import { Priority, Status } from "@/enum";
 import InputField from "../FormFields";
 import type { Task } from "@/interface";
+import Dropdown from "../FormFields/dropdown";
 
 type Props = {
 	isOpen: boolean;
@@ -14,6 +15,8 @@ type Props = {
 };
 
 const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
+	const { data: currentUser } = useGetCurrentUserQuery();
+
 	const [createTask, { isLoading }] = useCreateTaskMutation();
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
@@ -22,9 +25,37 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 	const [tags, setTags] = useState("");
 	const [startDate, setStartDate] = useState("");
 	const [dueDate, setDueDate] = useState("");
-	const [authorId, setAuthorId] = useState(1);
-	const [assigneeId, setAssigneeId] = useState(1);
+	const [authorId, setAuthorId] = useState(currentUser?.data?.id || 0);
+	const [assigneeId, setAssigneeId] = useState(currentUser?.data?.id || 0);
 	const [projectId, setProjectId] = useState(project || 1);
+
+	const handleProjectChange = (value: string) => {
+		setProjectId(Number(value));
+	}
+
+	const handleStatusChange = (value: string) => {
+		setStatus(Status[value as keyof typeof Status]);
+	}
+
+	const handleAuthorChange = (value: string) => {
+		setAuthorId(Number(value));
+	}
+	const handleAssigneeChange = (value: string) => {
+		setAssigneeId(Number(value));
+	}
+
+	const { data: projects } = useGetProjectsQuery({ limit: 100, page: 1 });
+	const { data: users } = useGetUsersQuery({ limit: 100, page: 1 });
+
+
+	const projectOptions = projects?.data.map((project) => (
+		{ value: project.id.toString() || "", label: project.name || "" }
+	)) || [];
+
+	const userOptions = users?.data.map((user) => (
+		{ value: user?.id?.toString() || "", label: `${user.firstName} ${user.lastName}` || "", imgSrc: user.profilePictureUrl }
+	)) || [];
+
 
 	useEffect(() => {
 		if (task) {
@@ -35,9 +66,21 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 			setTags(task.tags || "");
 			setStartDate(task.startDate || "");
 			setDueDate(task.dueDate || "");
-			setAuthorId(task.authorId || 1);
-			setAssigneeId(task.assigneeId || 1);
+			setAuthorId(task?.assignee?.id || 0);
+			setAssigneeId(task?.author?.id || 1);
 			setProjectId(task.projectId || 1);
+		}
+		else {
+			setTitle("");
+			setDescription("");
+			setStatus(Status.TODO);
+			setPriority(Priority.BACKLOG);
+			setTags("");
+			setStartDate("");
+			setDueDate("");
+			setAuthorId(currentUser?.data?.id || 0);
+			setAssigneeId(currentUser?.data?.id || 0);
+			setProjectId(project || 0);
 		}
 	}, [task]);
 
@@ -75,7 +118,7 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 		"mb-4 block w-full rounded border border-gray-300 px-3 py-2 dark:border-dark-tertiary dark:bg-dark-tertiary dark:focus:outline-none";
 
 	return (
-		<Modal isOpen={isOpen} onClose={onClose} name="Create New Task">
+		<Modal isOpen={isOpen} onClose={onClose} name={task ? "Edit Task" : "New Task"}>
 			<form
 				className="mt-4 space-y-6"
 				onSubmit={(e) => {
@@ -83,14 +126,20 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 					handleSubmit();
 				}}
 			>
-				{project !== null && (
-					<InputField
-						label="Project"
-						value={projectId.toString()}
-						onChange={(e) => setProjectId(Number(e.target.value))}
-						type="number"
-					/>
-				)}
+				<Dropdown
+					options={projectOptions}
+					value={projectId.toString()}
+					setValue={handleProjectChange}
+					label="Project"
+					disabled={projectId !== null}
+				/>
+				<Dropdown
+					options={userOptions}
+					value={authorId.toString()}
+					setValue={handleAuthorChange}
+					label="Author"
+					disabled={true}
+				/>
 				<InputField
 					label="Title"
 					value={title}
@@ -102,34 +151,19 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 					value={description}
 					onChange={(e) => setDescription(e.target.value)}
 				/>
-				<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-2">
-					<select
-						className={selectStyles}
+				<div className="flex flex-row w-full gap-2">
+					<Dropdown
+						options={Object.values(Status).map((status) => ({ value: status, label: status.replace("_", " ") }))}
 						value={status}
-						onChange={(e) =>
-							setStatus(Status[e.target.value as keyof typeof Status])
-						}
-					>
-						<option value={Status.BLOCKED}>Blocked</option>
-						<option value={Status.TODO}>To Do</option>
-						<option value={Status.IN_PROGRESS}>In Progress</option>
-						<option value={Status.UNDER_REVIEW}>Under Review</option>
-						<option value={Status.RELEASE_READY}>Release Ready</option>
-						<option value={Status.COMPLETED}>Completed</option>
-					</select>
-					<select
-						className={selectStyles}
+						setValue={handleStatusChange}
+						label="Status"
+					/>
+					<Dropdown
+						options={Object.values(Priority).map((priority) => ({ value: priority, label: priority }))}
 						value={priority}
-						onChange={(e) =>
-							setPriority(Priority[e.target.value as keyof typeof Priority])
-						}
-					>
-						<option value={Priority.BACKLOG}>Backlog</option>
-						<option value={Priority.LOW}>Low</option>
-						<option value={Priority.MEDIUM}>Medium</option>
-						<option value={Priority.HIGH}>High</option>
-						<option value={Priority.URGENT}>Urgent</option>
-					</select>
+						setValue={(value) => setPriority(value as Priority)}
+						label="Priority"
+					/>
 				</div>
 				<InputField
 					label="Tags (comma separated)"
@@ -154,26 +188,17 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 						type="date"
 					/>
 				</div>
-				<InputField
-					label="Assigned Author"
-					placeholder="Author User ID"
-					value={authorId.toString()}
-					onChange={(e) => setAuthorId(Number(e.target.value))}
-					type="number"
-				/>
-				<InputField
-					label="Assigned User"
-					placeholder="Assigned User ID"
-					value={assigneeId.toString()}
-					onChange={(e) => setAssigneeId(Number(e.target.value))}
-					type="number"
-				/>
 
+				<Dropdown
+					options={userOptions}
+					value={assigneeId.toString()}
+					setValue={handleAssigneeChange}
+					label="Assignee"
+				/>
 				<button
 					type="submit"
-					className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 ${
-						!isFormValid() || isLoading ? "cursor-not-allowed opacity-50" : ""
-					}`}
+					className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 ${!isFormValid() || isLoading ? "cursor-not-allowed opacity-50" : ""
+						}`}
 					disabled={!isFormValid() || isLoading}
 				>
 					{isLoading ? "Creating..." : "Create Task"}

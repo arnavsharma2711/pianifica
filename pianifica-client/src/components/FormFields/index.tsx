@@ -16,7 +16,7 @@ const InputField = ({
 	placeholder,
 }: InputFieldProps) => {
 	const className =
-		"h-10 w-full rounded-md border border-gray-300 dark:border-dark-tertiary dark:bg-dark-tertiary px-3 py-2 m-1 ring-offset-background md:text-sm";
+		"h-10 w-full box-border rounded-md border border-gray-300 dark:border-dark-tertiary dark:bg-dark-tertiary px-3 py-2 ring-offset-background md:text-sm";
 	return (
 		<div className="w-full">
 			<label htmlFor={label} className="w-full ml-1 block font-medium">
