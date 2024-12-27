@@ -25,6 +25,15 @@ export interface Attachment {
   taskId: number;
   uploadedById: number;
 }
+
+export interface Comment {
+  id: number;
+  text: string;
+  createdAt: string;
+  updatedAt: string;
+
+  user?: User;
+}
 export interface Project {
   id: string;
   name: string;
@@ -46,7 +55,9 @@ export interface Task {
   projectId: number;
   authorId?: number;
   assigneeId?: number;
+  comments_count?: number;
 
+  project?: Project;
   author?: User;
   assignee?: User;
   comments?: Comment[];

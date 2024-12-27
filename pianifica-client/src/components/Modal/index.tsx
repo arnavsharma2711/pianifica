@@ -9,6 +9,7 @@ type Props = {
 	isOpen: boolean;
 	onClose: () => void;
 	name: string;
+	size?: "md" | "lg" | "xl";
 };
 import { Component } from 'react';
 
@@ -26,7 +27,7 @@ class DisableBodyScroll extends Component {
 	}
 }
 
-const Modal = ({ children, isOpen, onClose, name }: Props) => {
+const Modal = ({ children, isOpen, onClose, name, size = "md" }: Props) => {
 	const modalRef = useRef<HTMLDivElement>(null);
 
 	if (!isOpen) return null;
@@ -55,7 +56,7 @@ const Modal = ({ children, isOpen, onClose, name }: Props) => {
 				<div
 					id="modal-content"
 					ref={modalRef}
-					className="w-full max-w-2xl rounded-lg bg-white p-4 shadow-lg dark:bg-dark-secondary"
+					className={`w-full ${size === "md" ? "max-w-2xl" : size === "lg" ? "max-w-3xl" : "max-w-5xl"} rounded-lg bg-white p-5 shadow-lg dark:bg-dark-secondary`}
 				>
 					<Header
 						name={name}

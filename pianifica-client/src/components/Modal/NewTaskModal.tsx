@@ -82,7 +82,7 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 			setAssigneeId(currentUser?.data?.id || 0);
 			setProjectId(project || 0);
 		}
-	}, [task]);
+	}, [task, currentUser?.data?.id, project]);
 
 	const handleSubmit = async () => {
 		if (!title || !authorId || !projectId) return;
@@ -113,10 +113,6 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 	const isFormValid = () => {
 		return title && authorId && projectId;
 	};
-
-	const selectStyles =
-		"mb-4 block w-full rounded border border-gray-300 px-3 py-2 dark:border-dark-tertiary dark:bg-dark-tertiary dark:focus:outline-none";
-
 	return (
 		<Modal isOpen={isOpen} onClose={onClose} name={task ? "Edit Task" : "New Task"}>
 			<form

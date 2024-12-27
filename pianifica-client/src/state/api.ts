@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { Project, Search, Task, Team, User } from "@/interface";
+import type { Comment, Project, Search, Task, Team, User } from "@/interface";
 import type {
   BaseQueryFn,
   FetchArgs,
@@ -42,7 +42,7 @@ export const baseQueryWithErrorHandling: BaseQueryFn<
 export const api = createApi({
   baseQuery: baseQueryWithErrorHandling,
   reducerPath: "api",
-  tagTypes: ["Projects", "Tasks", "UserTasks", "Users", "Teams"],
+  tagTypes: ["Projects", "Tasks", "Task", "UserTasks", "Users", "Teams"],
   endpoints: (build) => ({
     getUserOrganization: build.query<
       ApiResponse<{ id: number; name: string }>,
@@ -203,6 +203,18 @@ export const api = createApi({
       },
       providesTags: ["UserTasks"],
     }),
+    getTask: build.query<ApiResponse<Task>, { taskId: number }>({
+      query: ({ taskId }) => ({
+        url: `task/${taskId}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+      }),
+      providesTags: (result, error, { taskId }) => [
+        { type: "Task", id: taskId },
+      ],
+    }),
     createTask: build.mutation<ApiResponse<Task>, Partial<Task>>({
       query: (task) => ({
         url: "task",
@@ -230,6 +242,24 @@ export const api = createApi({
       }),
       invalidatesTags: (result, error, { taskId }) => [
         { type: "Tasks", id: taskId },
+        { type: "Task", id: taskId },
+      ],
+    }),
+    createComment: build.mutation<
+      ApiResponse<Comment>,
+      { taskId: number; text: string }
+    >({
+      query: ({ taskId, text }) => ({
+        url: `task/${taskId}/comment`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+        method: "POST",
+        body: { text },
+      }),
+      invalidatesTags: (result, error, { taskId }) => [
+        { type: "Task", id: taskId },
       ],
     }),
     getUsers: build.query<
@@ -310,8 +340,10 @@ export const {
   useCreateProjectMutation,
   useGetProjectTasksQuery,
   useGetUserTasksQuery,
+  useGetTaskQuery,
   useCreateTaskMutation,
   useUpdateTaskStatusMutation,
+  useCreateCommentMutation,
   useGetUsersQuery,
   useGetTeamsQuery,
   useSearchTaskProjectUserQuery,

@@ -1,13 +1,13 @@
 import Header from "@/components/Header";
-import { Priority, Status } from "@/enum";
+import { Status } from "@/enum";
 import type { Task as TaskType } from "@/interface";
 import {
 	useGetProjectTasksQuery,
 	useUpdateTaskStatusMutation,
 } from "@/state/api";
-import { EllipsisVertical, MessageSquareMore, Plus } from "lucide-react";
+import { MessageSquareMore, Plus } from "lucide-react";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import {
 	DndProvider,
 	type DragSourceMonitor,
@@ -18,12 +18,15 @@ import {
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Loading from "../Loading";
 import ErrorComponent from "../Error";
+import TaskViewModal from "../Modal/TaskViewModal";
+import PriorityTag from "../PriorityTag";
 
 type TaskColumnProps = {
 	status: Status;
 	tasks: TaskType[];
 	moveTask: (taskId: number, status: string) => void;
 	handleTaskModel: (action: string, task?: TaskType) => void;
+	setSelectedTaskId: (id: number) => void;
 };
 
 const TaskColumn = ({
@@ -31,6 +34,7 @@ const TaskColumn = ({
 	tasks,
 	moveTask,
 	handleTaskModel,
+	setSelectedTaskId,
 }: TaskColumnProps) => {
 	const [{ isOver }, dropRef] = useDrop(() => ({
 		accept: "task",
@@ -73,12 +77,6 @@ const TaskColumn = ({
 					<div className="flex items-center gap-1">
 						<button
 							type="button"
-							className="flex h-6 w-5 items-center justify-center dark:text-neutral-500"
-						>
-							<EllipsisVertical size={26} />
-						</button>
-						<button
-							type="button"
 							className="flex h-6 w-6 items-center justify-center rounded bg-gray-200 dark:bg-dark-tertiary"
 							onClick={() => handleTaskModel("create")}
 						>
@@ -91,7 +89,7 @@ const TaskColumn = ({
 			{tasks
 				.filter((task) => task.status === status)
 				.map((task) => (
-					<Task key={task.id} task={task} handleTaskModel={handleTaskModel} />
+					<Task key={task.id} task={task} handleTaskModel={handleTaskModel} setSelectedTaskId={setSelectedTaskId} />
 				))}
 		</div>
 	);
@@ -100,9 +98,10 @@ const TaskColumn = ({
 type TaskProps = {
 	task: TaskType;
 	handleTaskModel: (action: string, task?: TaskType) => void;
+	setSelectedTaskId: (id: number) => void;
 };
 
-const Task = ({ task, handleTaskModel }: TaskProps) => {
+const Task = ({ task, setSelectedTaskId }: TaskProps) => {
 	const [{ isDragging }, dragRef] = useDrag(() => ({
 		type: "task",
 		item: { id: task.id },
@@ -121,36 +120,23 @@ const Task = ({ task, handleTaskModel }: TaskProps) => {
 		? new Date(task.dueDate).toLocaleDateString()
 		: "";
 
-	const commentCount = task.comments ? task.comments.length : 0;
-
-	const PriorityTag = ({ priority }: { priority: Priority }) => (
-		<div
-			className={`rounded-full px-2 py-1 text-xs font-semibold ${
-				priority === Priority.URGENT
-					? "bg-red-200 text-red-700"
-					: priority === Priority.HIGH
-						? "bg-yellow-200 text-yellow-700"
-						: priority === Priority.MEDIUM
-							? "bg-green-200 text-green-700"
-							: priority === Priority.LOW
-								? "bg-blue-200 text-blue-700"
-								: priority === Priority.BACKLOG
-									? "bg-gray-200 text-gray-700"
-									: "bg-gray-200 text-gray-700"
-			}`}
-		>
-			{priority}
-		</div>
-	);
+	const commentCount = task.comments_count ?? 0;
 
 	return (
 		<div
 			ref={(instance) => {
 				dragRef(instance);
 			}}
-			className={`mb-4 rounded-md bg-white shadow dark:bg-dark-secondary ${
-				isDragging ? "opacity-50" : "opacity-100"
-			}`}
+			className={`mb-4 rounded-md cursor-pointer bg-white shadow dark:bg-dark-secondary ${isDragging ? "opacity-50" : "opacity-100"
+				}`}
+			onClick={() => {
+				setSelectedTaskId(task.id);
+			}}
+			onKeyUp={(e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					setSelectedTaskId(task.id);
+				}
+			}}
 		>
 			{task.attachments && task.attachments.length > 0 && (
 				<Image
@@ -164,42 +150,29 @@ const Task = ({ task, handleTaskModel }: TaskProps) => {
 			<div className="p-4 md:p-6">
 				<div className="flex items-start justify-between">
 					<div className="flex flex-1 flex-wrap items-center gap-2">
-						{task.priority && <PriorityTag priority={task.priority} />}
+						<div className="w-full flex justify-between">
+							<h4 className="text-md font-bold">{task.title}</h4>
+							<div>
+								{task.priority && <PriorityTag priority={task.priority} />}
+							</div>
+						</div>
 						<div className="flex gap-2">
 							{taskTags.map((tag) => (
 								<div
 									key={tag}
 									className="rounded-full bg-blue-100 px-2 py-1 text-xs"
 								>
-									{" "}
 									{tag}
 								</div>
 							))}
 						</div>
 					</div>
-					<button
-						type="button"
-						onClick={() => handleTaskModel("edit", task)}
-						className="flex h-6 w-4 flex-shrink-0 items-center justify-center dark:text-neutral-500"
-					>
-						<EllipsisVertical size={26} />
-					</button>
 				</div>
 
-				<div className="my-3 flex justify-between">
-					<h4 className="text-md font-bold">{task.title}</h4>
-					{typeof task.points === "number" && (
-						<div className="text-xs font-semibold">{task.points} pts</div>
-					)}
-				</div>
-
-				<div className="text-xs text-gray-500 dark:text-neutral-500">
+				<div className="w-full text-right text-xs text-gray-500 dark:text-neutral-500">
 					{formattedStartDate && <span>{formattedStartDate} - </span>}
 					{formattedDueDate && <span>{formattedDueDate}</span>}
 				</div>
-				<p className="text-sm text-gray-600 dark:text-neutral-500">
-					{task.description}
-				</p>
 				<div className="mt-4 border-t border-gray-200 dark:border-stroke-dark" />
 
 				{/* Users */}
@@ -267,6 +240,15 @@ const BoardView = ({ id, handleTaskModel }: BoardViewProps) => {
 
 	const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
+	const [taskId, setTaskId] = useState<number>(0);
+	const [taskViewModal, setTaskViewModal] = useState(false);
+
+	const setSelectedTaskId = (id: number) => {
+		setTaskId(id);
+		setTaskViewModal(true);
+	}
+
+
 	const moveTask = (taskId: number, status: string) => {
 		updateTaskStatus({ taskId, status });
 	};
@@ -277,6 +259,7 @@ const BoardView = ({ id, handleTaskModel }: BoardViewProps) => {
 
 	return (
 		<div className="px-4 pb-8 xl:px-6">
+			<TaskViewModal taskId={taskId} isOpen={taskViewModal} onClose={() => setTaskViewModal(false)} />
 			<div className="pt-5">
 				<Header
 					name="Board"
@@ -302,6 +285,7 @@ const BoardView = ({ id, handleTaskModel }: BoardViewProps) => {
 								tasks={tasks?.data || []}
 								moveTask={moveTask}
 								handleTaskModel={handleTaskModel}
+								setSelectedTaskId={setSelectedTaskId}
 							/>
 						))}
 					</div>

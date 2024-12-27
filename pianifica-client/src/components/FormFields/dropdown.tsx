@@ -26,7 +26,7 @@ const Dropdown = ({ options, value, setValue, label, disabled }: DropdownProps) 
 
   return (
     <div className="w-full">
-      <p className="block text-sm font-medium text-gray-900">
+      <p className="block text-sm font-medium">
         {label}
       </p>
       <div className="relative mt-2">
@@ -69,6 +69,13 @@ const Dropdown = ({ options, value, setValue, label, disabled }: DropdownProps) 
                   setValue(option.value);
                   setIsOpen(false);
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    setValue(option.value);
+                    setIsOpen(false);
+                  }
+                }}
+                tabIndex={0}
               >
                 <div className="flex items-center">
                   {option.imgSrc && (
