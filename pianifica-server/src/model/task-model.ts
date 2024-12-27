@@ -63,6 +63,7 @@ export const getTasks = async ({
     include: {
       author: true,
       assignee: true,
+      attachments: true,
     },
   });
 };

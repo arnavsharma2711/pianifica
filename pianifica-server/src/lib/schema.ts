@@ -110,6 +110,23 @@ export const projectSchema = z.object({
     .optional(),
 });
 
+export const attachmentSchema = z.object({
+  id: z.number({
+    required_error: "ID is required",
+    invalid_type_error: "ID must be a number",
+  }),
+  fileName: z.string({
+    required_error: "File name is required",
+    invalid_type_error: "File name must be a text",
+  }),
+  fileUrl: z
+    .string({
+      required_error: "File URL is required",
+      invalid_type_error: "File URL must be a text",
+    })
+    .url(),
+});
+
 export const taskSchema = z.object({
   id: z.number({
     required_error: "ID is required",
@@ -145,6 +162,7 @@ export const taskSchema = z.object({
     .number({
       invalid_type_error: "Points must be a number",
     })
+    .nullable()
     .optional(),
   projectId: z.number({
     required_error: "Project ID is required",
@@ -152,6 +170,9 @@ export const taskSchema = z.object({
   }),
   author: userInfoSchema.optional(),
   assignee: userInfoSchema.optional(),
+  attachments: z
+    .union([attachmentSchema, z.array(attachmentSchema)])
+    .optional(),
 });
 
 export const filterSchema = z.object({
@@ -169,5 +190,3 @@ export const filterSchema = z.object({
   sortBy: z.string().optional().nullable().default("createdAt"),
   order: z.nativeEnum(Order).optional().nullable().default(Order.ASC),
 });
-
-
