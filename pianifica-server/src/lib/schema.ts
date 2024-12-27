@@ -127,6 +127,26 @@ export const attachmentSchema = z.object({
     .url(),
 });
 
+export const commentSchema = z.object({
+  id: z.number({
+    required_error: "ID is required",
+    invalid_type_error: "ID must be a number",
+  }),
+  text: z.string({
+    required_error: "Comment text is required",
+    invalid_type_error: "Comment text must be a text",
+  }),
+  user: userInfoSchema.optional(),
+  createdAt: z.date({
+    required_error: "Created at is required",
+    invalid_type_error: "Created at must be a date",
+  }),
+  updatedAt: z.date({
+    required_error: "Updated at is required",
+    invalid_type_error: "Updated at must be a date",
+  }),
+});
+
 export const taskSchema = z.object({
   id: z.number({
     required_error: "ID is required",
@@ -168,11 +188,14 @@ export const taskSchema = z.object({
     required_error: "Project ID is required",
     invalid_type_error: "Project ID must be a number",
   }),
+  project: projectSchema.optional(),
   author: userInfoSchema.optional(),
   assignee: userInfoSchema.optional(),
   attachments: z
     .union([attachmentSchema, z.array(attachmentSchema)])
     .optional(),
+  comments_count: z.number().optional(),
+  comments: z.union([commentSchema, z.array(commentSchema)]).optional(),
 });
 
 export const filterSchema = z.object({

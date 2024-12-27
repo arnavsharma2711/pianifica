@@ -1,5 +1,6 @@
 import controllerWrapper from "../../lib/controllerWrapper";
 import {
+  addCommentToExistingTask,
   createNewTask,
   deleteExistingTask,
   getExistingTask,
@@ -10,6 +11,7 @@ import {
   updateExistingTaskStatus,
 } from "../../service/task-service";
 import {
+  addCommentSchema,
   createTaskSchema,
   updateTaskAssigneeSchema,
   updateTaskPrioritySchema,
@@ -111,6 +113,8 @@ export const getTask = controllerWrapper(async (req, res) => {
     id: Number(id),
     organizationId: req.user?.organizationId,
     withUserData: true,
+    withAttachments: true,
+    withComments: true,
   });
   if (!task) {
     res.invalid({
@@ -195,6 +199,37 @@ export const deleteTask = controllerWrapper(async (req, res) => {
 
   res.success({
     message: "Deleted Task Successfully.",
+  });
+});
+
+export const addCommentToTask = controllerWrapper(async (req, res) => {
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to update task from the project.",
+    });
+    return;
+  }
+
+  const { id } = req.params;
+  const { text } = addCommentSchema.parse(req.body);
+  if (!id) {
+    res.invalid({
+      message: "Missing required parameters: id",
+      error: "Task id are required to update the task status.",
+    });
+    return;
+  }
+
+  const addedComment = await addCommentToExistingTask({
+    id: Number(id),
+    organizationId: req.user?.organizationId,
+    text,
+    createdBy: req.user?.id,
+  });
+  res.success({
+    message: "Updated Task Status Successfully.",
+    data: addedComment,
   });
 });
 

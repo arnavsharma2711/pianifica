@@ -15,6 +15,7 @@ import {
 import { getExistingUser } from "./user-service";
 import { getExistingProject } from "./project-service";
 import type { Filter } from "../lib/filters";
+import { createComment } from "../model/comment-model";
 
 export const createNewTask = async ({
   title,
@@ -106,7 +107,12 @@ export const getExistingTasks = async ({
 }) => {
   const tasks = await getTasks({ projectId, organizationId });
 
-  return tasks;
+  const taskData = tasks.map((task) => ({
+    ...task,
+    comments_count: task._count.comments,
+  }));
+
+  return taskData;
 };
 
 export const getExistingUserTasks = async ({
@@ -126,14 +132,25 @@ export const getExistingTask = async ({
   title,
   organizationId,
   withUserData = false,
+  withAttachments = false,
+  withComments = false,
 }: {
   id?: number;
   title?: string;
   organizationId: number;
   withUserData?: boolean;
+  withAttachments?: boolean;
+  withComments?: boolean;
 }) => {
   let task = null;
-  if (id) task = await getTaskById({ id, organizationId, withUserData });
+  if (id)
+    task = await getTaskById({
+      id,
+      organizationId,
+      withUserData,
+      withAttachments,
+      withComments,
+    });
   else if (title) task = await getTaskByTitle({ title, organizationId });
 
   return task;
@@ -202,6 +219,31 @@ export const updateExistingTask = async ({
   });
 
   return updatedTask;
+};
+
+export const addCommentToExistingTask = async ({
+  id,
+  organizationId,
+  text,
+  createdBy,
+}: {
+  id: number;
+  organizationId: number;
+  text: string;
+  createdBy: number;
+}) => {
+  const existingTask = await getExistingTask({ id, organizationId });
+
+  if (!existingTask) {
+    throw new CustomError(
+      404,
+      `Task with id ${id} does not exist in organization.`,
+      "Task not found"
+    );
+  }
+
+  const comment = await createComment({ taskId: id, text, userId: createdBy });
+  return comment;
 };
 
 export const updateExistingTaskAssignedUser = async ({

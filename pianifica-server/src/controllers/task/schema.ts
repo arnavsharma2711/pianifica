@@ -112,6 +112,13 @@ export const userTaskSchema = filterSchema.extend({
     .transform((val) => (val === "" ? null : val)),
 });
 
+export const addCommentSchema = z.object({
+  text: z.string({
+    required_error: "Comment text is required.",
+    invalid_type_error: "Comment text must be a string.",
+  }),
+});
+
 export const updateTaskStatusSchema = z.object({
   status: z.nativeEnum(Status),
 });

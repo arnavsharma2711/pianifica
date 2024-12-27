@@ -40,6 +40,7 @@ import {
   getTask,
   getTasks,
   updateTask,
+  addCommentToTask,
   updateTaskAssignee,
   updateTaskPriority,
   updateTaskStatus,
@@ -98,6 +99,7 @@ router.get("/tasks", authenticationMiddleware, getTasks);
 router.get("/task/:id", authenticationMiddleware, getTask);
 router.post("/task", authenticationMiddleware, createTask);
 router.put("/task", authenticationMiddleware, updateTask);
+router.post("/task/:id/comment", authenticationMiddleware, addCommentToTask);
 router.patch("/task/:id/status", authenticationMiddleware, updateTaskStatus);
 router.patch(
   "/task/:id/priority",

@@ -64,6 +64,11 @@ export const getTasks = async ({
       author: true,
       assignee: true,
       attachments: true,
+      _count: {
+        select: {
+          comments: { where: { deletedAt: null } },
+        },
+      },
     },
   });
 };
@@ -131,10 +136,14 @@ export const getTaskById = async ({
   id,
   organizationId,
   withUserData = false,
+  withAttachments = false,
+  withComments = false,
 }: {
   id: number;
   organizationId: number;
   withUserData?: boolean;
+  withAttachments?: boolean;
+  withComments?: boolean;
 }) => {
   const task = await prisma.task.findFirst({
     where: {
@@ -148,7 +157,18 @@ export const getTaskById = async ({
     include: {
       project: true,
       author: withUserData,
+      attachments: withAttachments,
       assignee: withUserData,
+      comments: withComments
+        ? {
+            where: {
+              deletedAt: null,
+            },
+            include: {
+              user: true,
+            },
+          }
+        : false,
     },
   });
 
