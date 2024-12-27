@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Priority, PrismaClient, Status } from "@prisma/client";
 const prisma = new PrismaClient();
 import { faker } from "@faker-js/faker";
 import bcrypt from "bcrypt";
@@ -280,28 +280,16 @@ async function createTask(
   admins: { [key: number]: number },
   orgUsers: { [key: number]: number[] }
 ) {
-  enum Status {
-    BLOCKED = "BLOCKED",
-    TODO = "TODO",
-    IN_PROGRESS = "IN_PROGRESS",
-    UNDER_REVIEW = "UNDER_REVIEW",
-    RELEASE_READY = "RELEASE_READY",
-    COMPLETED = "COMPLETED",
-  }
+  const status_array = [
+    "BLOCKED",
+    "TODO",
+    "IN_PROGRESS",
+    "UNDER_REVIEW",
+    "RELEASE_READY",
+    "COMPLETED",
+  ];
 
-  enum Priority {
-    BACKLOG = "BACKLOG",
-    LOW = "LOW",
-    MEDIUM = "MEDIUM",
-    HIGH = "HIGH",
-    URGENT = "URGENT",
-  }
-
-  function getRandomEnumValue<T extends object>(enumObj: T): T[keyof T] {
-    const enumValues = Object.values(enumObj) as T[keyof T][];
-    const randomIndex = Math.floor(Math.random() * enumValues.length);
-    return enumValues[randomIndex];
-  }
+  const priority_array = ["BACKLOG", "LOW", "MEDIUM", "HIGH", "URGENT"];
 
   const attachment_urls = [
     "https://utfs.io/f/DTNeoJKzjEnawijxNM8j5DGBeKt9lYSrJIpksugaTAo0LqdE",
@@ -326,8 +314,12 @@ async function createTask(
       tasks.push({
         title: faker.commerce.productName(),
         description: faker.commerce.productDescription(),
-        status: getRandomEnumValue(Status),
-        priority: getRandomEnumValue(Priority),
+        status: status_array[
+          Math.floor(Math.random() * status_array.length)
+        ] as Status,
+        priority: priority_array[
+          Math.floor(Math.random() * priority_array.length)
+        ] as Priority,
         tags: "",
         points: Math.floor(Math.random() * 5),
         projectId: project.id,
