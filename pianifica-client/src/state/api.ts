@@ -352,7 +352,7 @@ export const api = createApi({
       invalidatesTags: ["Teams", "Team"],
     }),
     removeTeamMember: build.mutation<
-      ApiResponse<Team>,
+      ApiResponse<null>,
       { teamId: number; userId: number }
     >({
       query: ({ teamId, userId }) => ({

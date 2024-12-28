@@ -66,19 +66,22 @@ const TeamMemberModal = ({ isOpen, onClose, teamId, teamMembersIds }: Props) => 
 					handleSubmit();
 				}}
 			>
-
+				{userOptions.length === 0 && (
+					<p className="text-center text-red-600">No more users to add</p>
+				)}
 				<Dropdown
 					options={userOptions}
 					value={user.toString()}
 					setValue={handleSetUser}
 					label="Team Member"
+					disabled={userOptions.length === 0}
 				/>
 
 				<button
 					type="submit"
-					className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 ${!isFormValid() || isLoading ? "cursor-not-allowed opacity-50" : ""
+					className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 ${!isFormValid() || isLoading || userOptions.length === 0 ? "cursor-not-allowed opacity-50" : ""
 						}`}
-					disabled={!isFormValid() || isLoading}
+					disabled={!isFormValid() || isLoading || userOptions.length === 0}
 				>
 					{isLoading ? "Saving..." : "Add Team Member"}
 				</button>

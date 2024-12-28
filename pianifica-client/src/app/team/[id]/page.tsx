@@ -1,15 +1,18 @@
 "use client";
 
+import UserCard from "@/components/Cards/UserCard";
 import { DataTable } from "@/components/DataTable";
 import ErrorComponent from "@/components/Error";
 import Header from "@/components/Header";
 import Loading from "@/components/Loading";
+import ConfirmationModal from "@/components/Modal/ConfirmationModel";
 import TeamMemberModal from "@/components/Modal/TeamMemberModal";
 import type { User } from "@/interface";
-import { useGetTeamMemberQuery } from "@/state/api";
-import { CirclePlus } from "lucide-react";
+import { useGetTeamMemberQuery, useRemoveTeamMemberMutation } from "@/state/api";
+import { CirclePlus, Trash } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -18,10 +21,14 @@ type Props = {
 const Team = ({ params }: Props) => {
   const [id, setId] = useState<string | null>(null);
   const [isTeamMemberModalOpen, setIsTeamMemberModalOpen] = useState(false);
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [modelUser, setModalUser] = useState<User | null>(null);
+
   const { data: team, isLoading, isError } = useGetTeamMemberQuery(
     { teamId: Number(id) },
     { skip: id === null }
   );
+  const [removeTeamMember] = useRemoveTeamMemberMutation();
 
   useEffect(() => {
     params.then((resolvedParams) => {
@@ -81,8 +88,40 @@ const Team = ({ params }: Props) => {
     },
   ];
 
+  const TeamMemberAction = ({ user }: { user: User }) => {
+    const deleteTeamMember = () => {
+      setModalUser(user);
+      setIsConfirmationModalOpen(true);
+    };
+    return (
+      <button
+        type="button"
+        onClick={deleteTeamMember}
+        className={"p-2 rounded-full hover:bg-red-200 dark:hover:bg-zinc-700 text-red-600"}
+      >
+        <Trash size={15} />
+      </button>
+    );
+  };
+
+  const removeTeamMemberHandler = async (userId: number) => {
+    const response = await removeTeamMember({ teamId: Number(id), userId });
+    if (response.data?.success) {
+      toast.success("User removed from team successfully");
+    }
+  }
+
   return (
     <div className="flex w-full flex-col p-8">
+      <ConfirmationModal
+        isOpen={isConfirmationModalOpen}
+        onClose={() => setIsConfirmationModalOpen(false)}
+        onConfirm={() => {
+          removeTeamMemberHandler(modelUser?.id || 0);
+        }}
+        message="Are you sure you want to remove this user from team?"
+        component={modelUser && <UserCard user={modelUser} />}
+      />
       <TeamMemberModal
         isOpen={isTeamMemberModalOpen}
         onClose={() => setIsTeamMemberModalOpen(false)}
@@ -110,6 +149,8 @@ const Team = ({ params }: Props) => {
         data={team?.data?.members || []}
         columns={userColumns}
         withIndex={true}
+        actionHeader="Actions"
+        action={(user: User) => <TeamMemberAction user={user} />}
       />
     </div>
   );
