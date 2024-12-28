@@ -17,13 +17,7 @@ type DropdownProps = {
 
 const Dropdown = ({ options, value, setValue, label, disabled }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
-
   const selectedOption = options.find(option => option.value === value);
-
-  console.log(options);
-  console.log(value);
-
-
   return (
     <div className="w-full">
       <p className="block text-sm font-medium">
