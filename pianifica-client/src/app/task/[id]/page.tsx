@@ -1,17 +1,19 @@
-import Modal from "@/components/Modal";
+'use client';
+
 import type { Comment } from "@/interface";
 import { useCreateCommentMutation, useGetCurrentUserQuery, useGetTaskQuery } from "@/state/api";
-import StatusTag from "../StatusTag";
 import { Priority, Status } from "@/enum";
 import Image from "next/image";
-import PriorityTag from "../PriorityTag";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SendHorizonal } from "lucide-react";
+import Loading from "@/components/Loading";
+import StatusTag from "@/components/StatusTag";
+import PriorityTag from "@/components/PriorityTag";
+import Breadcrumb from "@/components/Breadcrumb";
+import Header from "@/components/Header";
 
 type Props = {
-  isOpen: boolean;
-  onClose: () => void;
-  taskId: number;
+  params: Promise<{ id: string }>;
 };
 
 const AddComponent = ({ taskId }: { taskId: number }) => {
@@ -95,31 +97,42 @@ const KeyValue = ({ keyName, value }: { keyName: React.ReactNode, value: React.R
   )
 }
 
-const TaskViewModal = ({ isOpen, onClose, taskId }: Props) => {
-  const { data: task, isLoading } = useGetTaskQuery({ taskId }, { skip: taskId === 0 });
+const TaskPage = ({ params }: Props) => {
+  const [id, setId] = useState<string | null>(null);
+
+  const { data: task, isLoading } = useGetTaskQuery({ taskId: id ? Number(id) : 0 }, { skip: id === null });
+
+  useEffect(() => {
+    params.then((resolvedParams) => {
+      setId(resolvedParams.id);
+    });
+  }, [params]);
+
+  if (!id || isLoading) {
+    return <Loading />;
+  }
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      name={task?.data.title || "Task"}
-      size={"xl"}
-    >
-      {isLoading || task === undefined ? (
-        <div className="flex items-center justify-center h-64">
-          Loading...
-        </div>
-      ) : (
+    <>
+      <Breadcrumb
+        links={[
+          {
+            value: task?.data.project?.name || "Projects",
+            link: `/project/${task?.data.project?.id}`,
+          },
+          { value: "Tasks", link: "/tasks", disable: true },
+          { value: task?.data?.title || "Task", link: `/task/${id}` },
+        ]}
+      />
+      <div className="pt-2 px-8">
         <div className="space-y-4">
-          <div className="flex items-start justify-between gap-10">
+          <Header name={task?.data.title || "Task"} />
+          <div className="flex flex-col-reverse md:flex-row items-start justify-between gap-10">
             <div className="flex flex-col w-full gap-10">
               <div className="flex flex-col gap-1">
-
-                <KeyValue keyName={"Project"} value={task.data.project?.name} />
-                <KeyValue keyName={"Description"} value={task.data.description} />
+                <KeyValue keyName={"Description"} value={task?.data.description} />
               </div>
-
-              <div>
-                {task.data?.attachments && task.data?.attachments.length > 0 && (
+              {task?.data?.attachments && task?.data?.attachments.length > 0 && (
+                <div className="max-w-xl border-2 dark:border-zinc-800 rounded-lg">
                   <Image
                     src={task.data?.attachments[0].fileUrl || "/default-attachment.webp"}
                     alt={task.data?.attachments[0].fileName}
@@ -127,21 +140,21 @@ const TaskViewModal = ({ isOpen, onClose, taskId }: Props) => {
                     height={200}
                     className="h-auto w-full rounded-t-md"
                   />
-                )}
-              </div>
+                </div>
+              )}
               <div className="mt-6">
                 <strong>Comments:</strong>
                 <ul className="space-y-2 mb-2">
-                  {task.data.comments?.map(comment => (
+                  {task?.data.comments?.map(comment => (
                     <li key={comment.id}>
                       <CommentComponent comment={comment} />
                     </li>
                   ))}
                 </ul>
-                <AddComponent taskId={taskId} />
+                <AddComponent taskId={Number(id)} />
               </div>
             </div>
-            <div className="border-2 dark:border-zinc-800 w-96 flex justify-between flex-col gap-4 p-2 rounded-lg whitespace-nowrap">
+            <div className="border-2 dark:border-zinc-800 w-full md:w-96 flex justify-between flex-col gap-4 p-2 rounded-lg whitespace-nowrap">
               <KeyValue keyName={"Author"} value={
                 <div className="flex items-center gap-2">
                   <div className="h-10 w-10 overflow-hidden rounded-full flex items-center justify-center">
@@ -152,7 +165,7 @@ const TaskViewModal = ({ isOpen, onClose, taskId }: Props) => {
                       height={100}
                       className="rounded-full" />
                   </div>
-                  {task.data.author?.firstName} {task.data.author?.lastName}
+                  {task?.data.author?.firstName} {task?.data.author?.lastName}
                 </div>
               } />
               <KeyValue keyName={"Assignee"} value={
@@ -165,22 +178,20 @@ const TaskViewModal = ({ isOpen, onClose, taskId }: Props) => {
                       height={100}
                       className="rounded-full" />
                   </div>
-                  {task.data.assignee?.firstName} {task.data.assignee?.lastName}
+                  {task?.data.assignee?.firstName} {task?.data.assignee?.lastName}
                 </div>
               } />
-              <KeyValue keyName={"Status"} value={<StatusTag status={task.data.status || Status.TODO} />} />
-              <KeyValue keyName={"Priority"} value={<PriorityTag priority={task.data.priority || Priority.BACKLOG} />} />
-              <KeyValue keyName={"Start Date"} value={task.data.startDate ? new Date(task.data.startDate).toLocaleDateString() : "N/A"} />
-              <KeyValue keyName={"Due Date"} value={task.data.dueDate ? new Date(task.data.dueDate).toLocaleDateString() : "N/A"} />
-              <KeyValue keyName={"Points"} value={task.data.points} />
+              <KeyValue keyName={"Status"} value={<StatusTag status={task?.data.status || Status.TODO} />} />
+              <KeyValue keyName={"Priority"} value={<PriorityTag priority={task?.data.priority || Priority.BACKLOG} />} />
+              <KeyValue keyName={"Start Date"} value={task?.data.startDate ? new Date(task.data.startDate).toLocaleDateString() : "N/A"} />
+              <KeyValue keyName={"Due Date"} value={task?.data.dueDate ? new Date(task.data.dueDate).toLocaleDateString() : "N/A"} />
+              <KeyValue keyName={"Points"} value={task?.data.points} />
             </div>
           </div>
         </div>
-      )
-      }
-
-    </Modal >
+      </div>
+    </>
   );
 };
 
-export default TaskViewModal;
+export default TaskPage;

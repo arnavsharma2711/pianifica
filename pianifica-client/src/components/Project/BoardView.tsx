@@ -7,7 +7,6 @@ import {
 } from "@/state/api";
 import { MessageSquareMore, Plus } from "lucide-react";
 import Image from "next/image";
-import React, { useState } from "react";
 import {
 	DndProvider,
 	type DragSourceMonitor,
@@ -18,15 +17,14 @@ import {
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Loading from "../Loading";
 import ErrorComponent from "../Error";
-import TaskViewModal from "../Modal/TaskViewModal";
 import PriorityTag from "../PriorityTag";
+import { redirect } from "next/navigation";
 
 type TaskColumnProps = {
 	status: Status;
 	tasks: TaskType[];
 	moveTask: (taskId: number, status: string) => void;
 	handleTaskModel: (action: string, task?: TaskType) => void;
-	setSelectedTaskId: (id: number) => void;
 };
 
 const TaskColumn = ({
@@ -34,7 +32,6 @@ const TaskColumn = ({
 	tasks,
 	moveTask,
 	handleTaskModel,
-	setSelectedTaskId,
 }: TaskColumnProps) => {
 	const [{ isOver }, dropRef] = useDrop(() => ({
 		accept: "task",
@@ -89,7 +86,7 @@ const TaskColumn = ({
 			{tasks
 				.filter((task) => task.status === status)
 				.map((task) => (
-					<Task key={task.id} task={task} handleTaskModel={handleTaskModel} setSelectedTaskId={setSelectedTaskId} />
+					<Task key={task.id} task={task} handleTaskModel={handleTaskModel} />
 				))}
 		</div>
 	);
@@ -98,10 +95,9 @@ const TaskColumn = ({
 type TaskProps = {
 	task: TaskType;
 	handleTaskModel: (action: string, task?: TaskType) => void;
-	setSelectedTaskId: (id: number) => void;
 };
 
-const Task = ({ task, setSelectedTaskId }: TaskProps) => {
+const Task = ({ task }: TaskProps) => {
 	const [{ isDragging }, dragRef] = useDrag(() => ({
 		type: "task",
 		item: { id: task.id },
@@ -130,11 +126,11 @@ const Task = ({ task, setSelectedTaskId }: TaskProps) => {
 			className={`mb-4 rounded-md cursor-pointer bg-white shadow dark:bg-dark-secondary ${isDragging ? "opacity-50" : "opacity-100"
 				}`}
 			onClick={() => {
-				setSelectedTaskId(task.id);
+				redirect(`/task/${task.id}`);
 			}}
 			onKeyUp={(e) => {
 				if (e.key === 'Enter' || e.key === ' ') {
-					setSelectedTaskId(task.id);
+					redirect(`/task/${task.id}`);
 				}
 			}}
 		>
@@ -240,15 +236,6 @@ const BoardView = ({ id, handleTaskModel }: BoardViewProps) => {
 
 	const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
-	const [taskId, setTaskId] = useState<number>(0);
-	const [taskViewModal, setTaskViewModal] = useState(false);
-
-	const setSelectedTaskId = (id: number) => {
-		setTaskId(id);
-		setTaskViewModal(true);
-	}
-
-
 	const moveTask = (taskId: number, status: string) => {
 		updateTaskStatus({ taskId, status });
 	};
@@ -259,7 +246,6 @@ const BoardView = ({ id, handleTaskModel }: BoardViewProps) => {
 
 	return (
 		<div className="px-4 pb-8 xl:px-6">
-			<TaskViewModal taskId={taskId} isOpen={taskViewModal} onClose={() => setTaskViewModal(false)} />
 			<div className="pt-5">
 				<Header
 					name="Board"
@@ -285,7 +271,6 @@ const BoardView = ({ id, handleTaskModel }: BoardViewProps) => {
 								tasks={tasks?.data || []}
 								moveTask={moveTask}
 								handleTaskModel={handleTaskModel}
-								setSelectedTaskId={setSelectedTaskId}
 							/>
 						))}
 					</div>
