@@ -1,6 +1,5 @@
 import controllerWrapper from "../../lib/controllerWrapper";
 import {
-  addCommentToExistingTask,
   createNewTask,
   deleteExistingTask,
   getExistingTask,
@@ -22,6 +21,7 @@ import {
 import { taskSchema } from "../../lib/schema";
 import type { Priority, Status } from "@prisma/client";
 import { getFilters } from "../../lib/filters";
+import { createNewComment } from "../../service/comment-service";
 
 export const createTask = controllerWrapper(async (req, res) => {
   if (req.user?.organizationId === undefined) {
@@ -221,8 +221,8 @@ export const addCommentToTask = controllerWrapper(async (req, res) => {
     return;
   }
 
-  const addedComment = await addCommentToExistingTask({
-    id: Number(id),
+  const addedComment = await createNewComment({
+    taskId: Number(id),
     organizationId: req.user?.organizationId,
     text,
     createdBy: req.user?.id,

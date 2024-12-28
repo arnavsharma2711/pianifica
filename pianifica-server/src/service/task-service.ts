@@ -221,31 +221,6 @@ export const updateExistingTask = async ({
   return updatedTask;
 };
 
-export const addCommentToExistingTask = async ({
-  id,
-  organizationId,
-  text,
-  createdBy,
-}: {
-  id: number;
-  organizationId: number;
-  text: string;
-  createdBy: number;
-}) => {
-  const existingTask = await getExistingTask({ id, organizationId });
-
-  if (!existingTask) {
-    throw new CustomError(
-      404,
-      `Task with id ${id} does not exist in organization.`,
-      "Task not found"
-    );
-  }
-
-  const comment = await createComment({ taskId: id, text, userId: createdBy });
-  return comment;
-};
-
 export const updateExistingTaskAssignedUser = async ({
   id,
   assigneeId,
