@@ -7,7 +7,7 @@ import Header from "@/components/Header";
 import Loading from "@/components/Loading";
 import NewProjectModal from "@/components/Modal/NewProjectModal";
 import type { Project } from "@/interface";
-import { useGetProjectsQuery } from "@/state/api";
+import { useGetCurrentUserQuery, useGetProjectsQuery } from "@/state/api";
 import { PlusSquare } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -18,6 +18,7 @@ const Projects = () => {
 	const [isModalNewProjectOpen, setIsModalNewProjectOpen] = useState(false);
 
 	const { data: projects, error, isLoading } = useGetProjectsQuery({});
+	const { data: currentUser } = useGetCurrentUserQuery();
 
 	if (isLoading) return <Loading />;
 	if (error || !projects)
@@ -76,13 +77,17 @@ const Projects = () => {
 				<Header
 					name="Project Boards"
 					buttonComponent={
-						<button
-							type="button"
-							className="flex items-center rounded-md bg-blue-primary px-3 py-2 text-white hover:bg-blue-700"
-							onClick={() => setIsModalNewProjectOpen(true)}
-						>
-							<PlusSquare className="mr-2 h-5 w-5" /> New Boards
-						</button>
+						currentUser?.data?.role === "ORG_ADMIN" ?
+							(
+								<button
+									type="button"
+									className="flex items-center rounded-md bg-blue-primary px-3 py-2 text-white hover:bg-blue-700"
+									onClick={() => setIsModalNewProjectOpen(true)}
+								>
+									<PlusSquare className="mr-2 h-5 w-5" /> New Boards
+								</button>
+							)
+							: undefined
 					}
 				/>
 				<DataTable

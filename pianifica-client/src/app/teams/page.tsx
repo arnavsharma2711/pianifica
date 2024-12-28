@@ -1,5 +1,5 @@
 "use client";
-import { useGetTeamsQuery, useRemoveTeamMutation } from "@/state/api";
+import { useGetCurrentUserQuery, useGetTeamsQuery, useRemoveTeamMutation } from "@/state/api";
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import { DataTable } from "@/components/DataTable";
@@ -22,7 +22,7 @@ const Teams = () => {
 	const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
 	const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 	const { data: teams, isLoading, isError } = useGetTeamsQuery({ page, limit });
-
+	const { data: currentUser } = useGetCurrentUserQuery();
 
 	const [removeTeam] = useRemoveTeamMutation();
 
@@ -163,14 +163,17 @@ const Teams = () => {
 				<Header
 					name="Teams"
 					buttonComponent={
-						<button
-							type="button"
-							className="flex items-center gap-2 rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
-							onClick={() => handleTeamModel("create")}
-						>
-							Create Team
-							<CirclePlus size={16} />
-						</button>
+						currentUser?.data?.role === "ORG_ADMIN" ?
+							(
+								<button
+									type="button"
+									className="flex items-center gap-2 rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+									onClick={() => handleTeamModel("create")}
+								>
+									Create Team
+									<CirclePlus size={16} />
+								</button>
+							) : undefined
 					}
 				/>
 				<DataTable
@@ -179,8 +182,8 @@ const Teams = () => {
 					withIndex
 					showPagination={true}
 					pagination={pagination}
-					actionHeader=" "
-					action={(team: Team) => <TeamActions team={team} />}
+					actionHeader={currentUser?.data?.role === "ORG_ADMIN" ? " " : undefined}
+					action={currentUser?.data?.role === "ORG_ADMIN" ? (team: Team) => <TeamActions team={team} /> : undefined}
 				/>
 			</div>
 		</>

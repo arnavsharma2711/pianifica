@@ -1,5 +1,5 @@
 "use client";
-import { useGetUsersQuery } from "@/state/api";
+import { useGetCurrentUserQuery, useGetUsersQuery } from "@/state/api";
 import Header from "@/components/Header";
 import Image from "next/image";
 import { EllipsisVertical, Pencil, Trash } from "lucide-react";
@@ -22,6 +22,8 @@ const Users = () => {
 	const [action, setAction] = useState<"create" | "edit">("create");
 	const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 	const { data: users, isLoading, isError } = useGetUsersQuery({ page, limit });
+	const { data: currentUser } = useGetCurrentUserQuery();
+
 	const handleUserModel = (action: string, user?: User) => {
 		if (action === "create") {
 			setAction("create");
@@ -142,13 +144,16 @@ const Users = () => {
 				<Header
 					name="Users"
 					buttonComponent={
-						<button
-							type="button"
-							className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
-							onClick={() => handleUserModel("create")}
-						>
-							Add User
-						</button>
+						currentUser?.data?.role === "ORG_ADMIN" ?
+							(
+								<button
+									type="button"
+									className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+									onClick={() => handleUserModel("create")}
+								>
+									Add User
+								</button>
+							) : undefined
 					}
 				/>
 
@@ -158,8 +163,8 @@ const Users = () => {
 					withIndex={true}
 					showPagination={true}
 					pagination={pagination}
-					actionHeader="Actions"
-					action={(user: User) => <UserAction user={user} />}
+					actionHeader={currentUser?.data?.role === "ORG_ADMIN" ? "Actions" : undefined}
+					action={currentUser?.data?.role === "ORG_ADMIN" ? (user: User) => <UserAction user={user} /> : undefined}
 				/>
 			</div>
 		</>
