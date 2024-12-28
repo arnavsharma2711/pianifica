@@ -87,7 +87,7 @@ export const getTeam = controllerWrapper(async (req, res) => {
 });
 
 export const addTeam = controllerWrapper(async (req, res) => {
-  const { name } = createTeamSchema.parse(req.body);
+  const { name, leadId, managerId } = createTeamSchema.parse(req.body);
 
   if (req.user?.organizationId === undefined) {
     res.unauthorized({
@@ -108,8 +108,8 @@ export const addTeam = controllerWrapper(async (req, res) => {
   const team = await createNewTeam({
     name,
     organizationId: req.user?.organizationId,
-    managerId: req.user?.id,
-    leadId: req.user?.id,
+    managerId,
+    leadId,
   });
 
   res.success({

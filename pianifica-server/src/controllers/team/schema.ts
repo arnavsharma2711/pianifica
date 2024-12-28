@@ -47,6 +47,14 @@ export const createTeamSchema = z.object({
     required_error: "Team name is required",
     invalid_type_error: "Team name must be a text",
   }),
+  leadId: z.number({
+    required_error: "Lead ID is required",
+    invalid_type_error: "Lead ID must be a number",
+  }),
+  managerId: z.number({
+    required_error: "Manager ID is required",
+    invalid_type_error: "Manager ID must be a number",
+  }),
 });
 
 export const updateTeamSchema = z.object({
