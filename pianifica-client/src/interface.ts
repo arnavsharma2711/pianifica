@@ -16,6 +16,7 @@ export interface Team {
   name: string;
   teamManager?: User;
   teamLead?: User;
+  members?: User[];
 }
 
 export interface Attachment {

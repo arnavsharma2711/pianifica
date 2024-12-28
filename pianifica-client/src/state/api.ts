@@ -42,7 +42,15 @@ export const baseQueryWithErrorHandling: BaseQueryFn<
 export const api = createApi({
   baseQuery: baseQueryWithErrorHandling,
   reducerPath: "api",
-  tagTypes: ["Projects", "Tasks", "Task", "UserTasks", "Users", "Teams"],
+  tagTypes: [
+    "Projects",
+    "Tasks",
+    "Task",
+    "UserTasks",
+    "Users",
+    "Teams",
+    "Team",
+  ],
   endpoints: (build) => ({
     getUserOrganization: build.query<
       ApiResponse<{ id: number; name: string }>,
@@ -318,6 +326,16 @@ export const api = createApi({
       },
       providesTags: ["Teams"],
     }),
+    getTeamMember: build.query<ApiResponse<Team>, { teamId: number }>({
+      query: ({ teamId }) => ({
+        url: `team/${teamId}/members`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+      }),
+      providesTags: ["Team"],
+    }),
     searchTaskProjectUser: build.query<ApiResponse<Search>, string>({
       query: (query) => ({
         url: `search?q=${query}`,
@@ -346,5 +364,6 @@ export const {
   useCreateCommentMutation,
   useGetUsersQuery,
   useGetTeamsQuery,
+  useGetTeamMemberQuery,
   useSearchTaskProjectUserQuery,
 } = api;
