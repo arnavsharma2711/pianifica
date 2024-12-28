@@ -4,6 +4,7 @@ import { DataTable } from "@/components/DataTable";
 import ErrorComponent from "@/components/Error";
 import Header from "@/components/Header";
 import Loading from "@/components/Loading";
+import TeamMemberModal from "@/components/Modal/TeamMemberModal";
 import type { User } from "@/interface";
 import { useGetTeamMemberQuery } from "@/state/api";
 import { CirclePlus } from "lucide-react";
@@ -16,6 +17,7 @@ type Props = {
 
 const Team = ({ params }: Props) => {
   const [id, setId] = useState<string | null>(null);
+  const [isTeamMemberModalOpen, setIsTeamMemberModalOpen] = useState(false);
   const { data: team, isLoading, isError } = useGetTeamMemberQuery(
     { teamId: Number(id) },
     { skip: id === null }
@@ -26,10 +28,6 @@ const Team = ({ params }: Props) => {
       setId(resolvedParams.id);
     });
   }, [params]);
-
-  const handleTeamMemberModel = (action: string, user?: User) => {
-    console.log(action, user);
-  };
 
   if (isLoading) return <Loading />;
   if (isError || !team?.success) return <ErrorComponent message="An error occurred while fetching users" />;
@@ -85,17 +83,22 @@ const Team = ({ params }: Props) => {
 
   return (
     <div className="flex w-full flex-col p-8">
+      <TeamMemberModal
+        isOpen={isTeamMemberModalOpen}
+        onClose={() => setIsTeamMemberModalOpen(false)}
+        teamId={Number(id)}
+        teamMembersIds={team?.data.members?.map((member) => member.id).filter((id): id is number => id !== undefined) || []}
+      />
       <Header
         name={team?.data.name || ""}
       />
-
       <Header
         name="Team List"
         buttonComponent={
           <button
             type="button"
             className="flex items-center gap-2 rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
-            onClick={() => handleTeamMemberModel("create")}
+            onClick={() => setIsTeamMemberModalOpen(true)}
           >
             Add Team Member
             <CirclePlus size={16} />

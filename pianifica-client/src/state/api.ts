@@ -336,6 +336,36 @@ export const api = createApi({
       }),
       providesTags: ["Team"],
     }),
+    addTeamMember: build.mutation<
+      ApiResponse<Team>,
+      { teamId: number; userId: number }
+    >({
+      query: ({ teamId, userId }) => ({
+        url: `team/${teamId}/member`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+        body: { userId },
+        method: "POST",
+      }),
+      invalidatesTags: ["Teams", "Team"],
+    }),
+    removeTeamMember: build.mutation<
+      ApiResponse<Team>,
+      { teamId: number; userId: number }
+    >({
+      query: ({ teamId, userId }) => ({
+        url: `team/${teamId}/member`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+        body: { userId },
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Teams", "Team"],
+    }),
     searchTaskProjectUser: build.query<ApiResponse<Search>, string>({
       query: (query) => ({
         url: `search?q=${query}`,
@@ -365,5 +395,7 @@ export const {
   useGetUsersQuery,
   useGetTeamsQuery,
   useGetTeamMemberQuery,
+  useAddTeamMemberMutation,
+  useRemoveTeamMemberMutation,
   useSearchTaskProjectUserQuery,
 } = api;
