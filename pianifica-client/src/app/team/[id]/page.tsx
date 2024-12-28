@@ -1,5 +1,6 @@
 "use client";
 
+import Breadcrumb from "@/components/Breadcrumb";
 import UserCard from "@/components/Cards/UserCard";
 import { DataTable } from "@/components/DataTable";
 import ErrorComponent from "@/components/Error";
@@ -20,9 +21,16 @@ type Props = {
 
 const Team = ({ params }: Props) => {
   const [id, setId] = useState<string | null>(null);
+  const [teamList, setTeamList] = useState<User[]>([]);
   const [isTeamMemberModalOpen, setIsTeamMemberModalOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
-  const [modelUser, setModalUser] = useState<User | null>(null);
+  const [modalUser, setModalUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    params.then((resolvedParams) => {
+      setId(resolvedParams.id);
+    });
+  }, [params]);
 
   const { data: team, isLoading, isError } = useGetTeamMemberQuery(
     { teamId: Number(id) },
@@ -31,14 +39,19 @@ const Team = ({ params }: Props) => {
   const [removeTeamMember] = useRemoveTeamMemberMutation();
 
   useEffect(() => {
-    params.then((resolvedParams) => {
-      setId(resolvedParams.id);
-    });
-  }, [params]);
+    if (team?.data) {
+      const { teamLead, teamManager, members = [] } = team.data;
+      const list = [
+        ...(teamManager ? [teamManager] : []),
+        ...(teamLead ? [teamLead] : []),
+        ...members,
+      ];
+      setTeamList(list);
+    }
+  }, [team]);
 
   if (isLoading) return <Loading />;
   if (isError || !team?.success) return <ErrorComponent message="An error occurred while fetching users" />;
-
 
   const userColumns = [
     {
@@ -94,13 +107,17 @@ const Team = ({ params }: Props) => {
       setIsConfirmationModalOpen(true);
     };
     return (
-      <button
-        type="button"
-        onClick={deleteTeamMember}
-        className={"p-2 rounded-full hover:bg-red-200 dark:hover:bg-zinc-700 text-red-600"}
-      >
-        <Trash size={15} />
-      </button>
+      (user.id === team.data.teamLead?.id || user.id === team.data.teamManager?.id) ? (
+        null
+      ) : (
+        <button
+          type="button"
+          onClick={deleteTeamMember}
+          className="p-2 rounded-full hover:bg-red-200 dark:hover:bg-zinc-700 text-red-600"
+        >
+          <Trash size={15} />
+        </button>
+      )
     );
   };
 
@@ -108,51 +125,60 @@ const Team = ({ params }: Props) => {
     const response = await removeTeamMember({ teamId: Number(id), userId });
     if (response.data?.success) {
       toast.success("User removed from team successfully");
+      setTeamList((prevList) => prevList.filter((user) => user.id !== userId));
     }
   }
 
   return (
-    <div className="flex w-full flex-col p-8">
-      <ConfirmationModal
-        isOpen={isConfirmationModalOpen}
-        onClose={() => setIsConfirmationModalOpen(false)}
-        onConfirm={() => {
-          removeTeamMemberHandler(modelUser?.id || 0);
-        }}
-        message="Are you sure you want to remove this user from team?"
-        component={modelUser && <UserCard user={modelUser} />}
+    <>
+      <Breadcrumb
+        links={[
+          { value: "Teams", link: "/teams" },
+          { value: team?.data.name || "", link: `/team/${team?.data.id}` },
+        ]}
       />
-      <TeamMemberModal
-        isOpen={isTeamMemberModalOpen}
-        onClose={() => setIsTeamMemberModalOpen(false)}
-        teamId={Number(id)}
-        teamMembersIds={team?.data.members?.map((member) => member.id).filter((id): id is number => id !== undefined) || []}
-      />
-      <Header
-        name={team?.data.name || ""}
-      />
-      <Header
-        name="Team List"
-        buttonComponent={
-          <button
-            type="button"
-            className="flex items-center gap-2 rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
-            onClick={() => setIsTeamMemberModalOpen(true)}
-          >
-            Add Team Member
-            <CirclePlus size={16} />
-          </button>
-        }
-        isSmallText
-      />
-      <DataTable
-        data={team?.data?.members || []}
-        columns={userColumns}
-        withIndex={true}
-        actionHeader="Actions"
-        action={(user: User) => <TeamMemberAction user={user} />}
-      />
-    </div>
+      <div className="flex w-full flex-col px-8 pt-2">
+        <ConfirmationModal
+          isOpen={isConfirmationModalOpen}
+          onClose={() => setIsConfirmationModalOpen(false)}
+          onConfirm={() => {
+            removeTeamMemberHandler(modalUser?.id || 0);
+          }}
+          message="Are you sure you want to remove this user from team?"
+          component={modalUser && <UserCard user={modalUser} />}
+        />
+        <TeamMemberModal
+          isOpen={isTeamMemberModalOpen}
+          onClose={() => setIsTeamMemberModalOpen(false)}
+          teamId={Number(id)}
+          teamMembersIds={teamList.map((member) => member.id).filter((id): id is number => id !== undefined) || []}
+        />
+        <Header
+          name={team?.data.name || ""}
+        />
+        <Header
+          name="Team List"
+          buttonComponent={
+            <button
+              type="button"
+              className="flex items-center gap-2 rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+              onClick={() => setIsTeamMemberModalOpen(true)}
+            >
+              Add Team Member
+              <CirclePlus size={16} />
+            </button>
+          }
+          isSmallText
+        />
+        <DataTable
+          data={teamList}
+          columns={userColumns}
+          withIndex={true}
+          actionHeader=" "
+          action={(user: User) => <TeamMemberAction user={user} />}
+        />
+      </div>
+    </>
   );
 };
 

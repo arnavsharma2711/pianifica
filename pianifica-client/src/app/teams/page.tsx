@@ -1,22 +1,42 @@
 "use client";
-import { useGetTeamsQuery } from "@/state/api";
+import { useGetTeamsQuery, useRemoveTeamMutation } from "@/state/api";
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import { DataTable } from "@/components/DataTable";
 import type { Team } from "@/interface";
-import { CirclePlus } from "lucide-react";
+import { CirclePlus, EllipsisVertical, Trash, UserRoundPen } from "lucide-react";
 import Loading from "@/components/Loading";
 import Image from "next/image";
 import ErrorComponent from "@/components/Error";
+import Link from "next/link";
+import TeamModal from "@/components/Modal/TeamModal";
+import ConfirmationModal from "@/components/Modal/ConfirmationModel";
+import toast from "react-hot-toast";
+import DropdownMenu from "@/components/DropdownMenu";
+import Breadcrumb from "@/components/Breadcrumb";
 
 const Teams = () => {
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(10);
+	const [modalTeam, setModalTeam] = useState<Team | null>(null);
+	const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
+	const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 	const { data: teams, isLoading, isError } = useGetTeamsQuery({ page, limit });
 
+
+	const [removeTeam] = useRemoveTeamMutation();
+
 	const handleTeamModel = (action: string, user?: Team) => {
-		console.log(action, user);
+		setModalTeam(user || null);
+		setIsTeamModalOpen(true);
 	};
+
+	const removeTeamHandler = async (teamId: number) => {
+		const response = await removeTeam({ teamId });
+		if (response.data?.success) {
+			toast.success("User removed from team successfully");
+		}
+	}
 
 	if (isLoading) return <Loading />;
 	if (isError || !teams?.success)
@@ -29,10 +49,14 @@ const Teams = () => {
 		setPage,
 		setLimit,
 	};
+
 	const teamColumns = [
 		{
 			header: "Team Name",
 			accessorKey: "name" as keyof Team,
+			cell: (team: Team) => (
+				<Link href={`/team/${team.id}`}>{team.name}</Link>
+			),
 		},
 		{
 			header: "Team Manager",
@@ -77,23 +101,89 @@ const Teams = () => {
 			),
 		},
 	];
-	return (
-		<div className="flex w-full flex-col p-8">
-			<Header
-				name="Teams"
-				buttonComponent={
-					<button
-						type="button"
-						className="flex items-center gap-2 rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
-						onClick={() => handleTeamModel("create")}
-					>
-						Create Team
-						<CirclePlus size={16} />
-					</button>
-				}
+
+	const TeamActions = ({ team }: { team: Team }) => {
+		const deleteTeam = () => {
+			setModalTeam(team);
+			setIsConfirmationModalOpen(true);
+		};
+
+		const editTeam = () => {
+			setModalTeam(team);
+			setIsTeamModalOpen(true);
+		};
+
+		return (
+			<DropdownMenu
+				toggle={<EllipsisVertical size={20} />}
+				options={[
+					{
+						key: "edit",
+						icon: <UserRoundPen size={15} />,
+						value: "Edit",
+						onClick: () => editTeam(),
+						className:
+							"hover:bg-blue-300 hover:text-blue-600 dark:hover:text-white dark:hover:bg-blue-700",
+					},
+					{
+						key: "delete",
+						icon: <Trash size={15} />,
+						value: "Delete",
+						onClick: () => deleteTeam(),
+						className:
+							"hover:bg-red-100 hover:text-red-600 hover:dark:text-white dark:hover:bg-red-700",
+					},
+				]}
 			/>
-			<DataTable data={teams?.data} columns={teamColumns} withIndex showPagination={true} pagination={pagination} />
-		</div>
+		);
+	};
+
+	return (
+		<>
+			<Breadcrumb
+				links={[
+					{ value: "Teams", link: "/teams" },
+				]}
+			/>
+			<div className="flex w-full flex-col px-8 pt-2">
+				<ConfirmationModal
+					isOpen={isConfirmationModalOpen}
+					onClose={() => setIsConfirmationModalOpen(false)}
+					onConfirm={() => {
+						removeTeamHandler(modalTeam?.id || 0);
+					}}
+					message="Are you sure you want to remove this team?"
+				/>
+				<TeamModal
+					isOpen={isTeamModalOpen}
+					onClose={() => setIsTeamModalOpen(false)}
+					action={modalTeam ? "edit" : "add"}
+					team={modalTeam ?? undefined}
+				/>
+				<Header
+					name="Teams"
+					buttonComponent={
+						<button
+							type="button"
+							className="flex items-center gap-2 rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+							onClick={() => handleTeamModel("create")}
+						>
+							Create Team
+							<CirclePlus size={16} />
+						</button>
+					}
+				/>
+				<DataTable
+					data={teams?.data}
+					columns={teamColumns}
+					withIndex
+					showPagination={true}
+					pagination={pagination}
+					actionHeader=" "
+					action={(team: Team) => <TeamActions team={team} />}
+				/>
+			</div>
+		</>
 	);
 };
 

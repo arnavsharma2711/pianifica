@@ -336,6 +336,41 @@ export const api = createApi({
       }),
       providesTags: ["Team"],
     }),
+    createTeam: build.mutation<ApiResponse<Team>, Partial<Team>>({
+      query: (team) => ({
+        url: "team",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+        method: "POST",
+        body: team,
+      }),
+      invalidatesTags: ["Teams"],
+    }),
+    editTeam: build.mutation<ApiResponse<Team>, Partial<Team>>({
+      query: (team) => ({
+        url: "team",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+        method: "PUT",
+        body: team,
+      }),
+      invalidatesTags: ["Teams", "Team"],
+    }),
+    removeTeam: build.mutation<ApiResponse<null>, { teamId: number }>({
+      query: ({ teamId }) => ({
+        url: `team/${teamId}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Teams", "Team"],
+    }),
     addTeamMember: build.mutation<
       ApiResponse<Team>,
       { teamId: number; userId: number }
@@ -394,6 +429,9 @@ export const {
   useCreateCommentMutation,
   useGetUsersQuery,
   useGetTeamsQuery,
+  useCreateTeamMutation,
+  useEditTeamMutation,
+  useRemoveTeamMutation,
   useGetTeamMemberQuery,
   useAddTeamMemberMutation,
   useRemoveTeamMemberMutation,

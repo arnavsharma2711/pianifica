@@ -41,11 +41,10 @@ const TeamMemberModal = ({ isOpen, onClose, teamId, teamMembersIds }: Props) => 
 			userId: user,
 		});
 
-		if (response.error) {
-			toast.error("An error occurred while adding user to team");
+		if (response.data?.success) {
+			toast.success("User added to team successfully");
 			return;
 		}
-		toast.success("User added to team successfully");
 		onClose();
 	};
 

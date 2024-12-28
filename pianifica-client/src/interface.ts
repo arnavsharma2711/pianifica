@@ -16,6 +16,8 @@ export interface Team {
   name: string;
   teamManager?: User;
   teamLead?: User;
+  leadId?: number;
+  managerId?: number;
   members?: User[];
 }
 
