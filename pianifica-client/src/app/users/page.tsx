@@ -12,6 +12,7 @@ import ConfirmationModal from "@/components/Modal/ConfirmationModel";
 import UserCard from "@/components/Cards/UserCard";
 import Loading from "@/components/Loading";
 import ErrorComponent from "@/components/Error";
+import Breadcrumb from "@/components/Breadcrumb";
 
 const Users = () => {
 	const [page, setPage] = useState(1);
@@ -20,7 +21,7 @@ const Users = () => {
 	const [modelUser, setModalUser] = useState<User | null>(null);
 	const [action, setAction] = useState<"create" | "edit">("create");
 	const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
-	const { data: users, isLoading, isError } = useGetUsersQuery({page,limit});
+	const { data: users, isLoading, isError } = useGetUsersQuery({ page, limit });
 	const handleUserModel = (action: string, user?: User) => {
 		if (action === "create") {
 			setAction("create");
@@ -116,45 +117,52 @@ const Users = () => {
 	};
 
 	return (
-		<div className="flex w-full flex-col p-8">
-			<ConfirmationModal
-				isOpen={isConfirmationModalOpen}
-				onClose={() => setIsConfirmationModalOpen(false)}
-				onConfirm={() => {
-					console.log("delete");
-				}}
-				message="Are you sure you want to delete this user?"
-				component={modelUser && <UserCard user={modelUser} />}
+		<>
+			<Breadcrumb
+				links={[
+					{ value: "User", link: "/users" },
+				]}
 			/>
-			<UserModal
-				isOpen={isUserModalOpen}
-				onClose={() => setIsUserModalOpen(false)}
-				user={modelUser}
-				action={action}
-			/>
-			<Header
-				name="Users"
-				buttonComponent={
-					<button
-						type="button"
-						className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
-						onClick={() => handleUserModel("create")}
-					>
-						Add User
-					</button>
-				}
-			/>
+			<div className="flex w-full flex-col px-8 pt-2">
+				<ConfirmationModal
+					isOpen={isConfirmationModalOpen}
+					onClose={() => setIsConfirmationModalOpen(false)}
+					onConfirm={() => {
+						console.log("delete");
+					}}
+					message="Are you sure you want to delete this user?"
+					component={modelUser && <UserCard user={modelUser} />}
+				/>
+				<UserModal
+					isOpen={isUserModalOpen}
+					onClose={() => setIsUserModalOpen(false)}
+					user={modelUser}
+					action={action}
+				/>
+				<Header
+					name="Users"
+					buttonComponent={
+						<button
+							type="button"
+							className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+							onClick={() => handleUserModel("create")}
+						>
+							Add User
+						</button>
+					}
+				/>
 
-			<DataTable
-				data={users?.data}
-				columns={userColumns}
-				withIndex={true}
-				showPagination={true}
-				pagination={pagination}
-				actionHeader="Actions"
-				action={(user: User) => <UserAction user={user} />}
-			/>
-		</div>
+				<DataTable
+					data={users?.data}
+					columns={userColumns}
+					withIndex={true}
+					showPagination={true}
+					pagination={pagination}
+					actionHeader="Actions"
+					action={(user: User) => <UserAction user={user} />}
+				/>
+			</div>
+		</>
 	);
 };
 

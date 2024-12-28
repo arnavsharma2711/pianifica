@@ -7,6 +7,7 @@ import { DataTable } from "@/components/DataTable";
 import type { Task } from "@/interface";
 import { Status, type Priority as PriorityEnum } from "@/enum";
 import StatusTag from "@/components/StatusTag";
+import Breadcrumb from "@/components/Breadcrumb";
 
 type Props = {
 	params: Promise<{ priority: string }>;
@@ -14,6 +15,8 @@ type Props = {
 
 const Priority = ({ params }: Props) => {
 	const [priority, setPriority] = useState<string | null>(null);
+	const [page, setPage] = useState(1);
+	const [limit, setLimit] = useState(10);
 
 	useEffect(() => {
 		params.then((resolvedParams) => {
@@ -27,10 +30,21 @@ const Priority = ({ params }: Props) => {
 		isError,
 	} = useGetUserTasksQuery({
 		priority: priority as PriorityEnum,
+		page,
+		limit,
 	});
 
 	if (!priority || isLoading) return <div>Loading...</div>;
 	if (isError || !tasks?.success) return <div>Error fetching tasks</div>;
+
+
+	const pagination = {
+		page,
+		limit,
+		total: tasks.total_count || 10,
+		setPage,
+		setLimit,
+	}
 
 	const taskColumns = [
 		{
@@ -72,14 +86,24 @@ const Priority = ({ params }: Props) => {
 	];
 
 	return (
-		<div className="flex w-full flex-col p-8">
-			<Header name="Tasks" />
-			<DataTable
-				data={tasks?.data}
-				columns={taskColumns}
-				emptyStr={`No task available with Priority: ${priority.toUpperCase()}`}
+		<>
+			<Breadcrumb
+				links={[
+					{ value: "Tasks", link: "/tasks", disable: true },
+					{ value: priority.toUpperCase(), link: `/priority/${priority}` },
+				]}
 			/>
-		</div>
+			<div className="flex w-full flex-col px-8 pt-2">
+				<Header name="Tasks" />
+				<DataTable
+					data={tasks?.data}
+					columns={taskColumns}
+					emptyStr={`No task available with Priority: ${priority.toUpperCase()}`}
+					showPagination
+					pagination={pagination}
+				/>
+			</div>
+		</>
 	);
 };
 

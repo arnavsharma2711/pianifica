@@ -9,6 +9,8 @@ import TableView from "@/components/Project/TableView";
 import NewTaskModal from "@/components/Modal/NewTaskModal";
 import type { Task } from "@/interface";
 import { useGetProjectQuery } from "@/state/api";
+import Breadcrumb from "@/components/Breadcrumb";
+import Loading from "@/components/Loading";
 
 type Props = {
 	params: Promise<{ id: string }>;
@@ -38,35 +40,43 @@ const Project = ({ params }: Props) => {
 	}, [params]);
 
 	if (!id || isLoading) {
-		return <div>Loading...</div>;
+		return <Loading />;
 	}
 
 	return (
-		<div>
-			<NewTaskModal
-				isOpen={isModalNewTaskOpen}
-				onClose={() => setIsModalNewTaskOpen(false)}
-				project={Number(id)}
-				task={task}
+		<>
+			<Breadcrumb
+				links={[
+					{ value: "Projects", link: "/projects" },
+					{ value: project?.data?.name || "Project Board", link: `/project/${id}` },
+				]}
 			/>
-			<ProjectHeader
-				activeTab={activeTab}
-				setActiveTab={setActiveTab}
-				projectName={project?.data?.name || "Project Board"}
-			/>
-			{activeTab === "Board" && (
-				<Board id={id} handleTaskModel={handleTaskModel} />
-			)}
-			{activeTab === "List" && (
-				<List id={id} handleTaskModel={handleTaskModel} />
-			)}
-			{activeTab === "Timeline" && (
-				<Timeline id={id} handleTaskModel={handleTaskModel} />
-			)}
-			{activeTab === "Table" && (
-				<TableView id={id} handleTaskModel={handleTaskModel} />
-			)}
-		</div>
+			<div>
+				<NewTaskModal
+					isOpen={isModalNewTaskOpen}
+					onClose={() => setIsModalNewTaskOpen(false)}
+					project={Number(id)}
+					task={task}
+				/>
+				<ProjectHeader
+					activeTab={activeTab}
+					setActiveTab={setActiveTab}
+					projectName={project?.data?.name || "Project Board"}
+				/>
+				{activeTab === "Board" && (
+					<Board id={id} handleTaskModel={handleTaskModel} />
+				)}
+				{activeTab === "List" && (
+					<List id={id} handleTaskModel={handleTaskModel} />
+				)}
+				{activeTab === "Timeline" && (
+					<Timeline id={id} handleTaskModel={handleTaskModel} />
+				)}
+				{activeTab === "Table" && (
+					<TableView id={id} handleTaskModel={handleTaskModel} />
+				)}
+			</div>
+		</>
 	);
 };
 

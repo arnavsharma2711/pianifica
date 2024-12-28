@@ -21,6 +21,8 @@ import { Status, type Priority } from "@/enum";
 import type { Project, Task } from "@/interface";
 import { DataTable } from "@/components/DataTable";
 import StatusTag from "@/components/StatusTag";
+import ErrorComponent from "@/components/Error";
+import Loading from "@/components/Loading";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
@@ -38,9 +40,9 @@ const Dashboard = () => {
 
 	const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
-	if (tasksLoading || isProjectsLoading) return <div>Loading..</div>;
+	if (tasksLoading || isProjectsLoading) return <Loading />;
 	if (tasksError || !tasks?.success || !projects?.success)
-		return <div>Error fetching data</div>;
+		return <ErrorComponent message="An error occurred while fetching data" />;
 
 	const priorityCount = tasks?.data.reduce(
 		(acc: Record<string, number>, task: Task) => {

@@ -30,11 +30,10 @@ const TabButton = ({
 	return (
 		<button
 			type="button"
-			className={`${
-				isActive
-					? "text-blue-600 after:bg-blue-600 dark:text-white font-bold"
-					: ""
-			} relative flex items-center gap-2 px-1 py-2 text-gray-500 after:absolute after:-bottom-[9px] after:left-0 after:h-[1px] after:w-full hover:text-blue-600 dark:text-neutral-500 dark:hover:text-white sm:px-2 lg:px-4`}
+			className={`${isActive
+				? "text-blue-600 after:bg-blue-600 dark:text-white font-bold"
+				: ""
+				} relative flex items-center gap-2 px-1 py-2 text-gray-500 after:absolute after:-bottom-[9px] after:left-0 after:h-[1px] after:w-full hover:text-blue-600 dark:text-neutral-500 dark:hover:text-white sm:px-2 lg:px-4`}
 			onClick={() => setActiveTab(tabName)}
 		>
 			{icon}
@@ -61,7 +60,7 @@ const ProjectHeader = ({
 				isOpen={isModalNewProjectOpen}
 				onClose={() => setIsModalNewProjectOpen(false)}
 			/>
-			<div className="pb-6 pt-6 lg:pb-4 lg:pt-8">
+			<div className="pb-6 pt-2 lg:pb-4">
 				<Header
 					name={projectName}
 					buttonComponent={

@@ -1,5 +1,6 @@
 "use client";
 
+import Breadcrumb from "@/components/Breadcrumb";
 import { DataTable } from "@/components/DataTable";
 import ErrorComponent from "@/components/Error";
 import Header from "@/components/Header";
@@ -61,12 +62,17 @@ const Projects = () => {
 	];
 
 	return (
-		<div className="flex w-full flex-col p-8">
-			<NewProjectModal
-				isOpen={isModalNewProjectOpen}
-				onClose={() => setIsModalNewProjectOpen(false)}
+		<>
+			<Breadcrumb
+				links={[
+					{ value: "Projects", link: "/projects" },
+				]}
 			/>
-			<div className="pb-6 pt-6 lg:pb-4 lg:pt-8">
+			<div className="flex w-full flex-col px-8 pt-2">
+				<NewProjectModal
+					isOpen={isModalNewProjectOpen}
+					onClose={() => setIsModalNewProjectOpen(false)}
+				/>
 				<Header
 					name="Project Boards"
 					buttonComponent={
@@ -79,15 +85,15 @@ const Projects = () => {
 						</button>
 					}
 				/>
+				<DataTable
+					data={projects?.data}
+					columns={projectColumns}
+					withIndex={true}
+					showPagination={true}
+					pagination={pagination}
+				/>
 			</div>
-			<DataTable
-				data={projects?.data}
-				columns={projectColumns}
-				withIndex={true}
-				showPagination={true}
-				pagination={pagination}
-			/>
-		</div>
+		</>
 	);
 };
 
