@@ -1,6 +1,6 @@
 import type React from "react";
 import { useState } from "react";
-import { useLoginUserMutation, useRegisterUserMutation } from "@/state/api";
+import { api, useLoginUserMutation, useRegisterUserMutation } from "@/state/api";
 import { useAppDispatch } from "@/app/redux";
 import { setAccessToken } from "@/state";
 import InputField from "../FormFields";
@@ -42,6 +42,7 @@ const AuthenticationForm = () => {
 					JSON.stringify(user.data.userInfo),
 				);
 				sessionStorage.setItem("accessToken", user.data.accessToken);
+				dispatch(api.util.invalidateTags(["Projects", "Tasks", "Task", "UserTasks", "Users", "Teams", "Team"]));
 			} else {
 				setError(user?.message);
 			}
@@ -84,9 +85,7 @@ const AuthenticationForm = () => {
 		<div className="w-full h-full min-h-full flex flex-row items-center justify-center p-4 lg:p-20">
 			<div className="w-full h-full bg-gray-100 dark:bg-zinc-800  flex items-center justify-center rounded-md shadow-md overflow-hidden relative">
 				<div
-					className={`w-full h-full transform transition-transform duration-500 ${
-						view === "login" ? "lg:translate-x-0" : "lg:translate-x-full"
-					}`}
+					className={`w-full h-full transform transition-transform duration-500 ${view === "login" ? "lg:translate-x-0" : "lg:translate-x-full"}`}
 				>
 					<div className=" w-full h-full  box-border flex flex-col items-center justify-center p-10">
 						<h1 className="text-2xl font-semibold text-center text-gray-800 dark:text-white">
@@ -197,9 +196,7 @@ const AuthenticationForm = () => {
 					</div>
 				</div>
 				<div
-					className={`hidden lg:flex w-full h-full transform transition-transform duration-500 items-center justify-center ${
-						view === "login" ? "translate-x-0" : "-translate-x-full"
-					}`}
+					className={`hidden lg:flex w-full h-full transform transition-transform duration-500 items-center justify-center ${view === "login" ? "translate-x-0" : "-translate-x-full"}`}
 				>
 					<img
 						className="w-full h-full object-cover rounded-r-md"

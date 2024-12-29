@@ -5,6 +5,8 @@ import { LogOutIcon, Menu, Moon, Search, Settings, Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import DropdownMenu from "../DropdownMenu";
+import { api, useGetCurrentUserQuery } from "@/state/api";
+
 const Navbar = () => {
 	const dispatch = useAppDispatch();
 	const isSidebarCollapsed = useAppSelector(
@@ -12,12 +14,13 @@ const Navbar = () => {
 	);
 	const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
-	const user = JSON.parse(sessionStorage.getItem("userDetails") || "{}");
+	const { data: currentUser } = useGetCurrentUserQuery();
 
 	const UserButton = ({ user }: { user: User }) => {
 		const handleLogout = () => {
 			sessionStorage.removeItem("userDetails");
 			dispatch(setAccessToken(null));
+			dispatch(api.util.invalidateTags(["Projects", "Tasks", "Task", "UserTasks", "Users", "Teams", "Team"]));
 		};
 		return (
 			<>
@@ -99,7 +102,7 @@ const Navbar = () => {
 					<Settings className="h-6 w-6 cursor-pointer" />
 				</Link>
 				<div className="ml-2 mr-5 hidden min-h-[2em] w-[0.1em] bg-gray-200 md:inline-block" />
-				<UserButton user={user} />
+				{currentUser?.data && <UserButton user={currentUser.data} />}
 			</div>
 		</div>
 	);

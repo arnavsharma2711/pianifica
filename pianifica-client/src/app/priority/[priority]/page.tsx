@@ -32,7 +32,11 @@ const Priority = ({ params }: Props) => {
 		priority: priority as PriorityEnum,
 		page,
 		limit,
-	});
+	},
+		{
+			skip: !priority,
+		}
+	);
 
 	if (!priority || isLoading) return <div>Loading...</div>;
 	if (isError || !tasks?.success) return <div>Error fetching tasks</div>;
