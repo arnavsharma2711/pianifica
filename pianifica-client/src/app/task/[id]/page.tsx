@@ -5,12 +5,15 @@ import { useCreateCommentMutation, useGetCurrentUserQuery, useGetTaskQuery } fro
 import { Priority, Status } from "@/enum";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { SendHorizonal } from "lucide-react";
+import { Pencil, SendHorizonal } from "lucide-react";
 import Loading from "@/components/Loading";
 import StatusTag from "@/components/StatusTag";
 import PriorityTag from "@/components/PriorityTag";
 import Breadcrumb from "@/components/Breadcrumb";
 import Header from "@/components/Header";
+import Link from "next/link";
+import UserCard from "@/components/Cards/UserCard";
+import NewTaskModal from "@/components/Modal/NewTaskModal";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -54,19 +57,21 @@ const CommentComponent = ({ comment }: { comment: Comment }) => {
   return (
     <div className="p-2 border dark:border-zinc-800 rounded-lg">
       <div className="flex flex-row gap-4">
-        <div className="h-10 w-10 overflow-hidden rounded-full flex items-center justify-center">
+        <Link href={`/user/${comment.user?.username}`} className="h-10 w-10 overflow-hidden rounded-full flex items-center justify-center">
           <Image
             src={comment.user?.profilePictureUrl || "/default-profile-picture.webp"}
             alt={comment.user?.username || "Profile Pic"}
             width={100}
             height={100}
             className="rounded-full" />
-        </div>
+        </Link>
         <div className="flex flex-col w-full gap-2">
           <div className="flex items-center justify-between">
-            <strong>
-              {comment.user?.firstName} {comment.user?.lastName}
-            </strong>
+            <Link href={`/user/${comment.user?.username}`} >
+              <strong>
+                {comment.user?.firstName} {comment.user?.lastName}
+              </strong>
+            </Link>
             <span className="whitespace-nowrap text-gray-600">
               {new Date(comment.updatedAt).toLocaleString('en-US', {
                 year: 'numeric',
@@ -99,6 +104,8 @@ const KeyValue = ({ keyName, value }: { keyName: React.ReactNode, value: React.R
 
 const TaskPage = ({ params }: Props) => {
   const [id, setId] = useState<string | null>(null);
+  const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
+
 
   const { data: task, isLoading } = useGetTaskQuery({ taskId: id ? Number(id) : 0 }, { skip: id === null });
 
@@ -124,8 +131,23 @@ const TaskPage = ({ params }: Props) => {
         ]}
       />
       <div className="pt-2 px-8">
+        <NewTaskModal
+          isOpen={isModalNewTaskOpen}
+          onClose={() => setIsModalNewTaskOpen(false)}
+          project={Number(id)}
+          task={task?.data}
+        />
         <div className="space-y-4">
-          <Header name={task?.data.title || "Task"} />
+          <Header name={task?.data.title || "Task"} buttonComponent={
+            <button
+              type="button"
+              className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+              onClick={() => setIsModalNewTaskOpen(true)}
+            >
+              <Pencil className="mr-2 h-5 w-5" />
+              Edit Task
+            </button>
+          } />
           <div className="flex flex-col-reverse md:flex-row items-start justify-between gap-10">
             <div className="flex flex-col w-full gap-10">
               <div className="flex flex-col gap-1">
@@ -155,32 +177,8 @@ const TaskPage = ({ params }: Props) => {
               </div>
             </div>
             <div className="border-2 dark:border-zinc-800 w-full md:w-96 flex justify-between flex-col gap-4 p-2 rounded-lg whitespace-nowrap">
-              <KeyValue keyName={"Author"} value={
-                <div className="flex items-center gap-2">
-                  <div className="h-10 w-10 overflow-hidden rounded-full flex items-center justify-center">
-                    <Image
-                      src={task?.data?.author?.profilePictureUrl || "/default-profile-picture.webp"}
-                      alt={task?.data?.author?.username || "Profile Pic"}
-                      width={100}
-                      height={100}
-                      className="rounded-full" />
-                  </div>
-                  {task?.data.author?.firstName} {task?.data.author?.lastName}
-                </div>
-              } />
-              <KeyValue keyName={"Assignee"} value={
-                <div className="flex items-center gap-2">
-                  <div className="h-10 w-10 overflow-hidden rounded-full flex items-center justify-center">
-                    <Image
-                      src={task?.data?.assignee?.profilePictureUrl || "/default-profile-picture.webp"}
-                      alt={task?.data?.assignee?.username || "Profile Pic"}
-                      width={100}
-                      height={100}
-                      className="rounded-full" />
-                  </div>
-                  {task?.data.assignee?.firstName} {task?.data.assignee?.lastName}
-                </div>
-              } />
+              <KeyValue keyName={"Author"} value={task?.data.author ? <UserCard user={task.data.author} /> : "N/A"} />
+              <KeyValue keyName={"Assignee"} value={task?.data.assignee ? <UserCard user={task.data.assignee} /> : "N/A"} />
               <KeyValue keyName={"Status"} value={<StatusTag status={task?.data.status || Status.TODO} />} />
               <KeyValue keyName={"Priority"} value={<PriorityTag priority={task?.data.priority || Priority.BACKLOG} />} />
               <KeyValue keyName={"Start Date"} value={task?.data.startDate ? new Date(task.data.startDate).toLocaleDateString() : "N/A"} />

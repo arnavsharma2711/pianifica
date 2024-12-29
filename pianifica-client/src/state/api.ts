@@ -235,6 +235,21 @@ export const api = createApi({
       }),
       invalidatesTags: ["Tasks"],
     }),
+    editTask: build.mutation<ApiResponse<Task>, Partial<Task>>({
+      query: (task) => ({
+        url: "task",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+        method: "PUT",
+        body: task,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Tasks", id },
+        { type: "Task", id },
+      ],
+    }),
     updateTaskStatus: build.mutation<
       ApiResponse<Task>,
       { taskId: number; status: string }
@@ -297,6 +312,15 @@ export const api = createApi({
         };
       },
       providesTags: ["Users"],
+    }),
+    getUser: build.query<ApiResponse<User>, { username: string }>({
+      query: ({ username }) => ({
+        url: `user/${username}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+      }),
     }),
     getTeams: build.query<
       ApiResponse<Team[]>,
@@ -418,6 +442,7 @@ export const {
   useLoginUserMutation,
   useRegisterUserMutation,
   useGetCurrentUserQuery,
+  useGetUserQuery,
   useGetProjectsQuery,
   useGetProjectQuery,
   useCreateProjectMutation,
@@ -425,6 +450,7 @@ export const {
   useGetUserTasksQuery,
   useGetTaskQuery,
   useCreateTaskMutation,
+  useEditTaskMutation,
   useUpdateTaskStatusMutation,
   useCreateCommentMutation,
   useGetUsersQuery,

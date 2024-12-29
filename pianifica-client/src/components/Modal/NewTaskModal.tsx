@@ -1,5 +1,5 @@
 import Modal from "@/components/Modal";
-import { useCreateTaskMutation, useGetCurrentUserQuery, useGetProjectsQuery, useGetUsersQuery } from "@/state/api";
+import { useCreateTaskMutation, useEditTaskMutation, useGetCurrentUserQuery, useGetProjectsQuery, useGetUsersQuery } from "@/state/api";
 import React, { useEffect, useState } from "react";
 import { formatISO } from "date-fns";
 import { Priority, Status } from "@/enum";
@@ -17,7 +17,8 @@ type Props = {
 const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 	const { data: currentUser } = useGetCurrentUserQuery();
 
-	const [createTask, { isLoading }] = useCreateTaskMutation();
+	const [createTask, { isLoading: isCreateLoading }] = useCreateTaskMutation();
+	const [editTask, { isLoading: isEditLoading }] = useEditTaskMutation();
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
 	const [status, setStatus] = useState<Status>(Status.TODO);
@@ -28,6 +29,7 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 	const [authorId, setAuthorId] = useState(currentUser?.data?.id || 0);
 	const [assigneeId, setAssigneeId] = useState(currentUser?.data?.id || 0);
 	const [projectId, setProjectId] = useState(project || 1);
+	const [error, setError] = useState("");
 
 	const handleProjectChange = (value: string) => {
 		setProjectId(Number(value));
@@ -85,7 +87,10 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 	}, [task, currentUser?.data?.id, project]);
 
 	const handleSubmit = async () => {
-		if (!title || !authorId || !projectId) return;
+		if (!title || !authorId || !projectId) {
+			setError("Title, Author and Project are required");
+			return;
+		};
 
 		const formattedStartDate = formatISO(new Date(startDate), {
 			representation: "complete",
@@ -94,18 +99,35 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 			representation: "complete",
 		});
 
-		await createTask({
-			title,
-			description,
-			status,
-			priority,
-			tags,
-			startDate: formattedStartDate,
-			dueDate: formattedDueDate,
-			authorId: authorId,
-			assigneeId: assigneeId,
-			projectId,
-		});
+		if (task) {
+			await editTask({
+				id: task.id,
+				title,
+				description,
+				status,
+				priority,
+				tags,
+				startDate: formattedStartDate,
+				dueDate: formattedDueDate,
+				authorId: authorId,
+				assigneeId: assigneeId,
+				projectId,
+			});
+		}
+		else {
+			await createTask({
+				title,
+				description,
+				status,
+				priority,
+				tags,
+				startDate: formattedStartDate,
+				dueDate: formattedDueDate,
+				authorId: authorId,
+				assigneeId: assigneeId,
+				projectId,
+			});
+		}
 
 		onClose();
 	};
@@ -113,6 +135,7 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 	const isFormValid = () => {
 		return title && authorId && projectId;
 	};
+
 	return (
 		<Modal isOpen={isOpen} onClose={onClose} name={task ? "Edit Task" : "New Task"}>
 			<form
@@ -191,13 +214,17 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 					setValue={handleAssigneeChange}
 					label="Assignee"
 				/>
+				<span className="text-red-500">
+					{error}
+				</span>
 				<button
 					type="submit"
-					className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 ${!isFormValid() || isLoading ? "cursor-not-allowed opacity-50" : ""
+					className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 ${!isFormValid() || (isCreateLoading || isEditLoading) ? "cursor-not-allowed opacity-50" : ""
 						}`}
-					disabled={!isFormValid() || isLoading}
+					disabled={!isFormValid() || (isCreateLoading || isEditLoading)}
 				>
-					{isLoading ? "Creating..." : "Create Task"}
+					{task ? isEditLoading ? "Editing..." : "Edit Task" : isCreateLoading ? "Creating..." : "Create Task"}
+					
 				</button>
 			</form>
 		</Modal>
