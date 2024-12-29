@@ -63,6 +63,7 @@ export const updateTaskSchema = z.object({
   }),
   description: z
     .string({
+      required_error: "Task description is required.",
       invalid_type_error: "Task description must be a string.",
     })
     .nullable(),
@@ -71,33 +72,38 @@ export const updateTaskSchema = z.object({
     invalid_type_error: "Project ID must be a number.",
   }),
   assigneeId: z
-    .string({
+    .number({
+      required_error: "Assignee ID is required.",
       invalid_type_error: "Assignee ID must be a number.",
     })
-    .nullable()
-    .transform((val) => (val === "" ? null : Number(val))),
+    .nullable(),
   status: z.nativeEnum(Status),
   priority: z.nativeEnum(Priority),
   tags: z
     .string({
+      required_error: "Task tags is required.",
       invalid_type_error: "Task tags must be a string.",
     })
     .nullable(),
   startDate: z
     .string({
+      required_error: "Task start date is required.",
       invalid_type_error: "Task start date must be a date.",
     })
     .nullable(),
   dueDate: z
     .string({
+      required_error: "Task due date is required.",
       invalid_type_error: "Task due date must be a date.",
     })
     .nullable(),
   points: z
     .number({
+      required_error: "Task points is required.",
       invalid_type_error: "Task points must be a number.",
     })
-    .nullable(),
+    .nullable()
+    .optional(),
 });
 
 export const userTaskSchema = filterSchema.extend({
