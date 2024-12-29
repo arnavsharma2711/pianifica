@@ -11,7 +11,6 @@ import TeamMemberModal from "@/components/Modal/TeamMemberModal";
 import type { User } from "@/interface";
 import { useGetTeamMemberQuery, useRemoveTeamMemberMutation } from "@/state/api";
 import { CirclePlus, Trash } from "lucide-react";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -57,35 +56,27 @@ const Team = ({ params }: Props) => {
     {
       header: "Username",
       accessorKey: "username" as keyof User,
-      cell: (user: User) => (
-        <div className="flex flex-row items-center gap-2">
-          <div className="h-9 w-9">
-            <Image
-              src={user.profilePictureUrl || "/default-profile-picture.webp"}
-              alt={user.username}
-              width={100}
-              height={50}
-              className="h-full rounded-full object-cover"
-            />
-          </div>
-          {user.username}
-          {(user.role === "ORG_ADMIN" || user.role === "SUPER_ADMIN") && (
-            <span className="bg-blue-300 text-blue-600 rounded-full px-2">
-              ADMIN
-            </span>
-          )}
-          {(user.id === team.data.teamLead?.id) && (
-            <span className="bg-yellow-300 text-yellow-600 rounded-full px-2">
-              LEAD
-            </span>
-          )}
-          {(user.id === team.data.teamManager?.id) && (
-            <span className="bg-pink-300 text-pink-600 rounded-full px-2">
-              MANAGER
-            </span>
-          )}
-        </div>
-      ),
+      cell: (user: User) => {
+        return user.username ? (
+          <UserCard
+            user={user}
+            tag={
+              <>
+                {user.id === team.data.teamLead?.id && (
+                  <span className="bg-yellow-300 text-yellow-600 rounded-full p-1 px-2">
+                    LEAD
+                  </span>
+                )}
+                {user.id === team.data.teamManager?.id && (
+                  <span className="bg-pink-300 text-pink-600 rounded-full p-1 px-2">
+                    MANAGER
+                  </span>
+                )}
+              </>
+            }
+          />
+        ) : null;
+      },
     },
     {
       header: "First Name",

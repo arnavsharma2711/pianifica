@@ -6,7 +6,6 @@ import { DataTable } from "@/components/DataTable";
 import type { Team } from "@/interface";
 import { CirclePlus, EllipsisVertical, Trash, UserRoundPen } from "lucide-react";
 import Loading from "@/components/Loading";
-import Image from "next/image";
 import ErrorComponent from "@/components/Error";
 import Link from "next/link";
 import TeamModal from "@/components/Modal/TeamModal";
@@ -14,6 +13,7 @@ import ConfirmationModal from "@/components/Modal/ConfirmationModel";
 import toast from "react-hot-toast";
 import DropdownMenu from "@/components/DropdownMenu";
 import Breadcrumb from "@/components/Breadcrumb";
+import UserCard from "@/components/Cards/UserCard";
 
 const Teams = () => {
 	const [page, setPage] = useState(1);
@@ -61,44 +61,16 @@ const Teams = () => {
 		{
 			header: "Team Manager",
 			accessorKey: "teamManager" as keyof Team,
-			cell: (team: Team) => (
-				<div className="flex flex-row items-center gap-2">
-					<div className="h-9 w-9">
-						<Image
-							src={
-								team.teamManager?.profilePictureUrl ||
-								"/default-profile-picture.webp"
-							}
-							alt={team.teamManager?.username || "N/A"}
-							width={100}
-							height={50}
-							className="h-full rounded-full object-cover"
-						/>
-					</div>
-					{team.teamManager?.firstName} {team.teamManager?.lastName}
-				</div>
-			),
+			cell: (team: Team) => {
+				return team.teamManager ? <UserCard user={team.teamManager} /> : null;
+			},
 		},
 		{
 			header: "Team Lead",
 			accessorKey: "teamLead" as keyof Team,
-			cell: (team: Team) => (
-				<div className="flex flex-row items-center gap-2">
-					<div className="h-9 w-9">
-						<Image
-							src={
-								team.teamLead?.profilePictureUrl ||
-								"/default-profile-picture.webp"
-							}
-							alt={team.teamLead?.username || "N/A"}
-							width={100}
-							height={50}
-							className="h-full rounded-full object-cover"
-						/>
-					</div>
-					{team.teamLead?.firstName} {team.teamLead?.lastName}
-				</div>
-			),
+			cell: (team: Team) => {
+				return team.teamLead ? <UserCard user={team.teamLead} /> : null;
+			},
 		},
 	];
 

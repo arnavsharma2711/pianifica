@@ -110,7 +110,7 @@ const Search = () => {
 						{searchResults?.data.users &&
 							searchResults?.data.users?.length > 0 && <h2>Users</h2>}
 						{searchResults?.data.users?.map((user) => (
-							<UserCard key={user.id} user={user} />
+							<UserCard key={user.id} user={user} size="md" />
 						))}
 					</div>
 				)}

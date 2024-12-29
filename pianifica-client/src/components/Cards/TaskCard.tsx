@@ -8,6 +8,7 @@ import { useState } from "react";
 import StatusTag from "../StatusTag";
 import { Priority } from "@/enum";
 import PriorityTag from "../PriorityTag";
+import UserCard from "./UserCard";
 
 type Props = {
 	task: Task;
@@ -70,32 +71,8 @@ const TaskCard = ({ task }: Props) => {
 									</div>
 								</div>
 								<div className="flex flex-col gap-2 mr-10">
-									<KeyValue keyName={"Author"} value={
-										<div className="flex flex-row items-center gap-2">
-											<div className="h-10 w-10 overflow-hidden rounded-full flex items-center justify-center">
-												<Image
-													src={task?.author?.profilePictureUrl || "/default-profile-picture.webp"}
-													alt={task?.author?.username || "Profile Pic"}
-													width={100}
-													height={100}
-													className="rounded-full" />
-											</div>
-											{task.author?.firstName} {task.author?.lastName}
-										</div>
-									} />
-									<KeyValue keyName={"Assignee"} value={
-										<div className="flex items-center gap-2">
-											<div className="h-10 w-10 overflow-hidden rounded-full flex items-center justify-center">
-												<Image
-													src={task?.assignee?.profilePictureUrl || "/default-profile-picture.webp"}
-													alt={task?.assignee?.username || "Profile Pic"}
-													width={100}
-													height={100}
-													className="rounded-full" />
-											</div>
-											{task.assignee?.firstName} {task.assignee?.lastName}
-										</div>
-									} />
+									<KeyValue keyName={"Author"} value={task?.author ? <UserCard user={task.author} /> : "N/A"} />
+									<KeyValue keyName={"Assignee"} value={task?.assignee ? <UserCard user={task.assignee} /> : "N/A"} />
 								</div>
 
 							</div>

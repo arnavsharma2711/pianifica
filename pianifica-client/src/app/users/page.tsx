@@ -1,7 +1,7 @@
 "use client";
+
 import { useGetCurrentUserQuery, useGetUsersQuery } from "@/state/api";
 import Header from "@/components/Header";
-import Image from "next/image";
 import { EllipsisVertical, Pencil, Trash } from "lucide-react";
 import { DataTable } from "@/components/DataTable";
 import type { User } from "@/interface";
@@ -50,25 +50,13 @@ const Users = () => {
 		{
 			header: "Username",
 			accessorKey: "username" as keyof User,
-			cell: (user: User) => (
-				<div className="flex flex-row items-center gap-2">
-					<div className="h-9 w-9">
-						<Image
-							src={user.profilePictureUrl || "/default-profile-picture.webp"}
-							alt={user.username}
-							width={100}
-							height={50}
-							className="h-full rounded-full object-cover"
-						/>
-					</div>
-					{user.username}
-					{(user.role === "ORG_ADMIN" || user.role === "SUPER_ADMIN") && (
-						<span className="bg-blue-300 text-blue-600 rounded-full px-2">
-							ADMIN
-						</span>
-					)}
-				</div>
-			),
+			cell: (user: User) => {
+				return user.username ? <UserCard user={user} tag={(user.role === "ORG_ADMIN" || user.role === "SUPER_ADMIN") && (
+					<span className="bg-blue-300 text-blue-600 rounded-full p-1 px-2">
+						ADMIN
+					</span>
+				)} /> : null;
+			},
 		},
 		{
 			header: "First Name",
@@ -133,7 +121,7 @@ const Users = () => {
 						console.log("delete");
 					}}
 					message="Are you sure you want to delete this user?"
-					component={modelUser && <UserCard user={modelUser} />}
+					component={modelUser && <UserCard user={modelUser} size="md" />}
 				/>
 				<UserModal
 					isOpen={isUserModalOpen}
