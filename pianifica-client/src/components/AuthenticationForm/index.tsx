@@ -51,6 +51,25 @@ const AuthenticationForm = () => {
 		}
 	};
 
+	const dummyLogin = async () => {
+		try {
+			const user = await loginUser({ emailOrUsername: "dummy_user", password: "password" }).unwrap();
+			if (user?.success) {
+				dispatch(setAccessToken(user.data.accessToken));
+				sessionStorage.setItem(
+					"userDetails",
+					JSON.stringify(user.data.userInfo),
+				);
+				sessionStorage.setItem("accessToken", user.data.accessToken);
+				dispatch(api.util.invalidateTags(["Projects", "Tasks", "Task", "UserTasks", "Users", "Teams", "Team"]));
+			} else {
+				setError(user?.message);
+			}
+		} catch (err) {
+			console.error("Failed to login:", err);
+		}
+	}
+
 	const handleRegister = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (password !== confirmPassword) {
@@ -113,6 +132,14 @@ const AuthenticationForm = () => {
 											placeholder="Password"
 											onChange={(e) => setPassword(e.target.value)}
 										/>
+										<button
+											type="button"
+											onClick={dummyLogin}
+											className={"focus-offset-2 mt-4 flex w-max justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600"}
+											disabled={isLoggingIn}
+										>
+											Login using a Dummy Account
+										</button>
 									</>
 								)}
 								{displayFields === "register" && (

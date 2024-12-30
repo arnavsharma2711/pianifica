@@ -25,7 +25,6 @@ export default function RootLayout({
 		<html lang="en">
 			<body className={`${raleway.className} antialiased`}>
 				<Toaster
-					position="bottom-left"
 					toastOptions={{ className: "dark:text-white dark:bg-zinc-800" }}
 				/>
 				<AuthWrapper>
