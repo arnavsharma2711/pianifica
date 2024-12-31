@@ -104,13 +104,15 @@ const Navbar = () => {
 						<div className="absolute top-full left-0 w-full bg-white dark:bg-zinc-800 shadow-md rounded-b-lg" onClick={() => setSearchTerm("")} onKeyUp={(e) => e.key === 'Enter' && setSearchTerm("")}>
 							{isLoading && <p>Loading...</p>}
 							{isError && <p>Error fetching search results</p>}
-							<div className="flex flex-col">
-								<ResultArray label="Tasks" type="task" total_count={searchResults?.data?.total_count?.task ?? 0} data={searchResults?.data?.tasks || []} />
-								<ResultArray label="Projects" type="project" total_count={searchResults?.data?.total_count?.project ?? 0} data={searchResults?.data?.projects || []} />
-								<ResultArray label="Teams" type="team" total_count={searchResults?.data?.total_count?.team ?? 0} data={searchResults?.data?.teams || []} />
-								<ResultArray label="Users" type="user" total_count={searchResults?.data?.total_count?.user ?? 0} data={searchResults?.data?.users || []} />
-							</div>
-
+							{
+								!isLoading && !isError &&
+								<div className="flex flex-col">
+									<ResultArray label="Tasks" type="task" total_count={searchResults?.data?.total_count?.task ?? 0} data={searchResults?.data?.tasks || []} />
+									<ResultArray label="Projects" type="project" total_count={searchResults?.data?.total_count?.project ?? 0} data={searchResults?.data?.projects || []} />
+									<ResultArray label="Teams" type="team" total_count={searchResults?.data?.total_count?.team ?? 0} data={searchResults?.data?.teams || []} />
+									<ResultArray label="Users" type="user" total_count={searchResults?.data?.total_count?.user ?? 0} data={searchResults?.data?.users || []} />
+								</div>
+							}
 						</div>
 				}
 

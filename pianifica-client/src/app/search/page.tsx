@@ -2,7 +2,7 @@
 
 import Header from "@/components/Header";
 import TaskCard from "@/components/Cards/TaskCard";
-import { useGetTasksQuery, useGetProjectsQuery, useGetUsersQuery, useGetTeamsQuery, useGlobalSearchQuery } from "@/state/api";
+import { useGetTasksQuery, useGetProjectsQuery, useGetUsersQuery, useGetTeamsQuery } from "@/state/api";
 import { debounce } from "lodash";
 import { useEffect, useState } from "react";
 import ProjectCard from "@/components/Cards/ProjectCard";
@@ -21,7 +21,6 @@ const SearchBar = ({ defaultValue, setValue, type }: { setValue: (q: string, typ
 	const optionsMap: {
 		[key: string]: string;
 	} = {
-		"all": "All Categories",
 		"task": "Tasks",
 		"project": "Projects",
 		"user": "Users",
@@ -184,8 +183,6 @@ const Search = () => {
 		case "team":
 			queryHook = useGetTeamsQuery;
 			break;
-		default:
-			queryHook = useGlobalSearchQuery;
 	}
 
 	const { data: searchResults, isLoading, isError } = queryHook ? queryHook({
@@ -231,7 +228,7 @@ const Search = () => {
 			<div className="p-5">
 				{isLoading && <p>Loading...</p>}
 				{isError && <p>Error occurred while fetching search results.</p>}
-				{!isLoading && !isError && searchParams.get('type')?.toString() !== 'all' && searchResults?.data && (
+				{!isLoading && !isError && searchResults?.data && (
 					<SearchResults
 						searchResults={searchResults.data}
 						limit={LIMIT}
