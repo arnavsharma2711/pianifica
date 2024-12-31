@@ -21,11 +21,14 @@ import {
   deleteTeam,
 } from "./controllers/team/controller";
 import {
+  bookmarkProject,
   createProject,
   deleteProject,
+  getBookmarkProjects,
   getProject,
   getProjects,
   getProjectTasks,
+  removeBookmarkProject,
   updateProject,
 } from "./controllers/project/controller";
 import {
@@ -45,9 +48,12 @@ import {
   updateTaskAssignee,
   updateTaskPriority,
   updateTaskStatus,
+  bookmarkTask,
+  removeBookmarkTask,
+  getBookmarkTasks,
 } from "./controllers/task/controller";
 import { loginUser, registerNewUser } from "./controllers/auth/controller";
-import { globalSearch, search } from "./controllers/search/controller";
+import { globalSearch } from "./controllers/search/controller";
 
 const router = Router();
 
@@ -89,7 +95,10 @@ router.delete(
 
 // Project routes
 router.get("/projects", authenticationMiddleware, getProjects);
+router.get("/projects/bookmark", authenticationMiddleware, getBookmarkProjects);
 router.get("/project/:id", authenticationMiddleware, getProject);
+router.get("/project/:id/bookmark", authenticationMiddleware, bookmarkProject);
+router.get("/project/:id/bookmark", authenticationMiddleware, removeBookmarkProject);
 router.get("/project/:id/tasks", authenticationMiddleware, getProjectTasks);
 router.post("/project", authenticationMiddleware, createProject);
 router.put("/project", authenticationMiddleware, updateProject);
@@ -97,10 +106,17 @@ router.delete("/project/:projectId", authenticationMiddleware, deleteProject);
 
 // Task routes
 router.get("/tasks", authenticationMiddleware, getTasks);
+router.get("/tasks/bookmark", authenticationMiddleware, getBookmarkTasks);
 router.get("/task/:id", authenticationMiddleware, getTask);
 router.post("/task", authenticationMiddleware, createTask);
 router.put("/task", authenticationMiddleware, updateTask);
 router.post("/task/:id/comment", authenticationMiddleware, addCommentToTask);
+router.post("/task/:id/bookmark", authenticationMiddleware, bookmarkTask);
+router.delete(
+  "/task/:id/bookmark",
+  authenticationMiddleware,
+  removeBookmarkTask
+);
 router.patch("/task/:id/status", authenticationMiddleware, updateTaskStatus);
 router.patch(
   "/task/:id/priority",

@@ -11,6 +11,11 @@ import { isAdmin } from "../../lib/utils";
 import { createProjectSchema, updateProjectSchema } from "./schema";
 import { filterSchema, projectSchema, taskSchema } from "../../lib/schema";
 import { getFilters } from "../../lib/filters";
+import {
+  createNewBookmark,
+  deleteExistingBookmark,
+  getUserExistingBookmarksByEntityType,
+} from "../../service/bookmark-service";
 
 // GET api/projects
 export const getProjects = controllerWrapper(async (req, res) => {
@@ -211,4 +216,94 @@ export const deleteProject = controllerWrapper(async (req, res) => {
   });
 
   res.success({ message: "Project deleted successfully." });
+});
+
+// POST api/project/:projectId/bookmark
+export const bookmarkProject = controllerWrapper(async (req, res) => {
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error:
+        "You are not authorized to bookmark project from the organization.",
+    });
+    return;
+  }
+
+  const { id } = req.params;
+  if (!id) {
+    res.invalid({
+      message: "Missing required parameter: id",
+      error: "Project id is required to bookmark the project.",
+    });
+    return;
+  }
+
+  const bookmark = await createNewBookmark({
+    userId: req.user?.id,
+    organizationId: req.user?.organizationId,
+    entityType: "Project",
+    entityId: Number(id),
+  });
+
+  res.success({
+    message: "Project bookmarked successfully.",
+    data: bookmark,
+  });
+});
+
+// GET api/project/bookmark
+export const getBookmarkProjects = controllerWrapper(async (req, res) => {
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to fetch bookmark from the organization.",
+    });
+    return;
+  }
+
+  const { limit, page } = req.query;
+
+  const bookmark = await getUserExistingBookmarksByEntityType({
+    userId: req.user?.id,
+    entityType: "Project",
+    limit: Number(limit) || undefined,
+    page: Number(page) || undefined,
+  });
+
+  const projectData = bookmark?.map((project) => projectSchema.parse(project));
+
+  res.success({
+    message: "Project bookmark fetched successfully.",
+    data: projectData,
+  });
+});
+
+// DELETE api/project/:projectId/bookmark
+export const removeBookmarkProject = controllerWrapper(async (req, res) => {
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to remove bookmark from the organization.",
+    });
+    return;
+  }
+
+  const { id } = req.params;
+  if (!id) {
+    res.invalid({
+      message: "Missing required parameter: id",
+      error: "Project id is required to bookmark the project.",
+    });
+    return;
+  }
+
+  await deleteExistingBookmark({
+    userId: req.user?.id,
+    entityType: "Project",
+    entityId: Number(id),
+  });
+
+  res.success({
+    message: "Project bookmark removed successfully.",
+  });
 });

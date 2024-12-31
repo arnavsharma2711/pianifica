@@ -19,9 +19,13 @@ import {
   userTaskSchema,
 } from "./schema";
 import { taskSchema } from "../../lib/schema";
-import type { Priority, Status } from "@prisma/client";
 import { getFilters } from "../../lib/filters";
 import { createNewComment } from "../../service/comment-service";
+import {
+  createNewBookmark,
+  deleteExistingBookmark,
+  getUserExistingBookmarksByEntityType,
+} from "../../service/bookmark-service";
 
 export const createTask = controllerWrapper(async (req, res) => {
   if (req.user?.organizationId === undefined) {
@@ -320,5 +324,93 @@ export const updateTaskAssignee = controllerWrapper(async (req, res) => {
   res.success({
     message: "Updated Task Status Successfully.",
     data: updatedTask,
+  });
+});
+
+export const getBookmarkTasks = controllerWrapper(async (req, res) => {
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to fetch bookmark from the organization.",
+    });
+    return;
+  }
+
+  const { limit, page } = req.query;
+
+  const bookmark = await getUserExistingBookmarksByEntityType({
+    userId: req.user?.id,
+    entityType: "Task",
+    limit: Number(limit) || undefined,
+    page: Number(page) || undefined,
+  });
+
+  const taskData = bookmark?.map((task) => taskSchema.parse(task));
+
+  res.success({
+    message: "Task bookmark fetched successfully.",
+    data: taskData,
+  });
+});
+
+// POST api/task/:taskId/bookmark
+export const bookmarkTask = controllerWrapper(async (req, res) => {
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to bookmark task from the organization.",
+    });
+    return;
+  }
+
+  const { id } = req.params;
+  if (!id) {
+    res.invalid({
+      message: "Missing required parameter: id",
+      error: "Task id is required to bookmark the task.",
+    });
+    return;
+  }
+
+  const bookmark = await createNewBookmark({
+    userId: req.user?.id,
+    organizationId: req.user?.organizationId,
+    entityType: "Task",
+    entityId: Number(id),
+  });
+
+  res.success({
+    message: "Task bookmarked successfully.",
+    data: bookmark,
+  });
+});
+
+// DELETE api/task/:taskId/bookmark
+export const removeBookmarkTask = controllerWrapper(async (req, res) => {
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to remove bookmark from the organization.",
+    });
+    return;
+  }
+
+  const { id } = req.params;
+  if (!id) {
+    res.invalid({
+      message: "Missing required parameter: id",
+      error: "Task id is required to bookmark the task.",
+    });
+    return;
+  }
+
+  await deleteExistingBookmark({
+    userId: req.user?.id,
+    entityType: "Task",
+    entityId: Number(id),
+  });
+
+  res.success({
+    message: "Task bookmark removed successfully.",
   });
 });

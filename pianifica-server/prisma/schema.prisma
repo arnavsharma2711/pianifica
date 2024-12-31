@@ -116,7 +116,6 @@ model Project {
   tasks        Task[]
   projectTeams ProjectTeam[]
   organization Organization  @relation(fields: [organizationId], references: [id])
-  bookmarks    Bookmark[]    @relation("BookmarkProject")
 }
 
 model ProjectTeam {
@@ -168,7 +167,6 @@ model Task {
   assignee    User?        @relation("TaskAssignee", fields: [assigneeId], references: [id])
   attachments Attachment[]
   comments    Comment[]
-  bookmarks   Bookmark[]   @relation("BookmarkTask")
   TagMapping  TagMapping[]
 }
 
@@ -207,9 +205,7 @@ model Bookmark {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now())
 
-  user    User     @relation(fields: [userId], references: [id])
-  task    Task?    @relation(fields: [entityId], references: [id], name: "BookmarkTask", map: "BookmarkTask_entityId_fkey")
-  project Project? @relation(fields: [entityId], references: [id], name: "BookmarkProject", map: "BookmarkProject_entityId_fkey")
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Tag {
