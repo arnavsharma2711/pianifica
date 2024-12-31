@@ -58,7 +58,6 @@ CREATE TABLE "UserTeam" (
     "userId" INTEGER NOT NULL,
     "teamId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "UserTeam_pkey" PRIMARY KEY ("userId","teamId")
 );
@@ -94,7 +93,6 @@ CREATE TABLE "ProjectTeam" (
     "teamId" INTEGER NOT NULL,
     "projectId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "ProjectTeam_pkey" PRIMARY KEY ("teamId","projectId")
 );
@@ -106,7 +104,6 @@ CREATE TABLE "Task" (
     "description" TEXT,
     "status" "Status",
     "priority" "Priority",
-    "tags" TEXT,
     "startDate" TIMESTAMP(3),
     "dueDate" TIMESTAMP(3),
     "points" INTEGER,
@@ -145,6 +142,36 @@ CREATE TABLE "Comment" (
     "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "Comment_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Bookmark" (
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "entityType" TEXT NOT NULL,
+    "entityId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Bookmark_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Tag" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Tag_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TagMapping" (
+    "tagId" INTEGER NOT NULL,
+    "taskId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "TagMapping_pkey" PRIMARY KEY ("tagId","taskId")
 );
 
 -- CreateIndex
@@ -215,3 +242,18 @@ ALTER TABLE "Comment" ADD CONSTRAINT "Comment_taskId_fkey" FOREIGN KEY ("taskId"
 
 -- AddForeignKey
 ALTER TABLE "Comment" ADD CONSTRAINT "Comment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Bookmark" ADD CONSTRAINT "Bookmark_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Bookmark" ADD CONSTRAINT "BookmarkTask_entityId_fkey" FOREIGN KEY ("entityId") REFERENCES "Task"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Bookmark" ADD CONSTRAINT "BookmarkProject_entityId_fkey" FOREIGN KEY ("entityId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TagMapping" ADD CONSTRAINT "TagMapping_tagId_fkey" FOREIGN KEY ("tagId") REFERENCES "Tag"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TagMapping" ADD CONSTRAINT "TagMapping_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "Task"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -1,4 +1,4 @@
-import { Priority, PrismaClient, Status } from "@prisma/client";
+import { type Priority, PrismaClient, type Status } from "@prisma/client";
 const prisma = new PrismaClient();
 import { faker } from "@faker-js/faker";
 import bcrypt from "bcrypt";
@@ -13,6 +13,9 @@ async function createData(model: any, data: object) {
 
 async function deleteAllData() {
   const modelNames = [
+    { name: "TagMapping", hasIdSequence: false },
+    { name: "Tag", hasIdSequence: true },
+    { name: "Bookmark", hasIdSequence: true },
     { name: "Comment", hasIdSequence: true },
     { name: "Attachment", hasIdSequence: true },
     { name: "Task", hasIdSequence: true },
@@ -51,6 +54,7 @@ async function main() {
   const orgUsers = await createUser();
   await createRole();
   const admins = await createUserRole();
+  await createTag();
   await createProject();
   await createTeam(admins);
   await createTask(admins, orgUsers);
@@ -67,6 +71,8 @@ const ProjectTeamModel: any = prisma["ProjectTeam" as keyof typeof prisma];
 const TaskModel: any = prisma["Task" as keyof typeof prisma];
 const AttachmentModel: any = prisma["Attachment" as keyof typeof prisma];
 const CommentModel: any = prisma["Comment" as keyof typeof prisma];
+const Tag: any = prisma["Tag" as keyof typeof prisma];
+const TagMapping: any = prisma["TagMapping" as keyof typeof prisma];
 
 async function createOrganization() {
   console.log("Creating organizations...");
@@ -203,6 +209,43 @@ async function createUserRole() {
   return admins;
 }
 
+async function createTag() {
+  console.log("Creating tags...");
+
+  const tags_array = [
+    "project-management",
+    "team-collaboration",
+    "task-tracking",
+    "workflow-automation",
+    "time-management",
+    "agile",
+    "kanban",
+    "calendar-integration",
+    "file-sharing",
+    "analytics",
+    "real-time-updates",
+    "role-based-access",
+    "user-invitations",
+    "workspace-management",
+    "custom-reports",
+    "status-badges",
+    "UI-components",
+    "database-migration",
+    "API-integration",
+    "performance-optimization",
+  ];
+
+  const tags = tags_array.map((tag) => ({
+    name: tag,
+  }));
+
+  for (const tag of tags) {
+    await createData(Tag, tag);
+  }
+
+  console.log("Tags created successfully!");
+}
+
 async function createProject() {
   console.log("Creating projects...");
 
@@ -304,6 +347,14 @@ async function createTask(
     "https://utfs.io/f/DTNeoJKzjEnag8cDkXazZFS7PKJ1xtG9n5iLY6H4cfdyEAX3",
   ];
 
+  const comments_array = [
+    "The issue seems to be caused by a misconfiguration in the environment. Investigating further.",
+    "Changes have been committed to the feature branch and are ready for QA testing.",
+    "The feature is deployed to staging. Please verify and provide feedback.",
+    "Pushed the updated changes based on the review comments. Let me know if there's anything else.",
+    "LGTM. Merging the changes to the main branch.",
+  ];
+
   console.log("Creating tasks, comments and attachments...");
 
   const projects = await ProjectModel.findMany();
@@ -320,7 +371,6 @@ async function createTask(
         priority: priority_array[
           Math.floor(Math.random() * priority_array.length)
         ] as Priority,
-        tags: "",
         points: Math.floor(Math.random() * 5),
         projectId: project.id,
         authorId: admins[project.organizationId],
@@ -333,9 +383,9 @@ async function createTask(
         const createdTask = await createData(TaskModel, task);
 
         const comments = Array.from(
-          { length: Math.floor(Math.random() * 4) },
-          () => ({
-            text: faker.lorem.sentence(),
+          { length: Math.floor(Math.random() * 6) },
+          (_, index) => ({
+            text: comments_array[index],
             taskId: createdTask.id,
             userId:
               orgUsers[project.organizationId][
@@ -361,6 +411,31 @@ async function createTask(
             fileName: faker.system.commonFileName("webp"),
           });
         }
+      }
+    }
+  }
+
+  console.log("Creating task tags...");
+
+  const tasks = await TaskModel.findMany();
+  for (const task of tasks) {
+    const tags = Array.from({ length: Math.floor(Math.random() * 4) }, () => ({
+      taskId: task.id,
+      tagId: Math.floor(Math.random() * 19) + 1,
+    }));
+
+    for (const tag of tags) {
+      const existingTag = await TagMapping.findUnique({
+        where: {
+          tagId_taskId: {
+            tagId: tag.tagId,
+            taskId: tag.taskId,
+          },
+        },
+      });
+
+      if (!existingTag) {
+        await createData(TagMapping, tag);
       }
     }
   }

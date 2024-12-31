@@ -36,6 +36,7 @@ model User {
   teamManagers  Team[]       @relation("TeamManager")
   teamLeads     Team[]       @relation("TeamLead")
   userTeam      UserTeam[]
+  Bookmark      Bookmark[]
 
   @@index([organizationId])
   @@index([username])
@@ -82,7 +83,6 @@ model UserTeam {
   userId    Int
   teamId    Int
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
   team Team @relation(fields: [teamId], references: [id])
@@ -116,16 +116,17 @@ model Project {
   tasks        Task[]
   projectTeams ProjectTeam[]
   organization Organization  @relation(fields: [organizationId], references: [id])
+  bookmarks    Bookmark[]    @relation("BookmarkProject")
 }
 
 model ProjectTeam {
   teamId    Int
   projectId Int
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
 
   team    Team    @relation(fields: [teamId], references: [id])
   project Project @relation(fields: [projectId], references: [id])
+
   @@id([teamId, projectId])
 }
 
@@ -152,7 +153,6 @@ model Task {
   description String?
   status      Status?
   priority    Priority?
-  tags        String?
   startDate   DateTime?
   dueDate     DateTime?
   points      Int?
@@ -168,6 +168,8 @@ model Task {
   assignee    User?        @relation("TaskAssignee", fields: [assigneeId], references: [id])
   attachments Attachment[]
   comments    Comment[]
+  bookmarks   Bookmark[]   @relation("BookmarkTask")
+  TagMapping  TagMapping[]
 }
 
 model Attachment {
@@ -195,4 +197,36 @@ model Comment {
 
   task Task @relation(fields: [taskId], references: [id])
   user User @relation(fields: [userId], references: [id])
+}
+
+model Bookmark {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  entityType String
+  entityId   Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+
+  user    User     @relation(fields: [userId], references: [id])
+  task    Task?    @relation(fields: [entityId], references: [id], name: "BookmarkTask", map: "BookmarkTask_entityId_fkey")
+  project Project? @relation(fields: [entityId], references: [id], name: "BookmarkProject", map: "BookmarkProject_entityId_fkey")
+}
+
+model Tag {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+
+  TagMapping TagMapping[]
+}
+
+model TagMapping {
+  tagId     Int
+  taskId    Int
+  createdAt DateTime @default(now())
+
+  tag  Tag  @relation(fields: [tagId], references: [id])
+  task Task @relation(fields: [taskId], references: [id])
+
+  @@id([tagId, taskId])
 }
