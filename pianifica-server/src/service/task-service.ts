@@ -5,12 +5,13 @@ import {
   deleteTask,
   getTaskById,
   getTaskByTitle,
-  getTasks,
+  getProjectTasks,
   getUserTasks,
   updateTask,
   updateTaskAssignee,
   updateTaskPriority,
   updateTaskStatus,
+  getTasks,
 } from "../model/task-model";
 import { getExistingUser } from "./user-service";
 import { getExistingProject } from "./project-service";
@@ -99,13 +100,25 @@ export const createNewTask = async ({
 };
 
 export const getExistingTasks = async ({
+  organizationId,
+  filters,
+}: {
+  organizationId: number;
+  filters: Filter;
+}) => {
+  const { tasks, totalCount } = await getTasks({ organizationId, filters });
+
+  return { tasks, totalCount };
+};
+
+export const getExistingProjectTasks = async ({
   projectId,
   organizationId,
 }: {
   projectId: number;
   organizationId: number;
 }) => {
-  const tasks = await getTasks({ projectId, organizationId });
+  const tasks = await getProjectTasks({ projectId, organizationId });
 
   const taskData = tasks.map((task) => ({
     ...task,
@@ -122,9 +135,9 @@ export const getExistingUserTasks = async ({
   userId: number;
   filters: Filter;
 }) => {
-  const tasks = await getUserTasks({ userId, filters });
+  const { tasks, totalCount } = await getUserTasks({ userId, filters });
 
-  return tasks;
+  return { tasks, totalCount };
 };
 
 export const getExistingTask = async ({

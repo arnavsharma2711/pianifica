@@ -6,7 +6,7 @@ import {
   getExistingProjects,
   updateExistingProject,
 } from "../../service/project-service";
-import { getExistingTasks } from "../../service/task-service";
+import { getExistingProjectTasks } from "../../service/task-service";
 import { isAdmin } from "../../lib/utils";
 import { createProjectSchema, updateProjectSchema } from "./schema";
 import { filterSchema, projectSchema, taskSchema } from "../../lib/schema";
@@ -89,7 +89,7 @@ export const getProjectTasks = controllerWrapper(async (req, res) => {
     return;
   }
 
-  const tasks = await getExistingTasks({
+  const tasks = await getExistingProjectTasks({
     projectId: Number(id),
     organizationId: req.user?.organizationId,
   });

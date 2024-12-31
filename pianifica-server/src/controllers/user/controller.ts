@@ -9,11 +9,14 @@ import { updateUserSchema } from "./schema";
 import {
   filterSchema,
   organizationSchema,
+  taskSchema,
   userInfoSchema,
 } from "../../lib/schema";
 import { isAdmin } from "../../lib/utils";
 import { getExistingOrganization } from "../../service/organization-service";
 import { getFilters } from "../../lib/filters";
+import { userTaskSchema } from "../task/schema";
+import { getExistingUserTasks } from "../../service/task-service";
 
 // GET api/users
 export const getUsers = controllerWrapper(async (req, res) => {
@@ -100,6 +103,31 @@ export const getUserOrganization = controllerWrapper(async (req, res) => {
   res.success({
     message: "Organization fetched successfully.",
     data: organizationData,
+  });
+});
+
+// GET api/user/tasks
+export const getUserTasks = controllerWrapper(async (req, res) => {
+  if (req.user?.id === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to fetch task.",
+    });
+    return;
+  }
+  const filters = userTaskSchema.parse(req.query);
+
+  const { tasks, totalCount } = await getExistingUserTasks({
+    userId: req.user?.id,
+    filters: getFilters(filters, "tasks"),
+  });
+
+  let taskData: object[] = [];
+  if (tasks.length > 0) taskData = tasks.map((task) => taskSchema.parse(task));
+  res.success({
+    message: "Tasks fetched successfully.",
+    data: taskData,
+    total_count: totalCount,
   });
 });
 

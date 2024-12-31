@@ -8,6 +8,7 @@ import {
   updateUser,
   deleteUser,
   getUserOrganization,
+  getUserTasks,
 } from "./controllers/user/controller";
 import {
   addTeamMember,
@@ -46,7 +47,7 @@ import {
   updateTaskStatus,
 } from "./controllers/task/controller";
 import { loginUser, registerNewUser } from "./controllers/auth/controller";
-import { search } from "./controllers/search/controller";
+import { globalSearch, search } from "./controllers/search/controller";
 
 const router = Router();
 
@@ -127,11 +128,12 @@ router.delete("/team/:id/member", authenticationMiddleware, removeTeamMember);
 router.get("/users", authenticationMiddleware, getUsers);
 router.get("/user", authenticationMiddleware, getCurrentUser);
 router.get("/user/organization", authenticationMiddleware, getUserOrganization);
+router.get("/user/tasks", authenticationMiddleware, getUserTasks);
 router.get("/user/:username", authenticationMiddleware, getUser);
 router.post("/user/:id", authenticationMiddleware, updateUser);
 router.delete("/user/:id", authenticationMiddleware, deleteUser);
 
 // Search routes
-router.use("/search", authenticationMiddleware, search);
+router.use("/search", authenticationMiddleware, globalSearch);
 
 export default router;

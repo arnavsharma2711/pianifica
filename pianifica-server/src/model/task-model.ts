@@ -44,7 +44,7 @@ export const createTask = async ({
   });
 };
 
-export const getTasks = async ({
+export const getProjectTasks = async ({
   projectId,
   organizationId,
 }: {
@@ -73,6 +73,66 @@ export const getTasks = async ({
   });
 };
 
+export const getTasks = async ({
+  organizationId,
+  filters,
+}: {
+  organizationId: number;
+  filters: Filter;
+}) => {
+  const whereClause: {
+    AND: {
+      deletedAt: null;
+      project: {
+        organizationId: number;
+        deletedAt: null;
+      };
+      title?: { contains: string; mode: "insensitive" };
+      priority?: Priority;
+      status?: Status;
+    };
+  } = {
+    AND: {
+      deletedAt: null,
+      project: {
+        organizationId,
+        deletedAt: null,
+      },
+    },
+  };
+
+  if (filters.search) {
+    whereClause.AND.title = { contains: filters.search, mode: "insensitive" };
+  }
+
+  if (filters.priority) {
+    whereClause.AND.priority = filters.priority as Priority;
+  }
+
+  if (filters.status) {
+    whereClause.AND.status = filters.status as Status;
+  }
+
+  const tasks = await prisma.task.findMany({
+    where: whereClause,
+    include: {
+      author: true,
+      assignee: true,
+    },
+    skip: (filters.page - 1) * filters.limit,
+    take: filters.limit,
+    orderBy: {
+      [filters.sortBy]: filters.order,
+    },
+  });
+
+  const totalCount = await prisma.task.count({
+    where: whereClause,
+  });
+
+  return { tasks, totalCount };
+};
+
 export const getUserTasks = async ({
   userId,
   filters,
@@ -84,10 +144,10 @@ export const getUserTasks = async ({
     AND: {
       deletedAt: null;
       OR: {
-        title?: { contains: string; mode: "insensitive" };
         assigneeId?: number;
         authorId?: number;
       }[];
+      title?: { contains: string; mode: "insensitive" };
       priority?: Priority;
       status?: Status;
     };
@@ -99,9 +159,7 @@ export const getUserTasks = async ({
   };
 
   if (filters.search) {
-    whereClause.AND.OR.push({
-      title: { contains: filters.search, mode: "insensitive" },
-    });
+    whereClause.AND.title = { contains: filters.search, mode: "insensitive" };
   }
 
   if (filters.priority) {

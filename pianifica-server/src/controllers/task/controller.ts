@@ -3,7 +3,7 @@ import {
   createNewTask,
   deleteExistingTask,
   getExistingTask,
-  getExistingUserTasks,
+  getExistingTasks,
   updateExistingTask,
   updateExistingTaskAssignedUser,
   updateExistingTaskPriority,
@@ -68,17 +68,17 @@ export const createTask = controllerWrapper(async (req, res) => {
 });
 
 export const getTasks = controllerWrapper(async (req, res) => {
-  if (req.user?.id === undefined) {
+  if (req.user?.organizationId === undefined) {
     res.unauthorized({
       message: "Unauthorized access",
-      error: "You are not authorized to fetch task.",
+      error: "You are not authorized to update task for the project.",
     });
     return;
   }
   const filters = userTaskSchema.parse(req.query);
 
-  const { tasks, totalCount } = await getExistingUserTasks({
-    userId: req.user?.id,
+  const { tasks, totalCount } = await getExistingTasks({
+    organizationId: req.user?.organizationId,
     filters: getFilters(filters, "tasks"),
   });
 
