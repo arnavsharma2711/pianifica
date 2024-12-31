@@ -26,11 +26,13 @@ const Table = ({
 	}
 }) => {
 	return (
-		<div className="relative border-2 dark:border-zinc-800 overflow-x-auto shadow-md sm:rounded-lg">
-			<table className={`w-full ${showPagination && "border-b-2 dark:border-zinc-800"} text-md text-left rtl:text-right`}>
-				{children}
-			</table>
-			{showPagination && <div className="flex flex-row items-center justify-end gap-10 whitespace-nowrap lg:text-lg border-b dark:border-zinc-800 bg-gray-100 dark:bg-dark-secondary">
+		<div className="shadow-md rounded-lg overflow-hidden">
+			<div className="relative border-2 border-b-0 dark:border-zinc-800 overflow-x-auto  sm:rounded-t-lg">
+				<table className={`w-full ${showPagination && "border-b-0 dark:border-zinc-800"} text-md text-left rtl:text-right`}>
+					{children}
+				</table>
+			</div>
+			{showPagination && <div className="flex flex-row items-center justify-end rounded-b-lg border-2 dark:border-zinc-800 gap-10 whitespace-nowrap lg:text-lg overflow-hidden bg-gray-100 dark:bg-dark-secondary ">
 				<div className="flex items-center justify-center gap-10 p-4">
 					<div className="relative flex items-center space-x-2 border overflow-hidden rounded-lg ">
 						<select
@@ -81,7 +83,8 @@ const Table = ({
 					</div>
 				</div>
 				{isEmpty && <EmptyTable str={emptyStr} />}
-			</div>}
+			</div>
+			}
 		</div>
 	);
 };

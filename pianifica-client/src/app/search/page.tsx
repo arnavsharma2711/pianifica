@@ -12,7 +12,7 @@ import type { Project, Task, Team, User } from "@/interface";
 import { useRouter, useSearchParams } from "next/navigation";
 import TeamCard from "@/components/Cards/TeamCard";
 
-const LIMIT = 10
+const LIMIT = 10;
 
 const SearchBar = ({ defaultValue, setValue, type }: { setValue: (q: string, type: string) => void, type: string; defaultValue: string }) => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -169,27 +169,48 @@ const Search = () => {
 	const searchParams = useSearchParams();
 	const { replace } = useRouter();
 
-	let queryHook;
-	switch (searchParams.get('type')?.toString()) {
-		case "task":
-			queryHook = useGetTasksQuery;
-			break;
-		case "project":
-			queryHook = useGetProjectsQuery;
-			break;
-		case "user":
-			queryHook = useGetUsersQuery;
-			break;
-		case "team":
-			queryHook = useGetTeamsQuery;
-			break;
-	}
+	const search = searchParams.get('search')?.toString() || "";
+	const type = searchParams.get('type')?.toString() || "task";
+	const page = Number(searchParams.get('page')) || 1;
 
-	const { data: searchResults, isLoading, isError } = queryHook ? queryHook({
-		search: searchParams.get('search')?.toString(),
+	const { data: taskResults, isLoading: isLoadingTasks, isError: isErrorTasks } = useGetTasksQuery({
+		search,
 		limit: LIMIT,
-		page: Number(searchParams.get('page')) || 1,
-	}) : { data: null, isLoading: false, isError: false };
+		page,
+	}, { skip: type !== "task" });
+
+	const { data: projectResults, isLoading: isLoadingProjects, isError: isErrorProjects } = useGetProjectsQuery({
+		search,
+		limit: LIMIT,
+		page,
+	}, { skip: type !== "project" });
+
+	const { data: userResults, isLoading: isLoadingUsers, isError: isErrorUsers } = useGetUsersQuery({
+		search,
+		limit: LIMIT,
+		page,
+	}, { skip: type !== "user" });
+
+	const { data: teamResults, isLoading: isLoadingTeams, isError: isErrorTeams } = useGetTeamsQuery({
+		search,
+		limit: LIMIT,
+		page,
+	}, { skip: type !== "team" });
+
+	const searchResults = type === "task" ? taskResults :
+		type === "project" ? projectResults :
+			type === "user" ? userResults :
+				type === "team" ? teamResults : null;
+
+	const isLoading = type === "task" ? isLoadingTasks :
+		type === "project" ? isLoadingProjects :
+			type === "user" ? isLoadingUsers :
+				type === "team" ? isLoadingTeams : false;
+
+	const isError = type === "task" ? isErrorTasks :
+		type === "project" ? isErrorProjects :
+			type === "user" ? isErrorUsers :
+				type === "team" ? isErrorTeams : false;
 
 	const handleSearch = debounce((q: string, type: string, page = 1) => {
 		const params = new URLSearchParams(searchParams);
@@ -224,7 +245,7 @@ const Search = () => {
 	return (
 		<div className="p-8">
 			<Header name="Search" />
-			<SearchBar setValue={handleSearch} type={searchParams.get('type')?.toString() || "task"} defaultValue={searchParams.get('search')?.toString() || ""} />
+			<SearchBar setValue={handleSearch} type={type} defaultValue={search} />
 			<div className="p-5">
 				{isLoading && <p>Loading...</p>}
 				{isError && <p>Error occurred while fetching search results.</p>}
@@ -232,10 +253,10 @@ const Search = () => {
 					<SearchResults
 						searchResults={searchResults.data}
 						limit={LIMIT}
-						page={Number(searchParams.get('page')) || 1}
+						page={page}
 						setPage={handleSearchPage}
 						total_count={searchResults.total_count || 0}
-						type={searchParams.get('type')?.toString() || "task"}
+						type={type}
 					/>
 				)}
 			</div>
