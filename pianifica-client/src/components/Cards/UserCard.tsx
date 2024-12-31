@@ -13,7 +13,7 @@ const UserCard = ({ user, size = "sm", tag = null }: Props) => {
 	const textSize = size === "sm" ? "text-sm" : "text-md";
 
 	return (
-		<Link href={`/user/${user.username}`} className={`flex flex-row w-max items-center gap-2 ${textSize}`}>
+		<Link href={`/user/${user.username}`} className={`flex flex-row w-max items-center gap-2 ${textSize} ${size === "md" ? "p-2 m-2 w-full border dark:border-zinc-400 " : ""}`}>
 			<div className={"size-9"}>
 				<Image
 					src={
@@ -28,7 +28,7 @@ const UserCard = ({ user, size = "sm", tag = null }: Props) => {
 			</div>
 			<div className="flex flex-col">
 				<div className="flex flex-row items-center gap-1">
-					<span>
+					<span className={`${size === "md" ? "font-bold" : ""}`}>
 						{user.firstName} {user.lastName}
 					</span>
 					<span>

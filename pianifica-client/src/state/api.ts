@@ -202,7 +202,7 @@ export const api = createApi({
         if (status) params.append("status", status.toUpperCase());
 
         return {
-          url: `tasks?${params.toString()}`,
+          url: `user/tasks?${params.toString()}`,
           headers: {
             "Content-Type": "application/json",
             Authorization: sessionStorage.getItem("accessToken") || undefined,
@@ -210,6 +210,38 @@ export const api = createApi({
         };
       },
       providesTags: ["UserTasks"],
+    }),
+    getTasks: build.query<
+      ApiResponse<Task[]>,
+      {
+        search?: string;
+        page?: number;
+        limit?: number;
+        sortBy?: string;
+        order?: string;
+        priority?: Priority;
+        status?: Status;
+      }
+    >({
+      query: ({ search, page, limit, sortBy, order, priority, status }) => {
+        const params = new URLSearchParams();
+        if (search) params.append("search", search);
+        if (page) params.append("page", page.toString());
+        if (limit) params.append("limit", limit.toString());
+        if (sortBy) params.append("sortBy", sortBy);
+        if (order) params.append("order", order);
+        if (priority) params.append("priority", priority.toUpperCase());
+        if (status) params.append("status", status.toUpperCase());
+
+        return {
+          url: `tasks?${params.toString()}`,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: sessionStorage.getItem("accessToken") || undefined,
+          },
+        };
+      },
+      providesTags: ["Tasks"],
     }),
     getTask: build.query<ApiResponse<Task>, { taskId: number }>({
       query: ({ taskId }) => ({
@@ -425,14 +457,26 @@ export const api = createApi({
       }),
       invalidatesTags: ["Teams", "Team"],
     }),
-    searchTaskProjectUser: build.query<ApiResponse<Search>, string>({
-      query: (query) => ({
-        url: `search?q=${query}`,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: sessionStorage.getItem("accessToken") || undefined,
-        },
-      }),
+    globalSearch: build.query<
+      ApiResponse<Search>,
+      { search?: string; limit?: number; page?: number }
+    >({
+      query: ({ search, limit = 2, page = 1 }) => {
+        const params = new URLSearchParams();
+        if (search) params.append("search", search);
+        if (page) params.append("page", page.toString());
+        if (limit) params.append("limit", limit.toString());
+
+        return {
+          url: `search?${params.toString()}`,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: sessionStorage.getItem("accessToken")
+              ? `Bearer ${sessionStorage.getItem("accessToken")}`
+              : undefined,
+          },
+        };
+      },
     }),
   }),
 });
@@ -449,6 +493,7 @@ export const {
   useGetProjectTasksQuery,
   useGetUserTasksQuery,
   useGetTaskQuery,
+  useGetTasksQuery,
   useCreateTaskMutation,
   useEditTaskMutation,
   useUpdateTaskStatusMutation,
@@ -461,5 +506,5 @@ export const {
   useGetTeamMemberQuery,
   useAddTeamMemberMutation,
   useRemoveTeamMemberMutation,
-  useSearchTaskProjectUserQuery,
+  useGlobalSearchQuery,
 } = api;

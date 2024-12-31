@@ -68,7 +68,14 @@ export interface Task {
 }
 
 export interface Search {
-  tasks?: Task[];
-  projects?: Project[];
-  users?: User[];
+  tasks: Task[];
+  projects: Project[];
+  teams: Team[];
+  users: User[];
+  total_count: {
+    task: number;
+    project: number;
+    team: number;
+    user: number;
+  };
 }

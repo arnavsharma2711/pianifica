@@ -3,15 +3,23 @@ import React from "react";
 
 type Props = {
 	project: Project;
+	size?: "sm" | "md";
 };
 
-const ProjectCard = ({ project }: Props) => {
+const ProjectCard = ({ project, size = "md" }: Props) => {
 	return (
-		<div className="rounded border p-4 shadow">
-			<h3>{project.name}</h3>
-			<p>{project.description}</p>
-			<p>Start Date: {project.startDate}</p>
-			<p>End Date: {project.endDate}</p>
+		<div className="">
+			<h3 className="font-bold">{project.name}</h3>
+			<p className="ml-2">{project.description}</p>
+			{
+				size === "md" && (
+					<>
+						<p>Start Date: {project.startDate}</p>
+						<p>End Date: {project.endDate}</p>
+					</>
+				)
+			}
+
 		</div>
 	);
 };
