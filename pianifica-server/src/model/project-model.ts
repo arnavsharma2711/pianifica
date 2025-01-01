@@ -1,3 +1,4 @@
+import type { Project } from "@prisma/client";
 import type { Filter } from "../lib/filters";
 import prisma from "../utils/prisma";
 
@@ -67,10 +68,12 @@ export const getProjectById = async ({
   id,
   organizationId,
   withProjectTeams = false,
+  getBookmarks = false,
 }: {
   id: number;
   organizationId: number;
   withProjectTeams?: boolean;
+  getBookmarks?: boolean;
 }) => {
   const project = await prisma.project.findFirst({
     where: {
@@ -80,6 +83,19 @@ export const getProjectById = async ({
       projectTeams: withProjectTeams,
     },
   });
+
+  if (getBookmarks && project) {
+    const bookmarkExists = await prisma.bookmark.findFirst({
+      where: {
+        entityType: "Project",
+        entityId: id,
+      },
+    });
+
+    return { ...project, bookmarked: !!bookmarkExists } as Project & {
+      bookmarked: boolean;
+    };
+  }
 
   return project;
 };

@@ -1,4 +1,4 @@
-import type { Priority, Status } from "@prisma/client";
+import type { Priority, Status, Task } from "@prisma/client";
 import prisma from "../utils/prisma";
 import type { Filter } from "../lib/filters";
 
@@ -10,7 +10,6 @@ export const createTask = async ({
   assigneeId,
   status = "TODO",
   priority = "BACKLOG",
-  tags = null,
   startDate = null,
   dueDate = null,
   points = null,
@@ -22,7 +21,6 @@ export const createTask = async ({
   assigneeId?: number;
   status?: Status;
   priority?: Priority;
-  tags?: string | null;
   startDate?: Date | null;
   dueDate?: Date | null;
   points?: number | null;
@@ -36,7 +34,6 @@ export const createTask = async ({
       assigneeId,
       status,
       priority,
-      tags,
       startDate,
       dueDate,
       points,
@@ -196,12 +193,14 @@ export const getTaskById = async ({
   withUserData = false,
   withAttachments = false,
   withComments = false,
+  withBookmarks = false,
 }: {
   id: number;
   organizationId: number;
   withUserData?: boolean;
   withAttachments?: boolean;
   withComments?: boolean;
+  withBookmarks?: boolean;
 }) => {
   const task = await prisma.task.findFirst({
     where: {
@@ -229,6 +228,19 @@ export const getTaskById = async ({
         : false,
     },
   });
+
+  if (withBookmarks && task) {
+    const bookmarkExists = await prisma.bookmark.findFirst({
+      where: {
+        entityType: "Task",
+        entityId: id,
+      },
+    });
+
+    return { ...task, bookmarked: !!bookmarkExists } as Task & {
+      bookmarked: boolean;
+    };
+  }
 
   return task;
 };
@@ -264,7 +276,6 @@ export const updateTask = async ({
   assigneeId = null,
   status = "TODO",
   priority = "BACKLOG",
-  tags = null,
   startDate = null,
   dueDate = null,
   points = null,
@@ -275,7 +286,6 @@ export const updateTask = async ({
   assigneeId?: number | null;
   status?: Status;
   priority?: Priority;
-  tags?: string | null;
   startDate?: Date | null;
   dueDate?: Date | null;
   points?: number | null;
@@ -290,7 +300,6 @@ export const updateTask = async ({
       assigneeId,
       status,
       priority,
-      tags,
       startDate,
       dueDate,
       points,

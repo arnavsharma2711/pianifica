@@ -16,7 +16,6 @@ import {
 import { getExistingUser } from "./user-service";
 import { getExistingProject } from "./project-service";
 import type { Filter } from "../lib/filters";
-import { createComment } from "../model/comment-model";
 
 export const createNewTask = async ({
   title,
@@ -27,7 +26,6 @@ export const createNewTask = async ({
   assigneeId,
   status = "TODO",
   priority = "BACKLOG",
-  tags = null,
   startDate = null,
   dueDate = null,
   points = null,
@@ -40,7 +38,6 @@ export const createNewTask = async ({
   assigneeId?: number;
   status?: Status;
   priority?: Priority;
-  tags?: string | null;
   startDate?: Date | null;
   dueDate?: Date | null;
   points?: number | null;
@@ -90,7 +87,6 @@ export const createNewTask = async ({
     assigneeId,
     status,
     priority,
-    tags,
     startDate,
     dueDate,
     points,
@@ -147,6 +143,7 @@ export const getExistingTask = async ({
   withUserData = false,
   withAttachments = false,
   withComments = false,
+  withBookmarks = false,
 }: {
   id?: number;
   title?: string;
@@ -154,6 +151,7 @@ export const getExistingTask = async ({
   withUserData?: boolean;
   withAttachments?: boolean;
   withComments?: boolean;
+  withBookmarks?: boolean;
 }) => {
   let task = null;
   if (id)
@@ -163,6 +161,7 @@ export const getExistingTask = async ({
       withUserData,
       withAttachments,
       withComments,
+      withBookmarks,
     });
   else if (title) task = await getTaskByTitle({ title, organizationId });
 
@@ -177,7 +176,6 @@ export const updateExistingTask = async ({
   assigneeId = null,
   status = "TODO",
   priority = "BACKLOG",
-  tags = null,
   startDate = null,
   dueDate = null,
   points = null,
@@ -189,7 +187,6 @@ export const updateExistingTask = async ({
   assigneeId?: number | null;
   status?: Status;
   priority?: Priority;
-  tags?: string | null;
   startDate?: Date | null;
   dueDate?: Date | null;
   points?: number | null;
@@ -225,7 +222,6 @@ export const updateExistingTask = async ({
     assigneeId,
     status,
     priority,
-    tags,
     startDate,
     dueDate,
     points,

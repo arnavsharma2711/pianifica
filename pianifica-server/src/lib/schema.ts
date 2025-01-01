@@ -108,6 +108,7 @@ export const projectSchema = z.object({
       invalid_type_error: "End date must be a date",
     })
     .optional(),
+  bookmarked: z.boolean().optional(),
 });
 
 export const attachmentSchema = z.object({
@@ -196,6 +197,7 @@ export const taskSchema = z.object({
     .optional(),
   comments_count: z.number().optional(),
   comments: z.union([commentSchema, z.array(commentSchema)]).optional(),
+  bookmarked: z.boolean().optional(),
 });
 
 export const filterSchema = z.object({

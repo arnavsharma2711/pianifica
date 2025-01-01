@@ -60,6 +60,7 @@ export const getProject = controllerWrapper(async (req, res) => {
   const project = await getExistingProject({
     id: Number(id),
     organizationId: req.user?.organizationId,
+    getBookmarks: true,
   });
   if (!project) {
     res.invalid({

@@ -97,8 +97,8 @@ router.delete(
 router.get("/projects", authenticationMiddleware, getProjects);
 router.get("/projects/bookmark", authenticationMiddleware, getBookmarkProjects);
 router.get("/project/:id", authenticationMiddleware, getProject);
-router.get("/project/:id/bookmark", authenticationMiddleware, bookmarkProject);
-router.get("/project/:id/bookmark", authenticationMiddleware, removeBookmarkProject);
+router.post("/project/:id/bookmark", authenticationMiddleware, bookmarkProject);
+router.delete("/project/:id/bookmark", authenticationMiddleware, removeBookmarkProject);
 router.get("/project/:id/tasks", authenticationMiddleware, getProjectTasks);
 router.post("/project", authenticationMiddleware, createProject);
 router.put("/project", authenticationMiddleware, updateProject);

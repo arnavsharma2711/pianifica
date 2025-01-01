@@ -9,11 +9,7 @@ interface Payload {
   data?: object | unknown[] | null;
 }
 
-const responseMiddleware = (
-  _req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export default (_req: Request, res: Response, next: NextFunction) => {
   res.invalid = ({
     status = 400,
     message = "Invalid Parameters",
@@ -64,5 +60,3 @@ const responseMiddleware = (
 
   next();
 };
-
-export default responseMiddleware;

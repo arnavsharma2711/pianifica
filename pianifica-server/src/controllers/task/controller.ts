@@ -41,7 +41,6 @@ export const createTask = controllerWrapper(async (req, res) => {
     description,
     status,
     priority,
-    tags,
     startDate,
     dueDate,
     points,
@@ -55,7 +54,6 @@ export const createTask = controllerWrapper(async (req, res) => {
     description,
     status,
     priority,
-    tags,
     startDate: startDate ? new Date(startDate) : null,
     dueDate: dueDate ? new Date(dueDate) : null,
     points,
@@ -119,6 +117,7 @@ export const getTask = controllerWrapper(async (req, res) => {
     withUserData: true,
     withAttachments: true,
     withComments: true,
+    withBookmarks: true,
   });
   if (!task) {
     res.invalid({
@@ -150,7 +149,6 @@ export const updateTask = controllerWrapper(async (req, res) => {
     description,
     status,
     priority,
-    tags,
     startDate,
     dueDate,
     points,
@@ -164,7 +162,6 @@ export const updateTask = controllerWrapper(async (req, res) => {
     description,
     status,
     priority,
-    tags,
     startDate: startDate ? new Date(startDate) : null,
     dueDate: dueDate ? new Date(dueDate) : null,
     points,

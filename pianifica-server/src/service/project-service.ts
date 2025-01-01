@@ -68,14 +68,16 @@ export const getExistingProject = async ({
   id,
   name,
   organizationId,
+  getBookmarks = false,
 }: {
   id?: number;
   name?: string;
   organizationId: number;
+  getBookmarks?: boolean;
 }) => {
   let project = null;
   if (id) {
-    project = await getProjectById({ id, organizationId });
+    project = await getProjectById({ id, organizationId, getBookmarks });
   } else if (name) project = await getProjectByName({ name, organizationId });
 
   return project;
