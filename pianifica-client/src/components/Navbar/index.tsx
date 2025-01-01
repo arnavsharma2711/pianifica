@@ -101,7 +101,7 @@ const Navbar = () => {
 					searchTerm.length < 3 ? <div className="absolute top-full left-0 w-full bg-white dark:bg-zinc-800 shadow-md rounded-b-lg">
 
 					</div> :
-						<div className="absolute top-full mt-2 left-0 w-full bg-white dark:bg-zinc-800 shadow-md rounded-lg" onClick={() => setSearchTerm("")} onKeyUp={(e) => e.key === 'Enter' && setSearchTerm("")}>
+						<div className="absolute top-full mt-2 border dark:border-zinc-700 left-0 w-full bg-white dark:bg-zinc-800 shadow-md rounded-lg" onClick={() => setSearchTerm("")} onKeyUp={(e) => e.key === 'Enter' && setSearchTerm("")}>
 							{isLoading && <p>Loading...</p>}
 							{isError && <p>Error fetching search results</p>}
 							{

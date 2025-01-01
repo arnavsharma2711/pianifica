@@ -104,9 +104,9 @@ const TaskCard = ({ task, size = "lg" }: Props) => {
       {
         size === "md" &&
         (
-          <Link href={`/task/${task.id}`} className={"flex flex-col w-96 p-4 bg-gray-200 dark:bg-dark-secondary rounded-md items-start gap-4"}>
-            <div className="w-full flex items-center justify-between">
-              <div>
+          <Link href={`/task/${task.id}`} className={"flex flex-col w-96 p-4 bg-white dark:bg-dark-secondary border dark:border-zinc-800 rounded-md items-start gap-4"}>
+            <div className="w-full h-10 flex items-center justify-between">
+              <div className="font-bold">
                 {task.title}
               </div>
               <StatusTag status={task.status || Status.TODO} />

@@ -18,6 +18,12 @@ const SearchBar = ({ defaultValue, setValue, type }: { setValue: (q: string, typ
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedType, setSelectedType] = useState(type);
 	const [inputValue, setInputValue] = useState(defaultValue);
+
+	useEffect(() => {
+		setSelectedType(type);
+		setInputValue(defaultValue);
+	}, [type, defaultValue]);
+
 	const optionsMap: {
 		[key: string]: string;
 	} = {
