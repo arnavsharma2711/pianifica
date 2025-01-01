@@ -4,7 +4,7 @@ import Breadcrumb from '@/components/Breadcrumb';
 import ProjectCard from '@/components/Cards/ProjectCard';
 import TaskCard from '@/components/Cards/TaskCard';
 import { useGetBookmarkedProjectsQuery, useGetBookmarkedTasksQuery } from '@/state/api';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const BookmarkPage = () => {
   const [selectedOption, setSelectedOption] = useState<'Tasks' | 'Projects'>('Tasks');
@@ -15,6 +15,10 @@ const BookmarkPage = () => {
 
   const { data: taskList, isLoading: taskLoading } = useGetBookmarkedTasksQuery();
   const { data: projectList, isLoading: projectLoading } = useGetBookmarkedProjectsQuery();
+
+  useEffect(() => {
+    document.title = "My Bookmarks - Pianifica";
+  }, []);
 
   return (
     <>

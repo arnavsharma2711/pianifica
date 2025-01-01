@@ -7,7 +7,7 @@ import { DataTable } from "@/components/DataTable";
 import type { User } from "@/interface";
 import DropdownMenu from "@/components/DropdownMenu";
 import UserModal from "@/components/Modal/UserModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ConfirmationModal from "@/components/Modal/ConfirmationModel";
 import UserCard from "@/components/Cards/UserCard";
 import Loading from "@/components/Loading";
@@ -34,6 +34,10 @@ const Users = () => {
 		}
 		setIsUserModalOpen(true);
 	};
+
+	useEffect(() => {
+		document.title = "Users - Pianifica";
+	}, []);
 
 	if (isLoading) return <Loading />;
 	if (isError || !users?.success) return <ErrorComponent message="An error occurred while fetching users" />;

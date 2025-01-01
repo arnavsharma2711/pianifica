@@ -261,21 +261,28 @@ const BoardView = ({ id, handleTaskModel }: BoardViewProps) => {
 					isSmallText
 				/>
 			</div>
-			<DndProvider backend={HTML5Backend}>
-				<div className="overflow-x-auto">
-					<div className="grid grid-cols-6 gap-4 min-w-max">
-						{TASK_STATUS.map((status) => (
-							<TaskColumn
-								key={status}
-								status={status}
-								tasks={tasks?.data || []}
-								moveTask={moveTask}
-								handleTaskModel={handleTaskModel}
-							/>
-						))}
-					</div>
+			{tasks?.data?.length === 0 ? (
+				<div className="text-center mt-5">
+					No Task Assigned to the project
 				</div>
-			</DndProvider>
+			) : (
+				<DndProvider backend={HTML5Backend}>
+					<div className="overflow-x-auto">
+						<div className="grid grid-cols-6 gap-4 min-w-max">
+							{TASK_STATUS.map((status) => (
+								<TaskColumn
+									key={status}
+									status={status}
+									tasks={tasks?.data || []}
+									moveTask={moveTask}
+									handleTaskModel={handleTaskModel}
+								/>
+							))}
+						</div>
+					</div>
+				</DndProvider>
+			)}
+
 		</div>
 	);
 };

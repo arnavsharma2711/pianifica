@@ -9,7 +9,7 @@ import { useGetProjectsQuery } from "@/state/api";
 import { type DisplayOption, Gantt, ViewMode } from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
 import type React from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type TaskTypeItems = "task" | "milestone" | "project";
 
@@ -44,6 +44,9 @@ const Timeline = () => {
 			viewMode: event.target.value as ViewMode,
 		}));
 	};
+	useEffect(() => {
+		document.title = "Project Timeline - Pianifica";
+	}, []);
 
 	if (isLoading) return <Loading />;
 	if (error || !projects)

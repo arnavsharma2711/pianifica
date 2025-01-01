@@ -5,7 +5,7 @@ import type { User } from '@/interface';
 type Props = {
 	user: User
 	size?: "sm" | "md" | "lg";
-	tag?: string;
+	tag?: React.ReactNode;
 };
 
 const UserCard = ({ user, size = "sm", tag }: Props) => {

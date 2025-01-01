@@ -48,7 +48,9 @@ const Team = ({ params }: Props) => {
       setTeamList(list);
     }
   }, [team]);
-
+  useEffect(() => {
+    document.title = `${team?.data?.name} - Pianifica` || "Task - Pianifica";
+  }, [team]);
   if (isLoading) return <Loading />;
   if (isError || !team?.success) return <ErrorComponent message="An error occurred while fetching users" />;
 

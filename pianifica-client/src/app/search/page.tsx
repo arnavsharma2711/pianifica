@@ -170,13 +170,17 @@ const SearchResults = ({ searchResults,
 		</>
 	)
 };
+const allowedTypes = new Set(["team", "user", "project", "task"]);
 
 const Search = () => {
 	const searchParams = useSearchParams();
 	const { replace } = useRouter();
 
 	const search = searchParams.get('search')?.toString() || "";
-	const type = searchParams.get('type')?.toString() || "task";
+	const type = allowedTypes.has(searchParams.get("type")?.toString() || "")
+		? searchParams.get("type")?.toString() || "task"
+		: "task";
+
 	const page = Number(searchParams.get('page')) || 1;
 
 	const { data: taskResults, isLoading: isLoadingTasks, isError: isErrorTasks } = useGetTasksQuery({
@@ -247,6 +251,9 @@ const Search = () => {
 	useEffect(() => {
 		return handleSearch.cancel;
 	}, [handleSearch]);
+	useEffect(() => {
+		document.title = "Search - Pianifica";
+	}, []);
 
 	return (
 		<div className="p-8">

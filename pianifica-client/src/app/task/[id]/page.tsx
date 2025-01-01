@@ -14,6 +14,7 @@ import Header from "@/components/Header";
 import Link from "next/link";
 import UserCard from "@/components/Cards/UserCard";
 import NewTaskModal from "@/components/Modal/NewTaskModal";
+import ErrorComponent from "@/components/Error";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -123,7 +124,7 @@ const TaskPage = ({ params }: Props) => {
   const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
 
 
-  const { data: task, isLoading } = useGetTaskQuery({ taskId: id ? Number(id) : 0 }, { skip: id === null });
+  const { data: task, isLoading, isError } = useGetTaskQuery({ taskId: id ? Number(id) : 0 }, { skip: id === null });
   const [addBookmark, { isLoading: addingBookmark }] = useAddBookmarkTaskMutation();
   const [removeBookmark, { isLoading: removingBookmark }] = useRemoveBookmarkTaskMutation();
 
@@ -140,9 +141,21 @@ const TaskPage = ({ params }: Props) => {
       setId(resolvedParams.id);
     });
   }, [params]);
+  useEffect(() => {
+    document.title = `${task?.data?.title} - Pianifica` || "Task - Pianifica";
+  }, [task]);
 
   if (!id || isLoading) {
     return <Loading />;
+  }
+  if (isError) {
+    return <ErrorComponent message={`Task with id ${id} not found`} breadcrumbLinks={[
+      {
+        value: "Projects",
+        link: '/projects',
+      },
+      { value: "Tasks", link: "/tasks", disable: true },
+    ]} />;
   }
   return (
     <>

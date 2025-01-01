@@ -1,6 +1,7 @@
 'use client';
 
 import Breadcrumb from "@/components/Breadcrumb";
+import ErrorComponent from "@/components/Error";
 import Header from "@/components/Header";
 import Loading from "@/components/Loading";
 import { useGetCurrentUserQuery, useGetUserQuery } from "@/state/api";
@@ -14,7 +15,7 @@ type Props = {
 const UserPage = ({ params }: Props) => {
   const [username, setUsername] = useState<string>("");
 
-  const { data: user, isLoading } = useGetUserQuery({ username }, { skip: username === "" });
+  const { data: user, isLoading, isError } = useGetUserQuery({ username }, { skip: username === "" });
   const { data: currentUser } = useGetCurrentUserQuery();
 
   useEffect(() => {
@@ -22,11 +23,21 @@ const UserPage = ({ params }: Props) => {
       setUsername(resolvedParams.username);
     });
   }, [params]);
+  useEffect(() => {
+    document.title = `${user?.data?.firstName} ${user?.data?.lastName} - Pianifica` || "Task - Pianifica";
+  }, [user]);
 
   if (!username || isLoading) {
     return <Loading />;
   }
-
+  if (isError) {
+    return <ErrorComponent message={`User with username ${username} not found`} breadcrumbLinks={[
+      {
+        value: "Users",
+        link: '/users',
+      },
+    ]} />;
+  }
   return (
     <>
       <Breadcrumb

@@ -1,6 +1,6 @@
 "use client";
 import { useGetCurrentUserQuery, useGetTeamsQuery, useRemoveTeamMutation } from "@/state/api";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import { DataTable } from "@/components/DataTable";
 import type { Team } from "@/interface";
@@ -37,6 +37,9 @@ const Teams = () => {
 			toast.success("User removed from team successfully");
 		}
 	}
+	useEffect(() => {
+		document.title = "Teams - Pianifica";
+	}, []);
 
 	if (isLoading) return <Loading />;
 	if (isError || !teams?.success)

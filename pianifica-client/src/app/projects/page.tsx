@@ -10,7 +10,7 @@ import type { Project } from "@/interface";
 import { useGetCurrentUserQuery, useGetProjectsQuery } from "@/state/api";
 import { PlusSquare } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Projects = () => {
 	const [page, setPage] = useState(1);
@@ -19,6 +19,10 @@ const Projects = () => {
 
 	const { data: projects, error, isLoading } = useGetProjectsQuery({});
 	const { data: currentUser } = useGetCurrentUserQuery();
+
+	useEffect(() => {
+		document.title = "Projects - Pianifica";
+	}, []);
 
 	if (isLoading) return <Loading />;
 	if (error || !projects)

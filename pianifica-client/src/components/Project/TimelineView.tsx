@@ -58,7 +58,7 @@ const Timeline = ({ id, handleTaskModel }: Props) => {
 
 	return (
 		<div className="px-4 xl:px-6">
-			<div className="flex flex-wrap items-center justify-between gap-2 py-5">
+			<div className="pt-5">
 				<Header
 					name="Project Tasks Timeline"
 					buttonComponent={

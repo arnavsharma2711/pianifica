@@ -12,21 +12,26 @@ import { useGetProjectQuery } from "@/state/api";
 import Breadcrumb from "@/components/Breadcrumb";
 import Loading from "@/components/Loading";
 import { useRouter, useSearchParams } from "next/navigation";
+import ErrorComponent from "@/components/Error";
 
 type Props = {
 	params: Promise<{ id: string }>;
 };
 
+const allowedTabs = new Set(["Board", "List", "Timeline", "Table"]);
+
 const Project = ({ params }: Props) => {
 	const searchParams = useSearchParams();
 	const { replace } = useRouter();
-	
+
 	const [id, setId] = useState<string | null>(null);
-	const activeTab = searchParams.get("tab") || "Board";
+	const activeTab = allowedTabs.has(searchParams.get("tab")?.toString() || "")
+		? searchParams.get("tab")?.toString() || "Board"
+		: "Board";
 	const [task, setTask] = useState<Task>();
 	const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
 
-	const { data: project, isLoading } = useGetProjectQuery(
+	const { data: project, isLoading, isError } = useGetProjectQuery(
 		{ projectId: Number(id) },
 		{ skip: id === null }
 	);
@@ -35,10 +40,10 @@ const Project = ({ params }: Props) => {
 			setTask(task);
 		}
 		setIsModalNewTaskOpen(true);
-	}; 
+	};
 
 	const handleActiveTab = (tabName: string) => {
-		if(tabName === activeTab) return;
+		if (tabName === activeTab) return;
 		const params = new URLSearchParams(searchParams);
 		params.set("tab", tabName);
 		replace(`/project/${id}?${params.toString()}`);
@@ -49,11 +54,21 @@ const Project = ({ params }: Props) => {
 			setId(resolvedParams.id);
 		});
 	}, [params]);
+	useEffect(() => {
+		document.title = `${project?.data?.name} - Pianifica` || "Project Board - Pianifica";
+	}, [project]);
 
 	if (!id || isLoading) {
 		return <Loading />;
 	}
-
+	if (isError) {
+		return <ErrorComponent message={`Project with id ${id} not found`} breadcrumbLinks={[
+			{
+				value: "Projects",
+				link: '/projects',
+			},
+		]} />;
+	}
 	return (
 		<>
 			<Breadcrumb
