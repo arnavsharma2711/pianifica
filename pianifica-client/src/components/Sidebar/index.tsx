@@ -20,6 +20,7 @@ import {
 	ShieldAlert,
 	User,
 	Users,
+	Bookmark,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -106,6 +107,7 @@ const Sidebar = () => {
 					<SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
 					<SidebarLink icon={Users} label="Teams" href="/teams" />
 					<SidebarLink icon={User} label="Users" href="/users" />
+					<SidebarLink icon={Bookmark} label="Bookmarks" href="/bookmarks" />
 				</nav>
 
 				{/* Projects */}

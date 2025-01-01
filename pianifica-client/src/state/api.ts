@@ -43,6 +43,7 @@ export const api = createApi({
   baseQuery: baseQueryWithErrorHandling,
   reducerPath: "api",
   tagTypes: [
+    "Project",
     "Projects",
     "Tasks",
     "Task",
@@ -152,7 +153,7 @@ export const api = createApi({
           Authorization: sessionStorage.getItem("accessToken") || undefined,
         },
       }),
-      providesTags: ["Projects"],
+      providesTags: ["Project"],
     }),
     createProject: build.mutation<ApiResponse<Project>, Partial<Project>>({
       query: (project) => ({
@@ -457,6 +458,74 @@ export const api = createApi({
       }),
       invalidatesTags: ["Teams", "Team"],
     }),
+    getBookmarkedTasks: build.query<ApiResponse<Task[]>, void>({
+      query: () => ({
+        url: "tasks/bookmark",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+      }),
+    }),
+    addBookmarkTask: build.mutation<ApiResponse<null>, { taskId: number }>({
+      query: ({ taskId }) => ({
+        url: `task/${taskId}/bookmark`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+        method: "POST",
+      }),
+      invalidatesTags: ["Task"],
+    }),
+    removeBookmarkTask: build.mutation<ApiResponse<null>, { taskId: number }>({
+      query: ({ taskId }) => ({
+        url: `task/${taskId}/bookmark`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Task"],
+    }),
+    getBookmarkedProjects: build.query<ApiResponse<Project[]>, void>({
+      query: () => ({
+        url: "projects/bookmark",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+      }),
+    }),
+    addBookmarkProject: build.mutation<
+      ApiResponse<null>,
+      { projectId: number }
+    >({
+      query: ({ projectId }) => ({
+        url: `project/${projectId}/bookmark`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+        method: "POST",
+      }),
+      invalidatesTags: ["Project"],
+    }),
+    removeBookmarkProject: build.mutation<
+      ApiResponse<null>,
+      { projectId: number }
+    >({
+      query: ({ projectId }) => ({
+        url: `project/${projectId}/bookmark`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Project"],
+    }),
     globalSearch: build.query<
       ApiResponse<Search>,
       { search?: string; limit?: number; page?: number }
@@ -506,5 +575,11 @@ export const {
   useGetTeamMemberQuery,
   useAddTeamMemberMutation,
   useRemoveTeamMemberMutation,
+  useGetBookmarkedTasksQuery,
+  useAddBookmarkTaskMutation,
+  useRemoveBookmarkTaskMutation,
+  useGetBookmarkedProjectsQuery,
+  useAddBookmarkProjectMutation,
+  useRemoveBookmarkProjectMutation,
   useGlobalSearchQuery,
 } = api;

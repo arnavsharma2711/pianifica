@@ -1,16 +1,17 @@
 import type React from "react";
 import Header from "@/components/Header";
-import NewProjectModal from "@/components/Modal/NewProjectModal";
 import {
+	Bookmark,
+	BookmarkCheck,
 	Clock,
 	Filter,
 	Grid3X3,
 	List,
-	PlusSquare,
+	LoaderCircle,
 	Share2,
 	Table2Icon,
 } from "lucide-react";
-import { useState } from "react";
+import { useAddBookmarkProjectMutation, useRemoveBookmarkProjectMutation } from "@/state/api";
 
 type TabButtonProps = {
 	tabName: string;
@@ -43,33 +44,53 @@ const TabButton = ({
 };
 type Props = {
 	projectName: string;
+	projectId: number;
+	isBookmarked: boolean;
 	activeTab: string;
 	setActiveTab: (tabName: string) => void;
 };
 
 const ProjectHeader = ({
 	projectName = "Project Board",
+	projectId,
+	isBookmarked = false,
 	activeTab,
 	setActiveTab,
 }: Props) => {
-	const [isModalNewProjectOpen, setIsModalNewProjectOpen] = useState(false);
+	const [addBookmark, { isLoading: addingBookmark }] = useAddBookmarkProjectMutation();
+	const [removeBookmark, { isLoading: removingBookmark }] = useRemoveBookmarkProjectMutation();
+
+	const handleBookmark = async (isBookmarked: boolean) => {
+		if (isBookmarked) {
+			await removeBookmark({ projectId });
+		} else {
+			await addBookmark({ projectId });
+		}
+	}
 
 	return (
 		<div className="px-4 xl:px-6">
-			<NewProjectModal
-				isOpen={isModalNewProjectOpen}
-				onClose={() => setIsModalNewProjectOpen(false)}
-			/>
 			<div className="pb-6 pt-2 lg:pb-4">
 				<Header
 					name={projectName}
 					buttonComponent={
 						<button
 							type="button"
-							className="flex items-center rounded-md bg-blue-primary px-3 py-2 text-white hover:bg-blue-700"
-							onClick={() => setIsModalNewProjectOpen(true)}
+							className="flex items-center rounded-md p-2"
+							onClick={() => handleBookmark(isBookmarked)}
+							disabled={addingBookmark || removingBookmark}
 						>
-							<PlusSquare className="mr-2 h-5 w-5" /> New Boards
+							{
+								addingBookmark || removingBookmark ? (
+									<LoaderCircle />
+								) : (
+									isBookmarked ? (
+										<BookmarkCheck />
+									) : (
+										<Bookmark />
+									)
+								)
+							}
 						</button>
 					}
 				/>

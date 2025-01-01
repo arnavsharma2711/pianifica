@@ -43,6 +43,7 @@ export interface Project {
   description?: string;
   startDate?: string;
   endDate?: string;
+  bookmarked?: boolean;
 }
 
 export interface Task {
@@ -59,6 +60,7 @@ export interface Task {
   authorId?: number;
   assigneeId?: number;
   comments_count?: number;
+  bookmarked?: boolean;
 
   project?: Project;
   author?: User;

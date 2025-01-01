@@ -1,11 +1,11 @@
 'use client';
 
 import type { Comment } from "@/interface";
-import { useCreateCommentMutation, useGetCurrentUserQuery, useGetTaskQuery } from "@/state/api";
+import { useAddBookmarkTaskMutation, useCreateCommentMutation, useGetCurrentUserQuery, useGetTaskQuery, useRemoveBookmarkTaskMutation } from "@/state/api";
 import { Priority, Status } from "@/enum";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Pencil, SendHorizonal } from "lucide-react";
+import { Bookmark, BookmarkCheck, LoaderCircle, Pencil, SendHorizonal } from "lucide-react";
 import Loading from "@/components/Loading";
 import StatusTag from "@/components/StatusTag";
 import PriorityTag from "@/components/PriorityTag";
@@ -109,6 +109,16 @@ const TaskPage = ({ params }: Props) => {
 
 
   const { data: task, isLoading } = useGetTaskQuery({ taskId: id ? Number(id) : 0 }, { skip: id === null });
+  const [addBookmark, { isLoading: addingBookmark }] = useAddBookmarkTaskMutation();
+  const [removeBookmark, { isLoading: removingBookmark }] = useRemoveBookmarkTaskMutation();
+
+  const handleBookmark = async (isBookmarked: boolean) => {
+    if (isBookmarked) {
+      await removeBookmark({ taskId: Number(id) });
+    } else {
+      await addBookmark({ taskId: Number(id) });
+    }
+  }
 
   useEffect(() => {
     params.then((resolvedParams) => {
@@ -140,14 +150,35 @@ const TaskPage = ({ params }: Props) => {
         />
         <div className="space-y-4">
           <Header name={task?.data.title || "Task"} buttonComponent={
-            <button
-              type="button"
-              className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
-              onClick={() => setIsModalNewTaskOpen(true)}
-            >
-              <Pencil className="mr-2 h-5 w-5" />
-              Edit Task
-            </button>
+            <div className="flex gap-4">
+              <button
+                type="button"
+                className="flex items-center rounded-md p-2"
+                onClick={() => handleBookmark(task?.data?.bookmarked || false)}
+                disabled={addingBookmark || removingBookmark}
+              >
+                {
+                  addingBookmark || removingBookmark ? (
+                    <LoaderCircle />
+                  ) : (
+                    task?.data?.bookmarked ? (
+                      <BookmarkCheck />
+                    ) : (
+                      <Bookmark />
+                    )
+                  )
+                }
+              </button>
+              <button
+                type="button"
+                className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+                onClick={() => setIsModalNewTaskOpen(true)}
+              >
+                <Pencil className="mr-2 h-5 w-5" />
+                Edit Task
+              </button>
+            </div>
+
           } />
           <div className="flex flex-col-reverse md:flex-row items-start justify-between gap-10">
             <div className="flex flex-col w-full gap-10">

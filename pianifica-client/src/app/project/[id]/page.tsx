@@ -62,6 +62,8 @@ const Project = ({ params }: Props) => {
 					activeTab={activeTab}
 					setActiveTab={setActiveTab}
 					projectName={project?.data?.name || "Project Board"}
+					projectId={Number(id)}
+					isBookmarked={project?.data?.bookmarked || false}
 				/>
 				{activeTab === "Board" && (
 					<Board id={id} handleTaskModel={handleTaskModel} />
