@@ -11,14 +11,18 @@ import type { Task } from "@/interface";
 import { useGetProjectQuery } from "@/state/api";
 import Breadcrumb from "@/components/Breadcrumb";
 import Loading from "@/components/Loading";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type Props = {
 	params: Promise<{ id: string }>;
 };
 
 const Project = ({ params }: Props) => {
+	const searchParams = useSearchParams();
+	const { replace } = useRouter();
+	
 	const [id, setId] = useState<string | null>(null);
-	const [activeTab, setActiveTab] = useState("Board");
+	const activeTab = searchParams.get("tab") || "Board";
 	const [task, setTask] = useState<Task>();
 	const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
 
@@ -31,7 +35,14 @@ const Project = ({ params }: Props) => {
 			setTask(task);
 		}
 		setIsModalNewTaskOpen(true);
-	};
+	}; 
+
+	const handleActiveTab = (tabName: string) => {
+		if(tabName === activeTab) return;
+		const params = new URLSearchParams(searchParams);
+		params.set("tab", tabName);
+		replace(`/project/${id}?${params.toString()}`);
+	}
 
 	useEffect(() => {
 		params.then((resolvedParams) => {
@@ -60,7 +71,7 @@ const Project = ({ params }: Props) => {
 				/>
 				<ProjectHeader
 					activeTab={activeTab}
-					setActiveTab={setActiveTab}
+					setActiveTab={handleActiveTab}
 					projectName={project?.data?.name || "Project Board"}
 					projectId={Number(id)}
 					isBookmarked={project?.data?.bookmarked || false}

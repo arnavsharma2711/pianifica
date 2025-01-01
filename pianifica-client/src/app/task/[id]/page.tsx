@@ -30,6 +30,12 @@ const AddCommentComponent = ({ taskId }: { taskId: number }) => {
     setText("");
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleAddComment();
+    }
+  }
+
   return (
     <div className="p-2 border dark:border-zinc-800 rounded-lg">
       <div className="flex flex-row gap-4 items-center">
@@ -42,14 +48,23 @@ const AddCommentComponent = ({ taskId }: { taskId: number }) => {
             className="rounded-full" />
         </div>
         <div className="flex flex-row w-full items-center">
-          <input className="bg-transparent outline-none h-full w-full p-2 rounded-l border-y border-l dark:border-zinc-800" type="text" placeholder="Add a comment..." onChange={(e) => setText(e.target.value)} />
-          <button disabled={!text} type="button" className={`h-[30.5px] px-4 rounded-r-lg ${text === "" ? "opacity-60 cursor-not-allowed" : "cursor-pointer"} bg-blue-500 whitespace-nowrap text-white`} onClick={handleAddComment}>
+          <input
+            className="bg-transparent outline-none h-full w-full p-2 rounded-l border-y border-l dark:border-zinc-800"
+            type="text"
+            placeholder="Add a comment..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <button
+            disabled={!text}
+            type="button"
+            className={`h-[30.5px] px-4 rounded-r-lg ${text === "" ? "opacity-60 cursor-not-allowed" : "cursor-pointer"} bg-blue-500 whitespace-nowrap text-white`}
+            onClick={handleAddComment}>
             <SendHorizonal size={20} />
           </button>
         </div>
-
       </div>
-
     </div>
   );
 }
@@ -66,7 +81,7 @@ const CommentComponent = ({ comment }: { comment: Comment }) => {
             height={100}
             className="rounded-full" />
         </Link>
-        <div className="flex flex-col w-full gap-2">
+        <div className="flex flex-col w-full gap-1">
           <div className="flex items-center justify-between">
             <Link href={`/user/${comment.user?.username}`} >
               <strong>

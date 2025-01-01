@@ -37,7 +37,7 @@ const UserCard = ({ user, size = "sm", tag }: Props) => {
 						{size === "md" && <span className="text-gray-500">@{user.username}</span>}
 					</div>
 				</Link>
-			) : (<div className="bg-gray-200 dark:bg-zinc-800 shadow-lg rounded-lg overflow-hidden max-w-sm mx-auto">
+			) : (<div className="bg-gray-200 dark:bg-zinc-800 shadow-lg rounded-lg overflow-hidden w-72 mx-auto">
 				<div className="relative h-32 bg-gradient-to-r from-blue-500 to-purple-600">
 					<div className="h-28 w-28 rounded-full border-4 border-gray-200 flex items-center justify-center overflow-hidden absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2">
 						<Image
