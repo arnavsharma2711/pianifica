@@ -1,16 +1,16 @@
 "use client";
 
-import Header from "@/components/Header";
-import TaskCard from "@/components/Cards/TaskCard";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useGetTasksQuery, useGetProjectsQuery, useGetUsersQuery, useGetTeamsQuery } from "@/state/api";
 import { debounce } from "lodash";
-import { useEffect, useState } from "react";
+import type { Project, Task, Team, User } from "@/interface";
+import { ChevronDown, ChevronLeft, ChevronRight, Search as SearchIcon, XIcon } from "lucide-react";
+import Header from "@/components/Header";
 import ProjectCard from "@/components/Cards/ProjectCard";
 import UserCard from "@/components/Cards/UserCard";
-import { ChevronDown, ChevronLeft, ChevronRight, Search as SearchIcon, XIcon } from "lucide-react";
-import type { Project, Task, Team, User } from "@/interface";
-import { useRouter, useSearchParams } from "next/navigation";
 import TeamCard from "@/components/Cards/TeamCard";
+import TaskCard from "@/components/Cards/TaskCard";
 
 const LIMIT = 10;
 
@@ -114,15 +114,15 @@ const SearchResults = ({ searchResults,
 	}) => {
 	return (
 		<>
-			<div className="flex flex-col justify-between items-center mt-5">
+			<div className="flex flex-wrap justify-start items-center gap-2 mt-5">
 				{searchResults?.map((result) => {
 					switch (type) {
 						case "task":
-							return <TaskCard key={result.id} task={result as Task} />;
+							return <TaskCard key={result.id} task={result as Task} size="md" />;
 						case "project":
 							return <ProjectCard key={result.id} project={result as Project} />;
 						case "user":
-							return <UserCard key={result.id} user={result as User} size="md" />;
+							return <UserCard key={result.id} user={result as User} size="lg" />;
 						case "team":
 							return <TeamCard key={result.id} team={result as Team} />;
 						default:
@@ -246,7 +246,7 @@ const Search = () => {
 		<div className="p-8">
 			<Header name="Search" />
 			<SearchBar setValue={handleSearch} type={type} defaultValue={search} />
-			<div className="p-5">
+			<div className="py-5">
 				{isLoading && <p>Loading...</p>}
 				{isError && <p>Error occurred while fetching search results.</p>}
 				{!isLoading && !isError && searchResults?.data && (

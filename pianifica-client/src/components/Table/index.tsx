@@ -33,55 +33,57 @@ const Table = ({
 				</table>
 			</div>
 			{showPagination && <div className="flex flex-row items-center justify-end rounded-b-lg border-2 dark:border-zinc-800 gap-10 whitespace-nowrap lg:text-lg overflow-hidden bg-gray-100 dark:bg-dark-secondary ">
-				<div className="flex items-center justify-center gap-10 p-4">
-					<div className="relative flex items-center space-x-2 border overflow-hidden rounded-lg ">
-						<select
-							id="rowsPerPage"
-							value={pagination.limit}
+				{!isEmpty &&
+					<div className="flex items-center justify-center gap-10 p-4">
+						<div className="relative flex items-center space-x-2 border overflow-hidden rounded-lg ">
+							<select
+								id="rowsPerPage"
+								value={pagination.limit}
 
-							className="appearance-none bg-transparent pl-2 pr-6 h-10 rounded-lg dark:text-white focus:outline-none"
-							onChange={(e) => pagination.setLimit(Number(e.target.value))}
-						>
-							<option value="10">10 per page</option>
-							<option value="20">20 per page</option>
-							<option value="30">30 per page</option>
-							<option value="50">50 per page</option>
-							<option value="100">100 per page</option>
-						</select>
-						<div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-							<span className="text-gray-500"><ChevronDown /></span>
+								className="appearance-none bg-transparent pl-2 pr-6 h-10 rounded-lg dark:text-white focus:outline-none"
+								onChange={(e) => pagination.setLimit(Number(e.target.value))}
+							>
+								<option value="10">10 per page</option>
+								<option value="20">20 per page</option>
+								<option value="30">30 per page</option>
+								<option value="50">50 per page</option>
+								<option value="100">100 per page</option>
+							</select>
+							<div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+								<span className="text-gray-500"><ChevronDown /></span>
+							</div>
+						</div>
+						<div className="flex items-center justify-between gap-2 border rounded-lg pl-2  overflow-hidden">
+							<div className="flex items-center gap-1 text-gray-700 dark:text-gray-300">
+								Showing
+								<span className="font-bold">
+									{`${(pagination.page - 1) * pagination.limit + 1} - ${Math.min(pagination.page * pagination.limit, pagination.total)}`}
+								</span>
+								of {pagination.total}
+							</div>
+							<div className="border-l">
+								<button
+									type="button"
+									className="p-1 hover:hover:bg-gray-300 dark:hover:bg-zinc-700 disabled:opacity-50"
+									onClick={() => pagination.setPage(pagination.page - 1)}
+									disabled={pagination.page === 1}
+									aria-label="Previous Page"
+								>
+									<ChevronLeft />
+								</button>
+								<button
+									type="button"
+									className="p-1 hover:bg-gray-300 dark:hover:bg-zinc-700 disabled:opacity-50"
+									onClick={() => pagination.setPage(pagination.page + 1)}
+									disabled={pagination.page === (Math.ceil(pagination.total / pagination.limit))}
+									aria-label="Next Page"
+								>
+									<ChevronRight />
+								</button>
+							</div>
 						</div>
 					</div>
-					<div className="flex items-center justify-between gap-2 border rounded-lg pl-2  overflow-hidden">
-						<div className="flex items-center gap-1 text-gray-700 dark:text-gray-300">
-							Showing
-							<span className="font-bold">
-								{`${(pagination.page - 1) * pagination.limit + 1} - ${Math.min(pagination.page * pagination.limit, pagination.total)}`}
-							</span>
-							of {pagination.total}
-						</div>
-						<div className="border-l">
-							<button
-								type="button"
-								className="p-1 hover:hover:bg-gray-300 dark:hover:bg-zinc-700 disabled:opacity-50"
-								onClick={() => pagination.setPage(pagination.page - 1)}
-								disabled={pagination.page === 1}
-								aria-label="Previous Page"
-							>
-								<ChevronLeft />
-							</button>
-							<button
-								type="button"
-								className="p-1 hover:bg-gray-300 dark:hover:bg-zinc-700 disabled:opacity-50"
-								onClick={() => pagination.setPage(pagination.page + 1)}
-								disabled={pagination.page === (Math.ceil(pagination.total / pagination.limit))}
-								aria-label="Next Page"
-							>
-								<ChevronRight />
-							</button>
-						</div>
-					</div>
-				</div>
+				}
 				{isEmpty && <EmptyTable str={emptyStr} />}
 			</div>
 			}

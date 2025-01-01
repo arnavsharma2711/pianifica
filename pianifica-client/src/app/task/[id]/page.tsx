@@ -19,7 +19,7 @@ type Props = {
   params: Promise<{ id: string }>;
 };
 
-const AddComponent = ({ taskId }: { taskId: number }) => {
+const AddCommentComponent = ({ taskId }: { taskId: number }) => {
   const { data: currentUser } = useGetCurrentUserQuery();
   const [text, setText] = useState("");
 
@@ -42,7 +42,7 @@ const AddComponent = ({ taskId }: { taskId: number }) => {
             className="rounded-full" />
         </div>
         <div className="flex flex-row w-full items-center">
-          <input className="h-full w-full p-2 rounded-l border-y border-l dark:border-zinc-800" type="text" placeholder="Add a comment..." onChange={(e) => setText(e.target.value)} />
+          <input className="bg-transparent outline-none h-full w-full p-2 rounded-l border-y border-l dark:border-zinc-800" type="text" placeholder="Add a comment..." onChange={(e) => setText(e.target.value)} />
           <button disabled={!text} type="button" className={`h-[30.5px] px-4 rounded-r-lg ${text === "" ? "opacity-60 cursor-not-allowed" : "cursor-pointer"} bg-blue-500 whitespace-nowrap text-white`} onClick={handleAddComment}>
             <SendHorizonal size={20} />
           </button>
@@ -53,6 +53,7 @@ const AddComponent = ({ taskId }: { taskId: number }) => {
     </div>
   );
 }
+
 const CommentComponent = ({ comment }: { comment: Comment }) => {
   return (
     <div className="p-2 border dark:border-zinc-800 rounded-lg">
@@ -173,7 +174,7 @@ const TaskPage = ({ params }: Props) => {
                     </li>
                   ))}
                 </ul>
-                <AddComponent taskId={Number(id)} />
+                <AddCommentComponent taskId={Number(id)} />
               </div>
             </div>
             <div className="border-2 dark:border-zinc-800 w-full md:w-96 flex justify-between flex-col gap-4 p-2 rounded-lg whitespace-nowrap">

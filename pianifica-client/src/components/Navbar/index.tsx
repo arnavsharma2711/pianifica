@@ -65,10 +65,10 @@ const Navbar = () => {
 							<span>{label}:</span>
 							<>
 								{data?.map((result) => (
-									<div key={result.id} className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-700">
+									<div key={result.id} className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-900 hover:cursor-pointer">
 										{type === "task" && "title" in result && <TaskCard task={result as Task} size="sm" />}
-										{type === "project" && "name" in result && <ProjectCard project={result as Project} size="sm" />}
-										{type === "team" && "name" in result && result.id && typeof result.id === 'number' && <TeamCard team={result as Team} />}
+										{type === "project" && "name" in result && <ProjectCard project={result as Project} size="sm" backgroundColor="bg-transparent" />}
+										{type === "team" && "name" in result && result.id && typeof result.id === 'number' && <TeamCard team={result as Team} size="sm" backgroundColor="bg-transparent" />}
 										{type === "user" && "username" in result && <UserCard user={result} size="md" />}
 									</div>
 								))}
@@ -101,7 +101,7 @@ const Navbar = () => {
 					searchTerm.length < 3 ? <div className="absolute top-full left-0 w-full bg-white dark:bg-zinc-800 shadow-md rounded-b-lg">
 
 					</div> :
-						<div className="absolute top-full left-0 w-full bg-white dark:bg-zinc-800 shadow-md rounded-b-lg" onClick={() => setSearchTerm("")} onKeyUp={(e) => e.key === 'Enter' && setSearchTerm("")}>
+						<div className="absolute top-full mt-2 left-0 w-full bg-white dark:bg-zinc-800 shadow-md rounded-lg" onClick={() => setSearchTerm("")} onKeyUp={(e) => e.key === 'Enter' && setSearchTerm("")}>
 							{isLoading && <p>Loading...</p>}
 							{isError && <p>Error fetching search results</p>}
 							{

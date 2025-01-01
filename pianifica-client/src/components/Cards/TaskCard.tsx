@@ -1,109 +1,170 @@
 "use client";
 
 import type { Task } from "@/interface";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { AlarmClock, CalendarDays, ChevronDown, ChevronUp, Link as LinkIcon } from "lucide-react";
 import Image from "next/image";
 import type React from "react";
 import { useState } from "react";
+import { Priority, Status } from "@/enum";
 import StatusTag from "../StatusTag";
-import { Priority } from "@/enum";
 import PriorityTag from "../PriorityTag";
 import UserCard from "./UserCard";
 import Link from "next/link";
 
 type Props = {
-	task: Task;
-	size?: "sm" | "md";
+  task: Task;
+  size?: "sm" | "md" | "lg";
 };
-const KeyValue = ({ keyName, value }: { keyName: React.ReactNode, value: React.ReactNode }) => {
-	return (
-		<div className="flex flex-col gap-1">
-			<strong>{keyName}:</strong> {value}
-		</div>
-	)
-}
 
-const TaskCard = ({ task, size = "md" }: Props) => {
-	const [isCollapsed, setIsCollapsed] = useState(true);
+const TaskCard = ({ task, size = "lg" }: Props) => {
+  const [isOpen, setIsOpen] = useState(false);
 
-	return (<>
-		{
-			size === "md" &&
-			<div className="mb-3 rounded-lg bg-white p-4 shadow-md dark:bg-dark-secondary">
-				<div
-					className={`mb-2 flex flex-row items-center justify-between ${isCollapsed ? "" : "pb-4 border-b-2 dark:border-zinc-800"} text-xl cursor-pointer`}
-					onClick={() => setIsCollapsed(!isCollapsed)}
-					onKeyUp={(e) => {
-						if (e.key === "Enter" || e.key === " ") {
-							setIsCollapsed(!isCollapsed);
-						}
-					}}
-				>
-					<div className="flex flex-row items-center justify-center gap-2">
-						<p>
-							<strong>{task.title}</strong>
-						</p>
-						{task.status && <StatusTag status={task.status} />}
-					</div>
+  return (
+    <>
+      {
+        size === "lg" &&
+        (
+          <div className="mb-3 rounded-lg bg-white p-2 shadow-md dark:bg-dark-secondary">
+            <div
+              className="w-full flex flex-row items-center justify-between py-2 gap-2 cursor-pointer"
+              onClick={() => setIsOpen(!isOpen)}
+              onKeyUp={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  setIsOpen(!isOpen);
+                }
+              }}>
+              <div className="flex gap-3 items-center text-xl font-bold">
+                {task.title}
+                <StatusTag status={task.status || Status.TODO} />
+                <Link href={`/task/${task.id}`}>
+                  <LinkIcon size={15} />
+                </Link>
+              </div>
+              {isOpen ? (
+                <ChevronUp className="w-5 h-5" />
+              ) : (
+                <ChevronDown className="w-5 h-5" />
+              )}
+            </div>
+            {isOpen && (<div className="flex flex-col gap-2 p-2 my-2 border-t-2 dark:border-zinc-800">
+              <div className="flex items-start justify-between">
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-2">
+                    <PriorityTag priority={task.priority || Priority.LOW} />
 
-					{isCollapsed ? (
-						<ChevronDown className="w-5 h-5" />
-					) : (
-						<ChevronUp className="w-5 h-5" />
-					)}
-				</div>
+                    <div className="w-full flex items-center gap-2">
+                      <div className=" flex items-center gap-2">
+                        <CalendarDays />
+                        {task.startDate && (
+                          <span>{new Date(task.startDate).toDateString()}</span>
+                        )}
+                      </div>
+                      {""}
+                      <div className="flex items-center gap-2">
+                        <AlarmClock />{task.dueDate && (
+                          <span>{new Date(task.dueDate).toDateString()}</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    {task.attachments && task.attachments.length > 0 && (
+                      <Image
+                        src={task.attachments[0].fileUrl || "/default-attachment.webp"}
+                        alt={task.attachments[0].fileName}
+                        width={400}
+                        height={200}
+                        className="h-auto w-full rounded-t-md"
+                      />
+                    )}
+                  </div>
+                  <p>{task.description}</p>
+                </div>
+                <div className="flex items-start gap-10">
+                  <div className="flex flex-col gap-1">
+                    <span className="font-semibold">
+                      Author:
+                    </span>
+                    {task.author && <UserCard user={task.author} />}
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="font-semibold">
+                      Assignee:
+                    </span>
+                    {task.assignee && <UserCard user={task.assignee} />}
+                  </div>
+                </div>
+              </div>
 
-				{!isCollapsed && (
-					<div className="space-y-4">
-						<div className="flex items-start justify-between gap-10">
-							<div className="w-full flex justify-between flex-col gap-4 p-2 rounded-lg whitespace-nowrap">
-								<div className="w-full flex flex-row justify-between gap-1">
-									<div>
-										<div className="flex flex-col gap-1">
-											<KeyValue keyName={"Description"} value={task.description} />
-										</div>
-										<div>
-											{task.attachments && task.attachments.length > 0 && (
-												<Image
-													src={task.attachments[0].fileUrl || "/default-attachment.webp"}
-													alt={task.attachments[0].fileName}
-													width={400}
-													height={200}
-													className="h-auto w-full rounded-t-md"
-												/>
-											)}
-										</div>
-									</div>
-									<div className="flex flex-col gap-2 mr-10">
-										<KeyValue keyName={"Author"} value={task?.author ? <UserCard user={task.author} /> : "N/A"} />
-										<KeyValue keyName={"Assignee"} value={task?.assignee ? <UserCard user={task.assignee} /> : "N/A"} />
-									</div>
 
-								</div>
+            </div>)}
+          </div>
+        )
+      }
+      {
+        size === "md" &&
+        (
+          <Link href={`/task/${task.id}`} className={"flex flex-col w-96 p-4 bg-gray-200 dark:bg-dark-secondary rounded-md items-start gap-4"}>
+            <div className="w-full flex items-center justify-between">
+              <div>
+                {task.title}
+              </div>
+              <StatusTag status={task.status || Status.TODO} />
+            </div>
+            <PriorityTag priority={task.priority || Priority.LOW} />
+            <div className="max-h-10 overflow-hidden">
+              {task.description && (
+                <span>
+                  {task.description.length > 80 ? `${task.description.substring(0, 100)}...` : task.description}
+                </span>
+              )}
+            </div>
+            <div className="w-full flex items-center justify-between gap-2">
+              <div className=" flex items-center gap-2">
+                <CalendarDays />
+                {task.startDate && (
+                  <span>{new Date(task.startDate).toDateString()}</span>
+                )}
+              </div>
+              {""}
+              <div className="flex items-center gap-2">
+                <AlarmClock />{task.dueDate && (
+                  <span>{new Date(task.dueDate).toDateString()}</span>
+                )}
+              </div>
+            </div>
+            <div className="flex items-start justify-between">
+              <div className="flex flex-col gap-1">
+                <span className="font-semibold">
+                  Author:
+                </span>
+                {task.author && <UserCard user={task.author} />}
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="font-semibold">
+                  Assignee:
+                </span>
+                {task.assignee && <UserCard user={task.assignee} />}
+              </div>
+            </div>
+          </Link>
+        )
+      }
+      {
+        size === "sm" &&
+        (
+          <Link href={`/task/${task.id}`} className={"flex flex-row w-max items-center gap-2"}>
+            <div className="flex flex-row items-center gap-1">
+              <span className="flex items-center gap-1 font-bold">
+                {task.title} {task.status && <StatusTag status={task.status} />}
+              </span>
+            </div>
+          </Link>
+        )
+      }
+    </>
 
-								<KeyValue keyName={"Status"} value={<PriorityTag priority={task.priority || Priority.BACKLOG} />} />
-								<KeyValue keyName={"Start Date"} value={task.startDate ? new Date(task.startDate).toLocaleDateString() : "N/A"} />
-								<KeyValue keyName={"Due Date"} value={task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "N/A"} />
-								<KeyValue keyName={"Points"} value={task.points} />
-							</div>
-						</div>
-					</div>
-				)}
-			</div>
-		}
-		{
-			size === "sm" &&
-			<Link href={`/task/${task.id}`} className={"flex flex-row w-max items-center gap-2"}>
-				<div className="flex flex-row items-center gap-1">
-					<span className="flex items-center gap-1 font-bold">
-						{task.title} {task.status && <StatusTag status={task.status} />}
-					</span>
-				</div>
-			</Link>
-		}
-	</>
-
-	);
+  );
 };
 
 export default TaskCard;
