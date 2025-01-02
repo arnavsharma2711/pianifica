@@ -1,6 +1,12 @@
 import { CustomError } from "../lib/error/custom.error";
 import type { Filter } from "../lib/filters";
 import {
+  createProjectTeam,
+  deleteProjectTeam,
+  getProjectTeam,
+  getTeamProjects,
+} from "../model/project-team-model";
+import {
   createTeam,
   deleteTeam,
   getTeamById,
@@ -14,6 +20,7 @@ import {
   deleteTeamMembers,
   getTeamMembers,
 } from "../model/user-team-model";
+import { getExistingProject } from "./project-service";
 import { getExistingUser } from "./user-service";
 
 export const createNewTeam = async ({
@@ -48,6 +55,65 @@ export const createNewTeam = async ({
   });
 
   return team;
+};
+
+export const createNewTeamProject = async ({
+  teamId,
+  projectId,
+  organizationId,
+  addedByUserId,
+  isAdmin = false,
+}: {
+  teamId: number;
+  projectId: number;
+  organizationId: number;
+  addedByUserId: number;
+  isAdmin: boolean;
+}) => {
+  const existingMapping = await getProjectTeam({ teamId, projectId });
+  if (existingMapping) {
+    throw new CustomError(
+      400,
+      "Project already exists!",
+      "Project with the provided id already exists in the team."
+    );
+  }
+
+  const existingTeam = await getExistingTeam({
+    id: teamId,
+    organizationId: organizationId,
+    withTeamMembers: "none",
+  });
+  if (!existingTeam) {
+    throw new CustomError(
+      400,
+      "Team not found!",
+      "Team with the provided id not found in the organization."
+    );
+  }
+
+  const existingProject = await getExistingProject({
+    id: projectId,
+    organizationId,
+  });
+  if (!existingProject) {
+    throw new CustomError(
+      400,
+      "Project not found!",
+      "Project with the provided id not found in the organization."
+    );
+  }
+
+  if (existingTeam.managerId !== addedByUserId || !isAdmin) {
+    throw new CustomError(
+      400,
+      "Unauthorized access!",
+      "You are not authorized to add projects to the team."
+    );
+  }
+
+  const teamProject = await createProjectTeam({ teamId, projectId });
+  return teamProject;
 };
 
 export const getExistingTeams = async ({
@@ -104,6 +170,32 @@ export const getExistingTeam = async ({
   }
 
   return teamData;
+};
+
+export const getExistingTeamProjects = async ({
+  id,
+  organizationId,
+}: {
+  id: number;
+  organizationId: number;
+}) => {
+  const team = await getExistingTeam({
+    id,
+    organizationId,
+    withTeamMembers: "none",
+  });
+
+  if (!team) {
+    throw new CustomError(
+      400,
+      "Team not found!",
+      "Team with the provided id not found in the organization."
+    );
+  }
+
+  const teamProjects = await getTeamProjects({ teamId: id });
+
+  return teamProjects;
 };
 
 export const updateExistingTeam = async ({
@@ -212,6 +304,52 @@ export const deleteExistingTeam = async ({
   }
 
   await deleteTeam({ id, organizationId });
+};
+
+export const deleteExistingTeamProject = async ({
+  teamId,
+  projectId,
+  organizationId,
+  removedByUserId,
+  isAdmin = false,
+}: {
+  teamId: number;
+  projectId: number;
+  organizationId: number;
+  removedByUserId: number;
+  isAdmin: boolean;
+}) => {
+  const existingMapping = await getProjectTeam({ teamId, projectId });
+  if (!existingMapping) {
+    throw new CustomError(
+      400,
+      "Project not found!",
+      "Project with the provided id not found in the team."
+    );
+  }
+
+  const existingTeam = await getExistingTeam({
+    id: teamId,
+    organizationId,
+    withTeamMembers: "none",
+  });
+  if (!existingTeam) {
+    throw new CustomError(
+      400,
+      "Team not found!",
+      "Team with the provided id not found in the organization."
+    );
+  }
+
+  if (existingTeam.managerId !== removedByUserId || !isAdmin) {
+    throw new CustomError(
+      400,
+      "Unauthorized access!",
+      "You are not authorized to remove projects from the team."
+    );
+  }
+
+  await deleteProjectTeam({ teamId, projectId });
 };
 
 export const addNewTeamMember = async ({

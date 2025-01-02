@@ -22,6 +22,9 @@ export const getTeamProjects = async ({ teamId }: { teamId: number }) => {
     where: {
       teamId,
     },
+    include: {
+      project: true,
+    },
   });
 
   return projects;

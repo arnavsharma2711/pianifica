@@ -19,6 +19,9 @@ import {
   addTeam,
   updateTeam,
   deleteTeam,
+  getTeamProjects,
+  addTeamProject,
+  removeTeamProject,
 } from "./controllers/team/controller";
 import {
   bookmarkProject,
@@ -54,7 +57,13 @@ import {
 } from "./controllers/task/controller";
 import { loginUser, registerNewUser } from "./controllers/auth/controller";
 import { globalSearch } from "./controllers/search/controller";
-import { createTag, createTags, deleteTag, getTags, updateTag } from "./controllers/tags/controller";
+import {
+  createTag,
+  createTags,
+  deleteTag,
+  getTags,
+  updateTag,
+} from "./controllers/tags/controller";
 
 const router = Router();
 
@@ -99,7 +108,11 @@ router.get("/projects", authenticationMiddleware, getProjects);
 router.get("/projects/bookmark", authenticationMiddleware, getBookmarkProjects);
 router.get("/project/:id", authenticationMiddleware, getProject);
 router.post("/project/:id/bookmark", authenticationMiddleware, bookmarkProject);
-router.delete("/project/:id/bookmark", authenticationMiddleware, removeBookmarkProject);
+router.delete(
+  "/project/:id/bookmark",
+  authenticationMiddleware,
+  removeBookmarkProject
+);
 router.get("/project/:id/tasks", authenticationMiddleware, getProjectTasks);
 router.post("/project", authenticationMiddleware, createProject);
 router.put("/project", authenticationMiddleware, updateProject);
@@ -137,6 +150,17 @@ router.post("/team", authenticationMiddleware, addTeam);
 router.put("/team", authenticationMiddleware, updateTeam);
 router.delete("/team/:id", authenticationMiddleware, deleteTeam);
 router.get("/team/:id", authenticationMiddleware, getTeam);
+router.get("/team/:id/projects", authenticationMiddleware, getTeamProjects);
+router.post(
+  "/team/:id/project/:projectId",
+  authenticationMiddleware,
+  addTeamProject
+);
+router.delete(
+  "/team/:id/project/:projectId",
+  authenticationMiddleware,
+  removeTeamProject
+);
 router.get("/team/:id/members", authenticationMiddleware, getTeamMembers);
 router.post("/team/:id/member", authenticationMiddleware, addTeamMember);
 router.delete("/team/:id/member", authenticationMiddleware, removeTeamMember);

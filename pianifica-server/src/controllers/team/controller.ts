@@ -2,13 +2,16 @@ import controllerWrapper from "../../lib/controllerWrapper";
 import {
   addNewTeamMember,
   createNewTeam,
+  createNewTeamProject,
   deleteExistingTeam,
+  deleteExistingTeamProject,
   getExistingTeam,
+  getExistingTeamProjects,
   getExistingTeams,
   removeExistingTeamMember,
   updateExistingTeam,
 } from "../../service/team-service";
-import { filterSchema, teamSchema } from "../../lib/schema";
+import { filterSchema, projectSchema, teamSchema } from "../../lib/schema";
 import {
   createTeamSchema,
   teamReturnSchema,
@@ -302,5 +305,120 @@ export const removeTeamMember = controllerWrapper(async (req, res) => {
 
   res.success({
     message: "User removed from team successfully!",
+  });
+});
+
+export const addTeamProject = controllerWrapper(async (req, res) => {
+  const { id, projectId } = req.params;
+
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to add projects to team",
+    });
+    return;
+  }
+
+  if (id === undefined) {
+    res.invalid({
+      message: "Invalid request",
+      error: "Team ID is required",
+    });
+    return;
+  }
+
+  if (projectId === undefined) {
+    res.invalid({
+      message: "Invalid request",
+      error: "Project ID is required",
+    });
+    return;
+  }
+
+  await createNewTeamProject({
+    teamId: Number(id),
+    projectId: Number(projectId),
+    organizationId: req.user?.organizationId,
+    addedByUserId: req.user?.id,
+    isAdmin: isAdmin(req.user?.role),
+  });
+
+  res.success({
+    message: "Project added to team successfully!",
+  });
+});
+
+export const getTeamProjects = controllerWrapper(async (req, res) => {
+  const { id } = req.params;
+
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to view projects",
+    });
+    return;
+  }
+
+  if (id === undefined) {
+    res.invalid({
+      message: "Invalid request",
+      error: "Team ID is required",
+    });
+    return;
+  }
+
+  console.log("id", req.user);
+  const teamProjects = await getExistingTeamProjects({
+    id: Number(id),
+    organizationId: req.user?.organizationId,
+  });
+
+  const teamData = teamProjects.map((teamProject) =>
+    projectSchema.parse(teamProject.project)
+  );
+
+  res.success({
+    message: "Team fetched successfully!",
+    data: teamData,
+  });
+});
+
+export const removeTeamProject = controllerWrapper(async (req, res) => {
+  const { id, projectId } = req.params;
+
+  if (req.user?.organizationId === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to remove projects from the team",
+    });
+    return;
+  }
+
+  if (id === undefined) {
+    res.invalid({
+      message: "Invalid request",
+      error: "Team ID is required",
+    });
+    return;
+  }
+
+  if (projectId === undefined) {
+    res.invalid({
+      message: "Invalid request",
+      error: "Project ID is required",
+    });
+    return;
+  }
+
+  await deleteExistingTeamProject({
+    teamId: Number(id),
+    projectId: Number(projectId),
+    organizationId: req.user?.organizationId,
+    removedByUserId: req.user?.id,
+    isAdmin: isAdmin(req.user?.role),
+  });
+
+  res.success({
+    message: "Project removed from team successfully!",
   });
 });
