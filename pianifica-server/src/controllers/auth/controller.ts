@@ -3,7 +3,9 @@ import controllerWrapper from "../../lib/controllerWrapper";
 import { userInfoSchema } from "../../lib/schema";
 import {
   createNewUser,
+  sendForgotPasswordMail,
   validateUserCredentials,
+  verifyForgotPasswordToken,
 } from "../../service/user-service";
 import { loginUserSchema, registerNewUserSchema } from "./schema";
 
@@ -55,5 +57,26 @@ export const loginUser = controllerWrapper(async (req, res) => {
       accessToken,
       userInfo,
     },
+  });
+});
+
+// POST /api/auth/forgot-password
+export const forgotPassword = controllerWrapper(async (req, res) => {
+  const { emailOrUsername } = loginUserSchema.parse(req.body);
+
+  await sendForgotPasswordMail({ emailOrUsername });
+  res.success({
+    message: "Forgot password request received!",
+  });
+});
+
+//POST /api/auth/verify-forgot-password
+export const verifyForgotPassword = controllerWrapper(async (req, res) => {
+  const { newPassword, resetToken } = req.body;
+
+  await verifyForgotPasswordToken({ newPassword, resetToken });
+
+  res.success({
+    message: "Password updated successfully!",
   });
 });

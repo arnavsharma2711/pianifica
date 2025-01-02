@@ -9,6 +9,7 @@ import {
   deleteUser,
   getUserOrganization,
   getUserTasks,
+  updateUserPassword,
 } from "./controllers/user/controller";
 import {
   addTeamMember,
@@ -55,7 +56,12 @@ import {
   removeBookmarkTask,
   getBookmarkTasks,
 } from "./controllers/task/controller";
-import { loginUser, registerNewUser } from "./controllers/auth/controller";
+import {
+  forgotPassword,
+  loginUser,
+  registerNewUser,
+  verifyForgotPassword,
+} from "./controllers/auth/controller";
 import { globalSearch } from "./controllers/search/controller";
 import {
   createTag,
@@ -64,12 +70,22 @@ import {
   getTags,
   updateTag,
 } from "./controllers/tags/controller";
+import {
+  createMailer,
+  deleteMailer,
+  getMailer,
+  getMailers,
+  previewMailer,
+  updateMailer,
+} from "./controllers/mailer/controller";
 
 const router = Router();
 
 // Auth routes
 router.post("/auth/login", loginUser);
 router.post("/auth/register", registerNewUser);
+router.post("/auth/forgot-password", forgotPassword);
+router.post("/auth/verify-forgot-password", verifyForgotPassword);
 
 //Organization routes
 router.get(
@@ -101,6 +117,44 @@ router.delete(
   authenticationMiddleware,
   superAdminAuthenticationMiddleware,
   deleteOrganization
+);
+
+// Mailer routes
+router.get(
+  "/mailers",
+  authenticationMiddleware,
+  superAdminAuthenticationMiddleware,
+  getMailers
+);
+router.get(
+  "/mailer/:id",
+  authenticationMiddleware,
+  superAdminAuthenticationMiddleware,
+  getMailer
+);
+router.post(
+  "/mailer",
+  authenticationMiddleware,
+  superAdminAuthenticationMiddleware,
+  createMailer
+);
+router.put(
+  "/mailer",
+  authenticationMiddleware,
+  superAdminAuthenticationMiddleware,
+  updateMailer
+);
+router.delete(
+  "/mailer/:id",
+  authenticationMiddleware,
+  superAdminAuthenticationMiddleware,
+  deleteMailer
+);
+router.post(
+  "/mailer/:id/preview",
+  authenticationMiddleware,
+  superAdminAuthenticationMiddleware,
+  previewMailer
 );
 
 // Project routes
@@ -172,6 +226,11 @@ router.get("/user/organization", authenticationMiddleware, getUserOrganization);
 router.get("/user/tasks", authenticationMiddleware, getUserTasks);
 router.get("/user/:username", authenticationMiddleware, getUser);
 router.post("/user/:id", authenticationMiddleware, updateUser);
+router.patch(
+  "/user/update-password",
+  authenticationMiddleware,
+  updateUserPassword
+);
 router.delete("/user/:id", authenticationMiddleware, deleteUser);
 
 // Tag routes

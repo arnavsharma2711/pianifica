@@ -200,6 +200,27 @@ export const updateUser = async ({
   return updatedUser;
 };
 
+export const updateUserPassword = async ({
+  id,
+  password,
+}: {
+  id: number;
+  password: string;
+}) => {
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const updatedUser = await Prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      password: hashedPassword,
+    },
+  });
+
+  return updatedUser;
+};
+
 export const deleteUser = async ({ id }: { id: number }) => {
   await Prisma.user.update({
     where: {

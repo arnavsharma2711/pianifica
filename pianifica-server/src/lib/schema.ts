@@ -222,3 +222,10 @@ export const tagSchema = z.object({
     invalid_type_error: "Tag name must be a text",
   }),
 });
+
+export const mailerSchema = z.object({
+  id: z.number(),
+  title: z.string().nonempty(),
+  content: z.string().nonempty(),
+  variables: z.record(z.string(), z.string()).optional(),
+});

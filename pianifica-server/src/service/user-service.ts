@@ -1,4 +1,4 @@
-import { ACCESS_TOKEN_SECRET } from "../constants";
+import { ACCESS_TOKEN_SECRET, FE_URL } from "../constants";
 import { CustomError } from "../lib/error/custom.error";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -10,8 +10,10 @@ import {
   getUserByUsername,
   getUsers,
   updateUser,
+  updateUserPassword,
 } from "../model/user-model";
 import type { Filter } from "../lib/filters";
+import { generateMail } from "./mailer-service";
 
 const determineHighestRole = ({
   userRoles,
@@ -99,6 +101,25 @@ export const updateExistingUser = async ({
   });
 
   return updatedUser;
+};
+
+export const updateExistingUserPassword = async ({
+  email,
+  oldPassword,
+  newPassword,
+}: {
+  email: string;
+  oldPassword: string;
+  newPassword: string;
+}) => {
+  const { accessToken, userDetails } = await validateUserCredentials({
+    emailOrUsername: email,
+    password: oldPassword,
+  });
+
+  await updateUserPassword({ id: userDetails.id, password: newPassword });
+
+  return { accessToken, userDetails };
 };
 
 export const getExistingUsers = async ({
@@ -214,4 +235,68 @@ export const deleteExistingUser = async ({ id }: { id: number }) => {
   }
 
   await deleteUser({ id });
+};
+
+export const sendForgotPasswordMail = async ({
+  emailOrUsername,
+}: {
+  emailOrUsername: string;
+}) => {
+  let user = null;
+  if (emailOrUsername.includes("@")) {
+    user = await getExistingUser({ email: emailOrUsername });
+  } else {
+    user = await getExistingUser({ username: emailOrUsername });
+  }
+
+  if (!user) {
+    throw new CustomError(404, "Not Found", "User not found!");
+  }
+
+  const resetToken = jwt.sign(
+    { id: user.id, email: user.email },
+    ACCESS_TOKEN_SECRET,
+    { expiresIn: "1h" }
+  );
+  const reset_link = `${FE_URL}/reset-password?resetToken=${resetToken}`;
+
+  await generateMail({
+    mailerId: 2,
+    receiverMail: user.email,
+    variables: {
+      "<user_name>": user.username,
+      "<reset_link>": reset_link,
+    } as Record<string, string>,
+  });
+};
+
+const decodeResetToken = async (resetToken: string) => {
+  try {
+    const decoded = jwt.verify(resetToken, ACCESS_TOKEN_SECRET);
+    return decoded;
+  } catch (error) {
+    throw new CustomError(
+      401,
+      "Invalid token resetToken",
+      "Invalid resetToken"
+    );
+  }
+};
+
+export const verifyForgotPasswordToken = async ({
+  resetToken,
+  newPassword,
+}: {
+  resetToken: string;
+  newPassword: string;
+}) => {
+  const decoded = await decodeResetToken(resetToken);
+  const { id, email } = decoded as { id: number; email: string };
+
+  const user = await getExistingUser({ id });
+  if (!user) {
+    throw new CustomError(404, "Not Found", "User not found!");
+  }
+
+  await updateUserPassword({ id, password: newPassword });
 };

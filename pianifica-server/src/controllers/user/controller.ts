@@ -4,6 +4,7 @@ import {
   getExistingUser,
   getExistingUsers,
   updateExistingUser,
+  updateExistingUserPassword,
 } from "../../service/user-service";
 import { updateUserSchema } from "./schema";
 import {
@@ -17,6 +18,7 @@ import { getExistingOrganization } from "../../service/organization-service";
 import { getFilters } from "../../lib/filters";
 import { userTaskSchema } from "../task/schema";
 import { getExistingUserTasks } from "../../service/task-service";
+import { COOKIE_SETTINGS } from "../../constants";
 
 // GET api/users
 export const getUsers = controllerWrapper(async (req, res) => {
@@ -157,6 +159,33 @@ export const updateUser = controllerWrapper(async (req, res) => {
   res.success({
     message: "User updated successfully!",
     data: userInfo,
+  });
+});
+
+// PATCH api/user/update-password
+export const updateUserPassword = controllerWrapper(async (req, res) => {
+  if (req.user?.email === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to update this user",
+    });
+    return;
+  }
+  const { oldPassword, newPassword } = req.body;
+
+  const { accessToken, userDetails } = await updateExistingUserPassword({
+    email: req.user?.email,
+    oldPassword,
+    newPassword,
+  });
+
+  const userInfo = userInfoSchema.parse(userDetails);
+  res.cookie("accessToken", accessToken, COOKIE_SETTINGS).success({
+    message: "Password updated successfully!",
+    data: {
+      accessToken,
+      userInfo,
+    },
   });
 });
 
