@@ -120,6 +120,7 @@ export const getTask = controllerWrapper(async (req, res) => {
     withAttachments: true,
     withComments: true,
     withBookmarks: true,
+    withTags: true,
   });
   if (!task) {
     res.invalid({

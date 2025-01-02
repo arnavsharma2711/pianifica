@@ -16,7 +16,7 @@ import {
 import { getExistingUser } from "./user-service";
 import { getExistingProject } from "./project-service";
 import type { Filter } from "../lib/filters";
-import { mapTaskTags } from "./tag-service";
+import { createNewTags } from "./tag-service";
 
 export const createNewTask = async ({
   title,
@@ -82,6 +82,8 @@ export const createNewTask = async ({
     }
   }
 
+  const tagsIds = (await createNewTags({ names: tags })).map((tag) => tag.id);
+
   const task = await createTask({
     title,
     description,
@@ -90,12 +92,11 @@ export const createNewTask = async ({
     assigneeId,
     status,
     priority,
+    tags: tagsIds,
     startDate,
     dueDate,
     points,
   });
-
-  await mapTaskTags({ taskId: task.id, tags });
 
   return task;
 };
@@ -149,6 +150,7 @@ export const getExistingTask = async ({
   withAttachments = false,
   withComments = false,
   withBookmarks = false,
+  withTags = false,
 }: {
   id?: number;
   title?: string;
@@ -157,6 +159,7 @@ export const getExistingTask = async ({
   withAttachments?: boolean;
   withComments?: boolean;
   withBookmarks?: boolean;
+  withTags?: boolean;
 }) => {
   let task = null;
   if (id)
@@ -167,6 +170,7 @@ export const getExistingTask = async ({
       withAttachments,
       withComments,
       withBookmarks,
+      withTags,
     });
   else if (title) task = await getTaskByTitle({ title, organizationId });
 
@@ -222,6 +226,8 @@ export const updateExistingTask = async ({
     );
   }
 
+  const tagsIds = (await createNewTags({ names: tags })).map((tag) => tag.id);
+
   const updatedTask = await updateTask({
     id,
     title,
@@ -229,12 +235,11 @@ export const updateExistingTask = async ({
     assigneeId,
     status,
     priority,
+    tags: tagsIds,
     startDate,
     dueDate,
     points,
   });
-
-  await mapTaskTags({ taskId: updatedTask.id, tags });
 
   return updatedTask;
 };

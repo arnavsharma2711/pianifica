@@ -8,6 +8,7 @@ export const createTask = async ({
   projectId,
   authorId,
   assigneeId,
+  tags = [],
   status = "TODO",
   priority = "BACKLOG",
   startDate = null,
@@ -19,12 +20,21 @@ export const createTask = async ({
   projectId: number;
   authorId: number;
   assigneeId?: number;
+  tags?: number[];
   status?: Status;
   priority?: Priority;
   startDate?: Date | null;
   dueDate?: Date | null;
   points?: number | null;
 }) => {
+  const tagsData = tags.map((tag) => ({
+    tag: {
+      connect: {
+        id: tag,
+      },
+    },
+  }));
+
   return prisma.task.create({
     data: {
       title,
@@ -32,6 +42,9 @@ export const createTask = async ({
       projectId,
       authorId,
       assigneeId,
+      tags: {
+        create: tagsData,
+      },
       status,
       priority,
       startDate,
@@ -194,6 +207,7 @@ export const getTaskById = async ({
   withAttachments = false,
   withComments = false,
   withBookmarks = false,
+  withTags = false,
 }: {
   id: number;
   organizationId: number;
@@ -201,8 +215,9 @@ export const getTaskById = async ({
   withAttachments?: boolean;
   withComments?: boolean;
   withBookmarks?: boolean;
+  withTags?: boolean;
 }) => {
-  const task = await prisma.task.findFirst({
+  let task = await prisma.task.findFirst({
     where: {
       id,
       deletedAt: null,
@@ -216,6 +231,11 @@ export const getTaskById = async ({
       author: withUserData,
       attachments: withAttachments,
       assignee: withUserData,
+      tags: withTags && {
+        include: {
+          tag: true,
+        },
+      },
       comments: withComments
         ? {
             where: {
@@ -237,8 +257,16 @@ export const getTaskById = async ({
       },
     });
 
-    return { ...task, bookmarked: !!bookmarkExists } as Task & {
+    task = { ...task, bookmarked: !!bookmarkExists } as Task & {
       bookmarked: boolean;
+    };
+  }
+
+  if (withTags && task) {
+    const taskTags = task.tags.map((item) => item?.tag?.name);
+
+    task = { ...task, tags: taskTags } as Task & {
+      tags: string[];
     };
   }
 
@@ -276,6 +304,7 @@ export const updateTask = async ({
   assigneeId = null,
   status = "TODO",
   priority = "BACKLOG",
+  tags = [],
   startDate = null,
   dueDate = null,
   points = null,
@@ -286,10 +315,19 @@ export const updateTask = async ({
   assigneeId?: number | null;
   status?: Status;
   priority?: Priority;
+  tags?: number[];
   startDate?: Date | null;
   dueDate?: Date | null;
   points?: number | null;
 }) => {
+  const tagsData = tags.map((tag) => ({
+    tag: {
+      connect: {
+        id: tag,
+      },
+    },
+  }));
+
   return prisma.task.update({
     where: {
       id,
@@ -300,6 +338,9 @@ export const updateTask = async ({
       assigneeId,
       status,
       priority,
+      tags: {
+        create: tagsData,
+      },
       startDate,
       dueDate,
       points,

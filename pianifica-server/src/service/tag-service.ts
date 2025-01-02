@@ -37,7 +37,11 @@ export const createNewTags = async ({ names }: { names: string[] }) => {
   );
 
   const newTags = await createTags({ names: remainingTags });
-  return newTags;
+
+  return [
+    ...(Array.isArray(newTags) ? newTags : []),
+    ...(Array.isArray(existingTags) ? existingTags : []),
+  ];
 };
 
 export const getExistingTags = async () => {
@@ -93,30 +97,4 @@ export const deleteExistingTag = async ({ id }: { id: number }) => {
 
   await deleteTag({ id });
   return existingTag;
-};
-
-export const mapTaskTags = async ({
-  taskId,
-  tags,
-}: {
-  taskId: number;
-  tags: string[];
-}) => {
-  const getExistingTaskTags = await getTagsByTaskId({ taskId });
-  const remainingTags = tags.filter(
-    (tag) =>
-      !getExistingTaskTags.map((taskTag) => taskTag.tag.name).includes(tag)
-  );
-  const deleteTags = getExistingTaskTags.filter(
-    (taskTag) => !tags.includes(taskTag.tag.name)
-  );
-  const getTags = await getTagsByName({ names: remainingTags });
-  const tagIds = getTags.map((tag) => tag.id);
-
-  const taskTagsMapping = await createTagMappings({ tagIds, taskId });
-  await deleteTagMappings({
-    taskId,
-    tagIds: deleteTags.map((taskTag) => taskTag.tagId),
-  });
-  return taskTagsMapping;
 };

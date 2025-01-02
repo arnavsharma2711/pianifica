@@ -164,11 +164,7 @@ export const taskSchema = z.object({
     .optional(),
   status: z.nativeEnum(Status),
   priority: z.nativeEnum(Priority),
-  tags: z
-    .string({
-      invalid_type_error: "Task tags must be a text",
-    })
-    .optional(),
+  tags: z.array(z.string()).optional(),
   startDate: z
     .date({
       invalid_type_error: "Start date must be a date",
