@@ -215,3 +215,14 @@ export const filterSchema = z.object({
   sortBy: z.string().optional().nullable().default("createdAt"),
   order: z.nativeEnum(Order).optional().nullable().default(Order.ASC),
 });
+
+export const tagSchema = z.object({
+  id: z.number({
+    required_error: "ID is required",
+    invalid_type_error: "ID must be a number",
+  }),
+  name: z.string({
+    required_error: "Tag name is required",
+    invalid_type_error: "Tag name must be a text",
+  }),
+});

@@ -54,6 +54,7 @@ import {
 } from "./controllers/task/controller";
 import { loginUser, registerNewUser } from "./controllers/auth/controller";
 import { globalSearch } from "./controllers/search/controller";
+import { createTag, createTags, deleteTag, getTags, updateTag } from "./controllers/tags/controller";
 
 const router = Router();
 
@@ -148,6 +149,13 @@ router.get("/user/tasks", authenticationMiddleware, getUserTasks);
 router.get("/user/:username", authenticationMiddleware, getUser);
 router.post("/user/:id", authenticationMiddleware, updateUser);
 router.delete("/user/:id", authenticationMiddleware, deleteUser);
+
+// Tag routes
+router.get("/tags", authenticationMiddleware, getTags);
+router.post("/tag", authenticationMiddleware, createTag);
+router.post("/tags", authenticationMiddleware, createTags);
+router.put("/tag/:id", authenticationMiddleware, updateTag);
+router.delete("/tag/:id", authenticationMiddleware, deleteTag);
 
 // Search routes
 router.use("/search", authenticationMiddleware, globalSearch);

@@ -26,11 +26,13 @@ export const createTaskSchema = z.object({
   status: z.nativeEnum(Status),
   priority: z.nativeEnum(Priority),
   tags: z
-    .string({
-      required_error: "Task tags is required.",
-      invalid_type_error: "Task tags must be a string.",
-    })
-    .nullable(),
+    .array(
+      z.string({
+        required_error: "Task tags is required.",
+        invalid_type_error: "Task tags must be a string.",
+      })
+    )
+    .default([]),
   startDate: z
     .string({
       required_error: "Task start date is required.",
@@ -80,11 +82,13 @@ export const updateTaskSchema = z.object({
   status: z.nativeEnum(Status),
   priority: z.nativeEnum(Priority),
   tags: z
-    .string({
-      required_error: "Task tags is required.",
-      invalid_type_error: "Task tags must be a string.",
-    })
-    .nullable(),
+    .array(
+      z.string({
+        required_error: "Task tags is required.",
+        invalid_type_error: "Task tags must be a string.",
+      })
+    )
+    .default([]),
   startDate: z
     .string({
       required_error: "Task start date is required.",

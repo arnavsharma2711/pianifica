@@ -16,6 +16,7 @@ import {
 import { getExistingUser } from "./user-service";
 import { getExistingProject } from "./project-service";
 import type { Filter } from "../lib/filters";
+import { mapTaskTags } from "./tag-service";
 
 export const createNewTask = async ({
   title,
@@ -24,6 +25,7 @@ export const createNewTask = async ({
   projectId,
   authorId,
   assigneeId,
+  tags = [],
   status = "TODO",
   priority = "BACKLOG",
   startDate = null,
@@ -36,6 +38,7 @@ export const createNewTask = async ({
   projectId: number;
   authorId: number;
   assigneeId?: number;
+  tags?: string[];
   status?: Status;
   priority?: Priority;
   startDate?: Date | null;
@@ -91,6 +94,8 @@ export const createNewTask = async ({
     dueDate,
     points,
   });
+
+  await mapTaskTags({ taskId: task.id, tags });
 
   return task;
 };
@@ -174,6 +179,7 @@ export const updateExistingTask = async ({
   organizationId,
   description = "",
   assigneeId = null,
+  tags = [],
   status = "TODO",
   priority = "BACKLOG",
   startDate = null,
@@ -185,6 +191,7 @@ export const updateExistingTask = async ({
   organizationId: number;
   description?: string | null;
   assigneeId?: number | null;
+  tags?: string[];
   status?: Status;
   priority?: Priority;
   startDate?: Date | null;
@@ -226,6 +233,8 @@ export const updateExistingTask = async ({
     dueDate,
     points,
   });
+
+  await mapTaskTags({ taskId: updatedTask.id, tags });
 
   return updatedTask;
 };
