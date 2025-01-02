@@ -1,6 +1,7 @@
 "use client";
 
 import Breadcrumb from "@/components/Breadcrumb";
+import ProjectCard from "@/components/Cards/ProjectCard";
 import UserCard from "@/components/Cards/UserCard";
 import { DataTable } from "@/components/DataTable";
 import ErrorComponent from "@/components/Error";
@@ -8,9 +9,10 @@ import Header from "@/components/Header";
 import Loading from "@/components/Loading";
 import ConfirmationModal from "@/components/Modal/ConfirmationModel";
 import TeamMemberModal from "@/components/Modal/TeamMemberModal";
-import type { User } from "@/interface";
-import { useGetTeamMemberQuery, useRemoveTeamMemberMutation } from "@/state/api";
+import type { Project, User } from "@/interface";
+import { useGetCurrentUserQuery, useGetTeamMemberQuery, useGetTeamProjectsQuery, useRemoveTeamMemberMutation, useRemoveTeamProjectMutation } from "@/state/api";
 import { CirclePlus, Trash } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -23,7 +25,9 @@ const Team = ({ params }: Props) => {
   const [teamList, setTeamList] = useState<User[]>([]);
   const [isTeamMemberModalOpen, setIsTeamMemberModalOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [isConfirmationModalOpen2, setIsConfirmationModalOpen2] = useState(false);
   const [modalUser, setModalUser] = useState<User | null>(null);
+  const [modalProject, setModalProject] = useState<Project | null>(null);
 
   useEffect(() => {
     params.then((resolvedParams) => {
@@ -31,11 +35,15 @@ const Team = ({ params }: Props) => {
     });
   }, [params]);
 
+  const { data: currentUser } = useGetCurrentUserQuery();
   const { data: team, isLoading, isError } = useGetTeamMemberQuery(
     { teamId: Number(id) },
     { skip: id === null }
   );
+  const { data: projectList, isLoading: projectListLoading } = useGetTeamProjectsQuery({ teamId: Number(id) }, { skip: Number(id) === 0 })
+
   const [removeTeamMember] = useRemoveTeamMemberMutation();
+  const [removeTeamProject] = useRemoveTeamProjectMutation();
 
   useEffect(() => {
     if (team?.data) {
@@ -122,6 +130,60 @@ const Team = ({ params }: Props) => {
     }
   }
 
+  const projectColumns = [
+    {
+      header: "Project Name",
+      accessorKey: "name" as keyof Project,
+      cell: (project: Project) => (
+        <Link href={`/project/${project.id}`}>{project.name}</Link>
+      ),
+    },
+    {
+      header: "Description",
+      accessorKey: "description" as keyof Project,
+    },
+    {
+      header: "Start Date",
+      accessorKey: "startDate" as keyof Project,
+      cell: (project: Project) =>
+        project.startDate
+          ? new Date(project.startDate).toLocaleDateString()
+          : "N/A",
+    },
+    {
+      header: "End Date",
+      accessorKey: "endDate" as keyof Project,
+      cell: (project: Project) =>
+        project.startDate
+          ? new Date(project.startDate).toLocaleDateString()
+          : "N/A",
+    },
+  ];
+
+  const TeamProjectAction = ({ project }: { project: Project }) => {
+    const deleteTeamProject = () => {
+      setModalProject(project);
+      setIsConfirmationModalOpen2(true);
+    };
+    return (
+      (currentUser?.data.id === team.data.teamLead?.id || currentUser?.data.id === team.data.teamManager?.id) && (
+        <button
+          type="button"
+          onClick={deleteTeamProject}
+          className="p-2 rounded-full hover:bg-red-200 dark:hover:bg-zinc-700 text-red-600"
+        >
+          <Trash size={15} />
+        </button>
+      )
+    );
+  }
+
+  const removeTeamProjectHandler = async (projectId: string) => {
+    const response = await removeTeamProject({ teamId: Number(id), projectId: Number(projectId) });
+    if (response.data?.success) {
+      toast.success("Project removed from team successfully");
+    }
+  }
   return (
     <>
       <Breadcrumb
@@ -139,6 +201,15 @@ const Team = ({ params }: Props) => {
           }}
           message="Are you sure you want to remove this user from team?"
           component={modalUser && <UserCard user={modalUser} />}
+        />
+        <ConfirmationModal
+          isOpen={isConfirmationModalOpen2}
+          onClose={() => setIsConfirmationModalOpen2(false)}
+          onConfirm={() => {
+            removeTeamProjectHandler(modalProject?.id || "");
+          }}
+          message="Are you sure you want to remove this project from team?"
+          component={modalProject && <ProjectCard project={modalProject} />}
         />
         <TeamMemberModal
           isOpen={isTeamMemberModalOpen}
@@ -170,6 +241,32 @@ const Team = ({ params }: Props) => {
           actionHeader=" "
           action={(user: User) => <TeamMemberAction user={user} />}
         />
+        {
+          projectListLoading ? <Loading /> : (<div className="flex flex-col mt-6">
+            <Header
+              name="Assigned Projects"
+              buttonComponent={
+                <button
+                  type="button"
+                  className="flex items-center gap-2 rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+                  onClick={() => setIsTeamMemberModalOpen(true)}
+                >
+                  Assignee Project
+                  <CirclePlus size={16} />
+                </button>
+              }
+              isSmallText
+            />
+            <DataTable
+              data={projectList?.data || []}
+              columns={projectColumns}
+              withIndex={true}
+              actionHeader=" "
+              action={(project: Project) => <TeamProjectAction project={project} />}
+            />
+          </div>
+          )
+        }
       </div>
     </>
   );

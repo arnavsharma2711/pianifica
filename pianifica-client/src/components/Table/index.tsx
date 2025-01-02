@@ -27,7 +27,7 @@ const Table = ({
 }) => {
 	return (
 		<div className="shadow-md rounded-lg overflow-hidden">
-			<div className="relative border-2 border-b-0 dark:border-zinc-800 overflow-x-auto  sm:rounded-t-lg">
+			<div className="relative border-2 dark:border-zinc-800 overflow-x-auto  sm:rounded-t-lg">
 				<table className={`w-full ${showPagination && "border-b-0 dark:border-zinc-800"} text-md text-left rtl:text-right`}>
 					{children}
 				</table>

@@ -5,7 +5,7 @@ import type {
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query";
 import type { ApiResponse } from "../api";
-import type { Team } from "@/interface";
+import type { Project, Team } from "@/interface";
 
 const teamAPI = (
   build: EndpointBuilder<
@@ -96,7 +96,7 @@ const teamAPI = (
     }),
     providesTags: ["Team"],
   }),
-  getTeamProjects: build.query<ApiResponse<Team>, { teamId: number }>({
+  getTeamProjects: build.query<ApiResponse<Project[]>, { teamId: number }>({
     query: ({ teamId }) => ({
       url: `team/${teamId}/projects`,
       headers: {
