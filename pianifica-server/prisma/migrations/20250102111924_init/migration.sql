@@ -166,12 +166,12 @@ CREATE TABLE "Tag" (
 );
 
 -- CreateTable
-CREATE TABLE "TagMapping" (
+CREATE TABLE "TagsOnTasks" (
     "tagId" INTEGER NOT NULL,
     "taskId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "TagMapping_pkey" PRIMARY KEY ("tagId","taskId")
+    CONSTRAINT "TagsOnTasks_pkey" PRIMARY KEY ("tagId","taskId")
 );
 
 -- CreateIndex
@@ -247,13 +247,7 @@ ALTER TABLE "Comment" ADD CONSTRAINT "Comment_userId_fkey" FOREIGN KEY ("userId"
 ALTER TABLE "Bookmark" ADD CONSTRAINT "Bookmark_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Bookmark" ADD CONSTRAINT "BookmarkTask_entityId_fkey" FOREIGN KEY ("entityId") REFERENCES "Task"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TagsOnTasks" ADD CONSTRAINT "TagsOnTasks_tagId_fkey" FOREIGN KEY ("tagId") REFERENCES "Tag"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Bookmark" ADD CONSTRAINT "BookmarkProject_entityId_fkey" FOREIGN KEY ("entityId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "TagMapping" ADD CONSTRAINT "TagMapping_tagId_fkey" FOREIGN KEY ("tagId") REFERENCES "Tag"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "TagMapping" ADD CONSTRAINT "TagMapping_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "Task"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TagsOnTasks" ADD CONSTRAINT "TagsOnTasks_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "Task"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

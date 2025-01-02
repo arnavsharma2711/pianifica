@@ -162,12 +162,12 @@ model Task {
   updatedAt   DateTime  @default(now())
   deletedAt   DateTime?
 
-  project     Project      @relation(fields: [projectId], references: [id])
-  author      User         @relation("TaskAuthor", fields: [authorId], references: [id])
-  assignee    User?        @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  project     Project       @relation(fields: [projectId], references: [id])
+  author      User          @relation("TaskAuthor", fields: [authorId], references: [id])
+  assignee    User?         @relation("TaskAssignee", fields: [assigneeId], references: [id])
   attachments Attachment[]
   comments    Comment[]
-  TagMapping  TagMapping[]
+  tags        TagsOnTasks[]
 }
 
 model Attachment {
@@ -209,20 +209,18 @@ model Bookmark {
 }
 
 model Tag {
-  id        Int      @id @default(autoincrement())
+  id        Int           @id @default(autoincrement())
   name      String
-  createdAt DateTime @default(now())
-
-  TagMapping TagMapping[]
+  createdAt DateTime      @default(now())
+  tasks     TagsOnTasks[]
 }
 
-model TagMapping {
+model TagsOnTasks {
+  tag       Tag      @relation(fields: [tagId], references: [id])
   tagId     Int
+  task      Task     @relation(fields: [taskId], references: [id])
   taskId    Int
   createdAt DateTime @default(now())
-
-  tag  Tag  @relation(fields: [tagId], references: [id])
-  task Task @relation(fields: [taskId], references: [id])
 
   @@id([tagId, taskId])
 }
