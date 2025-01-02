@@ -1,5 +1,5 @@
 import Modal from "@/components/Modal";
-import { useCreateTaskMutation, useUpdateTaskMutation, useGetCurrentUserQuery, useGetProjectsQuery, useGetUsersQuery } from "@/state/api";
+import { useCreateTaskMutation, useUpdateTaskMutation, useGetCurrentUserQuery, useGetProjectsQuery, useGetUsersQuery, useGetTagsQuery } from "@/state/api";
 import React, { useEffect, useState } from "react";
 import { formatISO } from "date-fns";
 import { Priority, Status } from "@/enum";
@@ -23,7 +23,7 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 	const [description, setDescription] = useState("");
 	const [status, setStatus] = useState<Status>(Status.TODO);
 	const [priority, setPriority] = useState<Priority>(Priority.BACKLOG);
-	const [tags, setTags] = useState("");
+	const [tags, setTags] = useState<string>("");
 	const [startDate, setStartDate] = useState("");
 	const [dueDate, setDueDate] = useState("");
 	const [authorId, setAuthorId] = useState(currentUser?.data?.id || 0);
@@ -48,6 +48,7 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 
 	const { data: projects } = useGetProjectsQuery({ limit: 100, page: 1 });
 	const { data: users } = useGetUsersQuery({ limit: 100, page: 1 });
+	const { data: tagsList } = useGetTagsQuery();
 
 
 	const projectOptions = projects?.data.map((project) => (
@@ -65,7 +66,7 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 			setDescription(task.description || "");
 			setStatus(task.status || Status.TODO);
 			setPriority(task.priority || Priority.BACKLOG);
-			setTags(task.tags || "");
+			setTags(task?.tags?.join(',') || "");
 			setStartDate(task.startDate || "");
 			setDueDate(task.dueDate || "");
 			setAuthorId(task?.assignee?.id || 0);
@@ -106,7 +107,7 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 				description,
 				status,
 				priority,
-				tags,
+				tags: tags.split(','),
 				startDate: formattedStartDate,
 				dueDate: formattedDueDate,
 				authorId: authorId,
@@ -120,7 +121,7 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 				description,
 				status,
 				priority,
-				tags,
+				tags: tags.split(','),
 				startDate: formattedStartDate,
 				dueDate: formattedDueDate,
 				authorId: authorId,
@@ -184,12 +185,12 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 						label="Priority"
 					/>
 				</div>
-				<InputField
-					label="Tags (comma separated)"
-					placeholder="Tags (comma separated)"
+				<Dropdown
+					options={tagsList?.data.map((tag) => ({ value: tag.name, label: tag.name })) || []}
 					value={tags}
-					onChange={(e) => setTags(e.target.value)}
-					type="text"
+					setValue={(value) => setTags(value)}
+					label="Tags"
+					multiSelect
 				/>
 				<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-2">
 					<InputField
@@ -224,7 +225,6 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 					disabled={!isFormValid() || (isCreateLoading || isEditLoading)}
 				>
 					{task ? isEditLoading ? "Editing..." : "Edit Task" : isCreateLoading ? "Creating..." : "Create Task"}
-					
 				</button>
 			</form>
 		</Modal>

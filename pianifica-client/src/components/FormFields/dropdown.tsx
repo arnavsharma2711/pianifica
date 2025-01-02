@@ -12,12 +12,14 @@ type DropdownProps = {
   value: string;
   setValue: (value: string) => void;
   label: string;
+  multiSelect?: boolean;
   disabled?: boolean;
 };
 
-const Dropdown = ({ options, value, setValue, label, disabled }: DropdownProps) => {
+const Dropdown = ({ options, value, setValue, label, multiSelect = false, disabled }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const selectedOption = options.find(option => option.value === value);
+  const selectedOptions = options.filter(option => value.split(',').includes(option.value));
   return (
     <div className="w-full">
       <p className="block text-sm font-medium">
@@ -35,12 +37,30 @@ const Dropdown = ({ options, value, setValue, label, disabled }: DropdownProps) 
             setIsOpen(!isOpen)
           }}
         >
-          <span className="flex items-center gap-3">
-            {selectedOption?.imgSrc && (
-              <img src={selectedOption.imgSrc} alt="" className="size-7 object-cover rounded-full" />
-            )}
-            <span className="block truncate">{selectedOption?.label}</span>
-          </span>
+          {
+            multiSelect && selectedOptions.length > 0 ? (
+              <span className="flex flex-wrap items-center gap-1">
+                {selectedOptions.map((option) => (
+                  <span key={option.value} className="flex items-center gap-1">
+                    {option.imgSrc && (
+                      <img src={option.imgSrc} alt="" className="size-5 object-cover rounded-full" />
+                    )}
+                    <span className="block truncate dark:bg-zinc-900 p-1 rounded">{option.label}</span>
+                  </span>
+                ))}
+              </span>
+            ) : null
+          }
+          {
+            !multiSelect && selectedOption ? (
+              <span className="flex items-center gap-3">
+                {selectedOption.imgSrc && (
+                  <img src={selectedOption.imgSrc} alt="" className="size-7 object-cover rounded-full" />
+                )}
+                <span className="block truncate">{selectedOption.label}</span>
+              </span>
+            ) : null
+          }
           <span className={`${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}>
 
             <ChevronDown />
@@ -54,18 +74,26 @@ const Dropdown = ({ options, value, setValue, label, disabled }: DropdownProps) 
             role="listbox"
             aria-labelledby="listbox-label"
           >
-            {options.map((option, index) => (
+            {options.filter(
+              (option) => !value.split(',').includes(option.value)
+            ).map((option, index) => (
               <li
                 key={option.value}
                 className="relative cursor-default py-2 pr-9 pl-3 text-gray-900 select-none"
                 id={`listbox-option-${index}`}
                 onClick={() => {
-                  setValue(option.value);
+                  if (multiSelect) {
+                    setValue(`${value},${option.value}`);
+                  }
+                  else setValue(option.value);
                   setIsOpen(false);
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
-                    setValue(option.value);
+                    if (multiSelect) {
+                      setValue(`${value},${option.value}`);
+                    }
+                    else setValue(option.value);
                     setIsOpen(false);
                   }
                 }}

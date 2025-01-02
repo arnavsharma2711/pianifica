@@ -52,7 +52,7 @@ export interface Task {
   description?: string;
   status?: Status;
   priority?: Priority;
-  tags?: string;
+  tags?: string[];
   startDate?: string;
   dueDate?: string;
   points?: number;

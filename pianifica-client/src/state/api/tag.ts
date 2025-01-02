@@ -26,6 +26,12 @@ const tagAPI = (
   getTags: build.query<ApiResponse<Tag[]>, void>({
     query: () => ({
       url: "tags",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: sessionStorage.getItem("accessToken")
+          ? `Bearer ${sessionStorage.getItem("accessToken")}`
+          : undefined,
+      },
       method: "GET",
     }),
     providesTags: ["Tags"],
@@ -33,6 +39,12 @@ const tagAPI = (
   createTag: build.mutation<ApiResponse<Tag>, { name: string }>({
     query: ({ name }) => ({
       url: "tag",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: sessionStorage.getItem("accessToken")
+          ? `Bearer ${sessionStorage.getItem("accessToken")}`
+          : undefined,
+      },
       method: "POST",
       body: { name },
     }),
@@ -41,6 +53,12 @@ const tagAPI = (
   createTags: build.mutation<ApiResponse<Tag>, { name: string }>({
     query: ({ name }) => ({
       url: "tags",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: sessionStorage.getItem("accessToken")
+          ? `Bearer ${sessionStorage.getItem("accessToken")}`
+          : undefined,
+      },
       method: "POST",
       body: { name },
     }),
@@ -49,6 +67,12 @@ const tagAPI = (
   updateTag: build.mutation<ApiResponse<Tag>, { id: number }>({
     query: ({ id }) => ({
       url: `tag/${id}`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: sessionStorage.getItem("accessToken")
+          ? `Bearer ${sessionStorage.getItem("accessToken")}`
+          : undefined,
+      },
       method: "PUT",
     }),
     invalidatesTags: ["Tags"],
@@ -56,6 +80,12 @@ const tagAPI = (
   deleteTag: build.mutation<ApiResponse<null>, { name: string }>({
     query: ({ name }) => ({
       url: `tag/${name}`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: sessionStorage.getItem("accessToken")
+          ? `Bearer ${sessionStorage.getItem("accessToken")}`
+          : undefined,
+      },
       method: "DELETE",
     }),
     invalidatesTags: ["Tags"],
