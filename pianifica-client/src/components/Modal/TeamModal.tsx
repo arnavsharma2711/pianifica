@@ -1,5 +1,5 @@
 import Modal from "@/components/Modal";
-import { useCreateTeamMutation, useEditTeamMutation, useGetCurrentUserQuery, useGetUsersQuery } from "@/state/api";
+import { useCreateTeamMutation, useUpdateTeamMutation, useGetCurrentUserQuery, useGetUsersQuery } from "@/state/api";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import Dropdown from "../FormFields/dropdown";
@@ -46,7 +46,7 @@ const TeamModal = ({ isOpen, onClose, team, action = 'add' }: Props) => {
   }
 
   const [createTeam, { isLoading: isCreateLoading }] = useCreateTeamMutation();
-  const [editTeam, { isLoading: isEditLoading }] = useEditTeamMutation();
+  const [editTeam, { isLoading: isEditLoading }] = useUpdateTeamMutation();
 
 
 

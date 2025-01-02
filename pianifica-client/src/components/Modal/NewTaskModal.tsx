@@ -1,5 +1,5 @@
 import Modal from "@/components/Modal";
-import { useCreateTaskMutation, useEditTaskMutation, useGetCurrentUserQuery, useGetProjectsQuery, useGetUsersQuery } from "@/state/api";
+import { useCreateTaskMutation, useUpdateTaskMutation, useGetCurrentUserQuery, useGetProjectsQuery, useGetUsersQuery } from "@/state/api";
 import React, { useEffect, useState } from "react";
 import { formatISO } from "date-fns";
 import { Priority, Status } from "@/enum";
@@ -18,7 +18,7 @@ const ModalNewTask = ({ isOpen, onClose, project = null, task }: Props) => {
 	const { data: currentUser } = useGetCurrentUserQuery();
 
 	const [createTask, { isLoading: isCreateLoading }] = useCreateTaskMutation();
-	const [editTask, { isLoading: isEditLoading }] = useEditTaskMutation();
+	const [editTask, { isLoading: isEditLoading }] = useUpdateTaskMutation();
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
 	const [status, setStatus] = useState<Status>(Status.TODO);
