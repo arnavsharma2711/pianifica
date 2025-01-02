@@ -224,3 +224,13 @@ model TagsOnTasks {
 
   @@id([tagId, taskId])
 }
+
+model Mailer {
+  id        Int      @id @default(autoincrement())
+  title     String
+  subject   String
+  content   String
+  variables Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}

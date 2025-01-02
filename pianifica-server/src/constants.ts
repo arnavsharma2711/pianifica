@@ -8,3 +8,6 @@ export const PORT = process.env.PORT || 8000;
 export const COOKIE_SETTINGS = { httpOnly: true, secure: true };
 export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || 'access_token_secret_key';
 export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'refresh_token_secret_key';
+export const MAILER_API = process.env.MAILER_API || 'http://localhost:8000';
+export const MAILER_API_KEY = process.env.MAILER_API_KEY || 'mailer_api_key';
+export const FE_URL = process.env.FE_URL || 'http://localhost:3000';

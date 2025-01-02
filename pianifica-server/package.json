@@ -24,6 +24,7 @@
   "dependencies": {
     "@netlify/functions": "^3.0.0",
     "@prisma/client": "^6.1.0",
+    "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
