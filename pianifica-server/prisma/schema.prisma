@@ -27,16 +27,17 @@ model User {
   updatedAt         DateTime  @default(now())
   deletedAt         DateTime?
 
-  authoredTasks Task[]       @relation("TaskAuthor")
-  assignedTasks Task[]       @relation("TaskAssignee")
+  authoredTasks Task[]         @relation("TaskAuthor")
+  assignedTasks Task[]         @relation("TaskAssignee")
   attachments   Attachment[]
   comments      Comment[]
   userRoles     UserRole[]
-  organization  Organization @relation(fields: [organizationId], references: [id])
-  teamManagers  Team[]       @relation("TeamManager")
-  teamLeads     Team[]       @relation("TeamLead")
+  organization  Organization   @relation(fields: [organizationId], references: [id])
+  teamManagers  Team[]         @relation("TeamManager")
+  teamLeads     Team[]         @relation("TeamLead")
   userTeam      UserTeam[]
   Bookmark      Bookmark[]
+  Notification  Notification[]
 
   @@index([organizationId])
   @@index([username])
@@ -233,4 +234,17 @@ model Mailer {
   variables Json
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+}
+
+model Notification {
+  id        Int       @id @default(autoincrement())
+  type      String
+  subType   String
+  content   Json?
+  userId    Int
+  seenAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }

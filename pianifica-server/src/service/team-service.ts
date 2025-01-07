@@ -20,6 +20,7 @@ import {
   deleteTeamMembers,
   getTeamMembers,
 } from "../model/user-team-model";
+import { createNewNotification } from "./notification-service";
 import { getExistingProject } from "./project-service";
 import { getExistingUser } from "./user-service";
 
@@ -82,7 +83,7 @@ export const createNewTeamProject = async ({
   const existingTeam = await getExistingTeam({
     id: teamId,
     organizationId: organizationId,
-    withTeamMembers: "none",
+    withTeamMembers: "mapping",
   });
   if (!existingTeam) {
     throw new CustomError(
@@ -113,6 +114,41 @@ export const createNewTeamProject = async ({
   }
 
   const teamProject = await createProjectTeam({ teamId, projectId });
+
+  if (existingTeam.leadId)
+    await createNewNotification({
+      type: "Team",
+      subType: "ProjectAssigned",
+      userId: existingTeam.leadId,
+      content: {
+        entityId: projectId,
+        entityType: "Project",
+      },
+    });
+
+  await createNewNotification({
+    type: "Project",
+    subType: "Assigned",
+    userId: existingTeam.managerId,
+    content: {
+      entityId: teamId,
+      entityType: "Team",
+    },
+  });
+
+  for (const user of existingTeam.userTeam) {
+    console.log("user", user);
+    await createNewNotification({
+      type: "Team",
+      subType: "ProjectAssigned",
+      userId: user.userId,
+      content: {
+        entityId: projectId,
+        entityType: "Project",
+      },
+    });
+  }
+
   return teamProject;
 };
 
@@ -421,6 +457,16 @@ export const addNewTeamMember = async ({
   }
 
   const userTeam = await createTeamMember({ teamId, userId });
+
+  await createNewNotification({
+    type: "Team",
+    subType: "Assigned",
+    userId,
+    content: {
+      entityId: teamId,
+      entityType: "Team",
+    },
+  });
 
   return userTeam;
 };

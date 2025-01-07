@@ -10,6 +10,7 @@ import {
   getUserOrganization,
   getUserTasks,
   updateUserPassword,
+  getUserNotifications,
 } from "./controllers/user/controller";
 import {
   addTeamMember,
@@ -78,6 +79,10 @@ import {
   previewMailer,
   updateMailer,
 } from "./controllers/mailer/controller";
+import {
+  markAllAsSeenNotification,
+  markAsSeenNotification,
+} from "./controllers/notification/controller";
 
 const router = Router();
 
@@ -224,6 +229,11 @@ router.get("/users", authenticationMiddleware, getUsers);
 router.get("/user", authenticationMiddleware, getCurrentUser);
 router.get("/user/organization", authenticationMiddleware, getUserOrganization);
 router.get("/user/tasks", authenticationMiddleware, getUserTasks);
+router.get(
+  "/user/notifications",
+  authenticationMiddleware,
+  getUserNotifications
+);
 router.get("/user/:username", authenticationMiddleware, getUser);
 router.post("/user/:id", authenticationMiddleware, updateUser);
 router.patch(
@@ -239,6 +249,18 @@ router.post("/tag", authenticationMiddleware, createTag);
 router.post("/tags", authenticationMiddleware, createTags);
 router.put("/tag/:id", authenticationMiddleware, updateTag);
 router.delete("/tag/:id", authenticationMiddleware, deleteTag);
+
+// Notification routes
+router.patch(
+  "/notifications",
+  authenticationMiddleware,
+  markAllAsSeenNotification
+);
+router.patch(
+  "/notification/:id",
+  authenticationMiddleware,
+  markAsSeenNotification
+);
 
 // Search routes
 router.use("/search", authenticationMiddleware, globalSearch);

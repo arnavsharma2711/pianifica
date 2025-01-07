@@ -19,6 +19,7 @@ import { getFilters } from "../../lib/filters";
 import { userTaskSchema } from "../task/schema";
 import { getExistingUserTasks } from "../../service/task-service";
 import { COOKIE_SETTINGS } from "../../constants";
+import { getExistingNotifications } from "../../service/notification-service";
 
 // GET api/users
 export const getUsers = controllerWrapper(async (req, res) => {
@@ -129,6 +130,34 @@ export const getUserTasks = controllerWrapper(async (req, res) => {
   res.success({
     message: "Tasks fetched successfully.",
     data: taskData,
+    total_count: totalCount,
+  });
+});
+
+// GET api/user/notification
+export const getUserNotifications = controllerWrapper(async (req, res) => {
+  if (req.user?.id === undefined) {
+    res.unauthorized({
+      message: "Unauthorized access",
+      error: "You are not authorized to fetch task.",
+    });
+    return;
+  }
+  const { limit, page, unSeenOnly } = req.query;
+
+  console.log(limit, page, unSeenOnly);
+  const { notifications, totalCount } = await getExistingNotifications({
+    userId: req.user?.id,
+    filters: {
+      limit: Number(limit) || 10,
+      page: Number(page) || 1,
+      unSeenOnly: unSeenOnly === "true",
+    },
+  });
+
+  res.success({
+    message: "Notification fetched successfully.",
+    data: notifications,
     total_count: totalCount,
   });
 });

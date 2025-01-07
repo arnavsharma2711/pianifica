@@ -17,6 +17,7 @@ import { getExistingUser } from "./user-service";
 import { getExistingProject } from "./project-service";
 import type { Filter } from "../lib/filters";
 import { createNewTags } from "./tag-service";
+import { createNewNotification } from "./notification-service";
 
 export const createNewTask = async ({
   title,
@@ -241,6 +242,27 @@ export const updateExistingTask = async ({
     points,
   });
 
+  await createNewNotification({
+    type: "Task",
+    subType: "Updated",
+    userId: updatedTask.authorId,
+    content: {
+      entityId: updatedTask.id,
+      entityType: "Task",
+    },
+  });
+
+  if (updatedTask.assigneeId)
+    await createNewNotification({
+      type: "Task",
+      subType: "Updated",
+      userId: updatedTask.assigneeId,
+      content: {
+        entityId: updatedTask.id,
+        entityType: "Task",
+      },
+    });
+
   return updatedTask;
 };
 
@@ -283,6 +305,28 @@ export const updateExistingTaskAssignedUser = async ({
   }
 
   const updatedTask = await updateTaskAssignee({ id, assigneeId });
+
+  await createNewNotification({
+    type: "Task",
+    subType: "Updated",
+    userId: updatedTask.authorId,
+    content: {
+      entityId: updatedTask.id,
+      entityType: "Task",
+    },
+  });
+
+  if (updatedTask.assigneeId)
+    await createNewNotification({
+      type: "Task",
+      subType: "Assigned",
+      userId: updatedTask.assigneeId,
+      content: {
+        entityId: updatedTask.id,
+        entityType: "Task",
+      },
+    });
+
   return updatedTask;
 };
 
@@ -313,6 +357,28 @@ export const updateExistingTaskStatus = async ({
   }
 
   const updatedTask = await updateTaskStatus({ id, status });
+
+  await createNewNotification({
+    type: "Task",
+    subType: "Updated",
+    userId: updatedTask.authorId,
+    content: {
+      entityId: updatedTask.id,
+      entityType: "Task",
+    },
+  });
+
+  if (updatedTask.assigneeId)
+    await createNewNotification({
+      type: "Task",
+      subType: "Updated",
+      userId: updatedTask.assigneeId,
+      content: {
+        entityId: updatedTask.id,
+        entityType: "Task",
+      },
+    });
+
   return updatedTask;
 };
 
@@ -343,6 +409,28 @@ export const updateExistingTaskPriority = async ({
   }
 
   const updatedTask = await updateTaskPriority({ id, priority });
+
+  await createNewNotification({
+    type: "Task",
+    subType: "Updated",
+    userId: updatedTask.authorId,
+    content: {
+      entityId: updatedTask.id,
+      entityType: "Task",
+    },
+  });
+
+  if (updatedTask.assigneeId)
+    await createNewNotification({
+      type: "Task",
+      subType: "Updated",
+      userId: updatedTask.assigneeId,
+      content: {
+        entityId: updatedTask.id,
+        entityType: "Task",
+      },
+    });
+
   return updatedTask;
 };
 

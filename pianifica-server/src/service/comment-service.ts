@@ -9,6 +9,7 @@ import {
   deleteComment,
 } from "../model/comment-model";
 import { getExistingTask } from "./task-service";
+import { createNewNotification } from "./notification-service";
 
 export const createNewComment = async ({
   taskId,
@@ -45,6 +46,28 @@ export const createNewComment = async ({
     text,
     userId: createdBy,
   });
+
+  await createNewNotification({
+    type: "Task",
+    subType: "Comment",
+    userId: existingTask.authorId,
+    content: {
+      entityId: taskId,
+      entityType: "Task",
+    },
+  });
+
+  if (existingTask.assigneeId)
+    await createNewNotification({
+      type: "Task",
+      subType: "Comment",
+      userId: existingTask.assigneeId,
+      content: {
+        entityId: taskId,
+        entityType: "Task",
+      },
+    });
+
   return comment;
 };
 
