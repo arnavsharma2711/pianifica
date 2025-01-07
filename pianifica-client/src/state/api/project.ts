@@ -19,6 +19,7 @@ const projectAPI = (
     | "Tasks"
     | "Task"
     | "UserTasks"
+    | "Notifications"
     | "Tags",
     "api"
   >,

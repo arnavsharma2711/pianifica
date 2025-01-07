@@ -19,6 +19,7 @@ const searchAPI = (
     | "Tasks"
     | "Task"
     | "UserTasks"
+    | "Notifications"
     | "Tags",
     "api"
   >,

@@ -86,3 +86,17 @@ export interface Tag {
   id: number;
   name: string;
 }
+
+export interface Notification {
+  id: number;
+  type: string;
+  subType: string;
+  content: {
+    entityType: string;
+    entityId: number;
+  };
+  userId: number;
+  seenAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

@@ -5,7 +5,7 @@ import type {
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query";
 import type { ApiResponse } from "../api";
-import type { Task, User } from "@/interface";
+import type { Notification, Task, User } from "@/interface";
 import type { Priority, Status } from "@/enum";
 
 const userAPI = (
@@ -20,6 +20,7 @@ const userAPI = (
     | "Tasks"
     | "Task"
     | "UserTasks"
+    | "Notifications"
     | "Tags",
     "api"
   >,
@@ -104,6 +105,26 @@ const userAPI = (
       };
     },
     providesTags: ["UserTasks"],
+  }),
+  getUserNotifications: build.query<
+    ApiResponse<Notification[]>,
+    { limit: number; page: number; unSeenOnly?: boolean }
+  >({
+    query: ({ unSeenOnly, limit, page }) => {
+      const params = new URLSearchParams();
+      if (unSeenOnly) params.append("unSeenOnly", "true");
+      if (page) params.append("page", page.toString());
+      if (limit) params.append("limit", limit.toString());
+
+      return {
+        url: `user/notifications?${params.toString()}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("accessToken") || undefined,
+        },
+      };
+    },
+    providesTags: ["Notifications"],
   }),
   getUser: build.query<ApiResponse<User>, { username: string }>({
     query: ({ username }) => ({

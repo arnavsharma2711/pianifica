@@ -13,6 +13,7 @@ import tagAPI from "./api/tag";
 import taskAPI from "./api/task";
 import teamAPI from "./api/team";
 import userAPI from "./api/user";
+import notificationAPI from "./api/notification";
 
 export type ApiResponse<T> = {
   success: boolean;
@@ -58,6 +59,7 @@ export const api = createApi({
     "Tasks",
     "Task",
     "UserTasks",
+    "Notifications",
     "Tags",
   ],
   endpoints: (build) => ({
@@ -68,6 +70,7 @@ export const api = createApi({
     ...userAPI(build),
     ...tagAPI(build),
     ...searchAPI(build),
+    ...notificationAPI(build),
   }),
 });
 
@@ -80,6 +83,7 @@ export const {
   useGetCurrentUserQuery,
   useGetUserOrganizationQuery,
   useGetUserTasksQuery,
+  useGetUserNotificationsQuery,
   useGetUserQuery,
   useUpdateUserMutation,
   useDeleteUserMutation,
@@ -124,6 +128,9 @@ export const {
   useCreateTagsMutation,
   useUpdateTagMutation,
   useDeleteTagMutation,
+  //Notification
+  useMarkAsSeenMutation,
+  useMarkAllAsSeenMutation,
   // Search
   useGlobalSearchQuery,
 } = api;

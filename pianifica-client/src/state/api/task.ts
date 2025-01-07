@@ -20,6 +20,7 @@ const taskAPI = (
     | "Tasks"
     | "Task"
     | "UserTasks"
+    | "Notifications"
     | "Tags",
     "api"
   >,

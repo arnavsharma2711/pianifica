@@ -3,17 +3,18 @@
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import type { Project, Team, User, Task } from "@/interface";
 import { setAccessToken, setIsDarkMode, setIsSidebarCollapsed } from "@/state";
-import { LogOutIcon, Menu, Moon, Search, Settings, Sun } from "lucide-react";
+import { Bell, LogOutIcon, Menu, Moon, Search, Settings, Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import DropdownMenu from "../DropdownMenu";
-import { api, useGetCurrentUserQuery, useGlobalSearchQuery } from "@/state/api";
+import { api, useGetCurrentUserQuery, useGetUserNotificationsQuery, useGlobalSearchQuery } from "@/state/api";
 import { useEffect, useState } from "react";
 import { debounce } from "lodash";
 import UserCard from "../Cards/UserCard";
 import TeamCard from "../Cards/TeamCard";
 import TaskCard from "../Cards/TaskCard";
 import ProjectCard from "../Cards/ProjectCard";
+import NotificationContainer from "../NotificationContainer";
 
 const Navbar = () => {
 	const dispatch = useAppDispatch();
@@ -22,7 +23,13 @@ const Navbar = () => {
 	);
 	const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
+	const [showNotification, setShowNotifications] = useState(false);
+
 	const { data: currentUser } = useGetCurrentUserQuery();
+	const { data: notifications } = useGetUserNotificationsQuery({
+		limit: 5,
+		page: 1
+	});
 
 	const SearchBar = () => {
 		const [searchTerm, setSearchTerm] = useState("");
@@ -126,6 +133,7 @@ const Navbar = () => {
 			dispatch(setAccessToken(null));
 			dispatch(api.util.invalidateTags(["Projects", "Tasks", "Task", "UserTasks", "Users", "Teams", "Team"]));
 		};
+
 		return (
 			<>
 				<DropdownMenu
@@ -199,6 +207,15 @@ const Navbar = () => {
 				>
 					<Settings className="h-6 w-6 cursor-pointer" />
 				</Link>
+				<button
+					type="button"
+					onClick={() => setShowNotifications(!showNotification)} className={`h-min w-min rounded-full p-2 ${isDarkMode ? "dark:hover:bg-zinc-800" : "hover:bg-gray-200"}`}>
+					<Bell className="h-6 w-6 cursor-pointer" />
+				</button>
+				{
+					showNotification &&
+					<NotificationContainer notifications={notifications?.data || []} />
+				}
 				<div className="ml-2 mr-5 hidden min-h-[2em] w-[0.1em] bg-gray-200 md:inline-block" />
 				{currentUser?.data && <UserButton user={currentUser.data} />}
 			</div>
