@@ -72,6 +72,12 @@ Visit `http://localhost:3000` to view the app in your browser.
 
 ----------
 
+## Screenshots
+- Dashboard
+  <img width="2048" alt="Dashboard" src="https://github.com/user-attachments/assets/2c5e786b-fe95-45e5-a998-c1e629b6b50e" />
+- Project Page
+  <img width="2048" alt="Project Page" src="https://github.com/user-attachments/assets/0e2107fb-8b01-407a-bc1d-aad63421a619" />
+
 ## Contributing
 
 We welcome contributions! Please read our [CONTRIBUTING](https://chatgpt.com/c/CONTRIBUTING.md) guidelines before submitting a pull request.
